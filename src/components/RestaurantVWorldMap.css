@@ -1,0 +1,12 @@
+.rvm-container {
+  height: calc(100vh - 70px);
+  display: flex;
+}
+
+.rvm-restaurant-list {
+  width: 450px;
+}
+
+.rvm-vworld-map {
+  width: calc(100vw - 450px);
+}

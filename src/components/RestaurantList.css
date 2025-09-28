@@ -1,0 +1,342 @@
+.restaurant-list-container {
+  width: 100%;
+  height: 100%;
+  color: var(--white);
+  background-color: var(--light-black);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+
+  .rl-header {
+    padding: 30px;
+    border-bottom: 1px solid var(--dark-gray);
+
+    .rl-distance {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+      margin-bottom: 20px;
+      gap: 10px;
+
+      .distance-number,
+      .distance-text {
+        display: block;
+        font-size: 20px;
+        font-weight: 600;
+      }
+
+      .distance-number {
+        position: relative;
+        transition: all 0.15s ease;
+
+        &.sliding-left {
+          animation: slideLeft 0.15s ease-out;
+        }
+
+        &.sliding-right {
+          animation: slideRight 0.15s ease-out;
+        }
+
+        &.shake {
+          animation: shake 0.4s ease-in-out;
+        }
+      }
+
+      .triangle-left,
+      .triangle-right {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: var(--white);
+        transition: all 0.15s ease;
+
+        &:hover {
+          color: var(--light-gray);
+          transform: scale(1.1);
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+
+        svg {
+          width: 14px;
+          height: 16px;
+        }
+      }
+    }
+
+    .rl-categories {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .rl-category {
+        padding: 5px 10px;
+        border-radius: 5px;
+        color: var(--white);
+        font-size: 14px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+
+        &.active {
+          background-color: var(--light-gray);
+
+          &:hover {
+            transform: scale(1.05);
+            background-color: var(--gray);
+          }
+        }
+
+        &.deactive {
+          background-color: var(--dark-gray);
+          color: var(--light-gray);
+
+          &:hover {
+            transform: scale(1.05);
+            background-color: var(--gray);
+          }
+        }
+      }
+
+      .refresh-btn {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+
+        img {
+          width: 24px;
+          height: 24px;
+        }
+
+        &:hover {
+          animation: spin 1s linear infinite;
+          transform: scale(1.05);
+        }
+      }
+    }
+  }
+
+  .rl-body {
+    overflow-y: auto;
+
+    .rl-restaurants {
+      display: flex;
+      flex-direction: column;
+
+      .rlr {
+        padding: 30px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: var(--dark-gray);
+        }
+
+        &+.rlr {
+          border-top: 1px solid var(--dark-gray);
+        }
+      }
+
+      .rlr-header {
+        display: flex;
+        margin-bottom: 10px;
+        align-items: baseline;
+        gap: 10px;
+
+
+
+        .rlr-index,
+        .rlr-name {
+          font-size: 18px;
+          font-weight: 700;
+        }
+
+        .rlr-category {
+          font-size: 13.5px;
+          color: var(--white);
+          margin-left: 5px;
+        }
+      }
+
+      .no-restaurant-wrap {
+        margin-top: 30px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+
+        img {
+          width: 50px;
+          height: 50px;
+        }
+
+        .no-restaurant-text {
+          font-size: 15px;
+          font-weight: 600;
+          color: var(--light-gray);
+        }
+      }
+
+      .rlr-body {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+
+        .rlr-images {
+          min-width: 390px;
+          display: flex;
+          gap: 10px;
+          overflow-x: auto;
+          margin-bottom: 20px;
+        }
+
+        .rlr-images img {
+          width: 100px;
+          height: 100px;
+          object-fit: cover;
+          flex-shrink: 0;
+        }
+
+        .rlr-row {
+          display: flex;
+          gap: 15px;
+          align-items: center;
+          margin-bottom: 10px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          img {
+            width: 16px;
+            height: 16px;
+            object-fit: cover;
+          }
+        }
+
+        .rlr-menus,
+        .rlr-bizHour,
+        .rlr-address,
+        .rlr-price {
+          font-size: 14px;
+          color: var(--white);
+
+          &.no-info {
+            color: var(--light-gray);
+          }
+        }
+      }
+    }
+  }
+
+  .rl-worldcup-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 50px;
+    background-color: var(--dark-gray);
+    border: none;
+    cursor: pointer;
+    border-radius: 10px;
+    padding: 10px;
+    font-size: 14px;
+    color: var(--white);
+    font-weight: 600;
+    z-index: 10;
+
+    &:hover {
+      transform: translateX(-50%) scale(1.05);
+      background-color: var(--gray);
+    }
+
+    &:active {
+      transform: translateX(-50%) scale(0.95);
+    }
+
+    &:disabled {
+      background-color: var(--dark-gray);
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+  }
+}
+
+@keyframes slideLeft {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  30% {
+    transform: translateX(-15px);
+    opacity: 0.2;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideRight {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  30% {
+    transform: translateX(15px);
+    opacity: 0.2;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-3px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}

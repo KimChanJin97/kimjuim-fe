@@ -1,0 +1,200 @@
+.restaurant-detail-container {
+  position: absolute;
+  width: 360px;
+  top: calc(70px + 30px);
+  left: calc(450px + 30px);
+  color: var(--white);
+  background-color: var(--light-black);
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 1;
+
+  .rd-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+
+    .rd-title {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+    }
+
+    .close-btn {
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--white);
+
+      &:before {
+        content: '';
+        left: -30px;
+        position: absolute;
+        width: 1px;
+        height: 20px;
+        background-color: var(--light-gray);
+        cursor: default;
+      }
+
+      &:hover {
+        color: var(--light-gray);
+      }
+    }
+
+    .close-icon {
+      transition: color 0.2s ease;
+      color: currentColor;
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  .rd-body {
+    border-top: 1px solid var(--light-gray);
+
+    .tabs {
+      padding: 0 30px;
+      margin-top: 10px;
+      border-bottom: 1px solid var(--light-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+
+      .tab {
+        flex: 1;
+        width: 140px;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        padding: 8px 10px;
+        border-radius: 5px 5px 0 0;
+        background-color: var(--dark-gray);
+        color: var(--light-gray);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+
+        &.active {
+          background-color: var(--light-gray);
+          color: var(--white);
+        }
+
+        &:hover {
+          background-color: var(--gray);
+        }
+      }
+    }
+
+    .rd-menus {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px 15px;
+      padding: 30px;
+      overflow-y: auto;
+      max-height: calc(100vh - 280px);
+
+      .rdm-row {
+        display: flex;
+        gap: 16px;
+        margin-top: 10px;
+
+        img {
+          width: 16px;
+          height: 16px;
+          object-fit: cover;
+        }
+      }
+
+      .rdm-image-wrap {
+        position: relative;
+        display: inline-block;
+
+        .rdm-badge {
+          position: absolute;
+          top: 5px;
+          right: 5px;
+          background-color: var(--black);
+          color: var(--white);
+          padding: 3px 4px;
+          border-radius: 4px;
+          font-size: 10px;
+          letter-spacing: 1.1px;
+        }
+
+        img {
+          width: 140px;
+          height: 140px;
+          object-fit: cover;
+          border-radius: 8px;
+        }
+      }
+
+      .rdm-name,
+      .rdm-price,
+      .rdm-description {
+        width: 110px;
+        word-break: break-all;
+        white-space: normal;
+        text-align: left;
+        color: var(--white);
+        font-size: 13px;
+        line-height: 1.4;
+      }
+    }
+
+    .rd-reviews {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+      padding: 30px;
+      overflow-y: auto;
+      max-height: calc(100vh - 280px);
+
+      .rdv {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        background-color: var(--dark-gray);
+        padding: 20px;
+        border-radius: 8px;
+
+        .rdv-row {
+          display: flex;
+          gap: 16px;
+          align-items: center;
+
+          img {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+          }
+        }
+
+        .rdv-profile-url,
+        .rdv-author-name,
+        .rdv-title,
+        .rdv-content {
+          font-size: 13px;
+          color: var(--white);
+        }
+
+        .rdv-created-at {
+          font-size: 12px;
+          color: var(--light-gray);
+        }
+      }
+    }
+  }
+}

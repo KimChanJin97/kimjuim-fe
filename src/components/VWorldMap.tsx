@@ -26,6 +26,7 @@ interface VWorldMapProps {
   y: number
   distance: number
   onClickRestaurantOverlay: (rid: string) => void
+  focusedRestaurantId?: string
 }
 
 enum MarkerState {
@@ -36,7 +37,7 @@ enum MarkerState {
 }
 
 const VWorldMap: React.FC<VWorldMapProps> = ({
-  restaurants, x, y, distance, onClickRestaurantOverlay
+  restaurants, x, y, distance, onClickRestaurantOverlay, focusedRestaurantId
 }) => {
 
   // 지도
@@ -345,6 +346,59 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       }
     })
   }
+
+  // 리스트에서 선택한 음식점 마커 포커싱
+  useEffect(() => {
+    if (!mapInstanceRef.current) return
+
+    const vectorSource = vectorSourceRef.current
+    const features = vectorSource.getFeatures()
+
+    // 포커싱 해제 (상세정보 닫을 경우)
+    if (!focusedRestaurantId) {
+      if (oldClickedMarkerFeature) {
+        oldClickedMarkerFeature.setStyle(new Style({ image: normal }))
+        oldClickedMarkerFeature.set('markerState', MarkerState.NORMAL)
+        setOldClickedMarkerFeature(null)
+      }
+      return
+    }
+
+    // 포커싱 
+    const targetFeature = features.find(f =>
+      f.get('restaurantId') === focusedRestaurantId
+    )
+
+    if (targetFeature) {
+      const geometry = targetFeature.getGeometry()
+      if (geometry instanceof Point) {
+        const coord = geometry.getCoordinates()
+        if (coord) {
+          mapInstanceRef.current.getView().animate({
+            center: coord,
+            zoom: 19,
+            duration: 500,
+          })
+
+          const newMarkerState = targetFeature.get('markerState')
+          if (newMarkerState !== MarkerState.CLICKED && newMarkerState !== MarkerState.CLICKED_HOVERED) {
+            if (oldClickedMarkerFeature && oldClickedMarkerFeature !== targetFeature) {
+              const oldClickedMarkerState = oldClickedMarkerFeature.get('markerState')
+              if (oldClickedMarkerState === MarkerState.CLICKED) {
+                oldClickedMarkerFeature.setStyle(new Style({ image: normal }))
+                oldClickedMarkerFeature.set('markerState', MarkerState.NORMAL)
+              }
+            }
+          }
+
+          targetFeature.setStyle(new Style({ image: clicked }))
+          targetFeature.set('markerState', MarkerState.CLICKED)
+          setOldClickedMarkerFeature(targetFeature)
+          onClickRestaurantOverlay(focusedRestaurantId)
+        }
+      }
+    }
+  }, [focusedRestaurantId])
 
   return (
     <div className="vworld-map-container">

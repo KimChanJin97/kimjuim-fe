@@ -10,7 +10,7 @@
 
   .rl-header {
     padding: 30px;
-    border-bottom: 1px solid var(--dark-gray);
+    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
 
     .rl-distance {
       display: flex;
@@ -120,8 +120,8 @@
         }
 
         &:hover {
-          animation: spin 1s linear infinite;
-          transform: scale(1.05);
+          transform: rotate(180deg);
+          transition: transform 0.2s ease-in-out;
         }
       }
     }
@@ -143,7 +143,17 @@
         }
 
         &+.rlr {
-          border-top: 1px solid var(--dark-gray);
+          position: relative;
+
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 30px;
+            right: 30px;
+            height: 1px;
+            background-color: var(--light-gray);
+          }
         }
       }
 
@@ -152,8 +162,6 @@
         margin-bottom: 10px;
         align-items: baseline;
         gap: 10px;
-
-
 
         .rlr-index,
         .rlr-name {
@@ -328,15 +336,5 @@
   60%,
   80% {
     transform: translateX(3px);
-  }
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
   }
 }

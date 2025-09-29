@@ -24,6 +24,7 @@ const RestaurantVWorldMap = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [restaurants, setRestaurants] = useState<Restaurant[]>([])
   const [clickedRestaurantId, setClickedRestaurantId] = useState<string>('')
+  const [focusedRestaurantId, setFocusedRestaurantId] = useState<string>('')
   // 디테일
   const [isRestaurantDetailOn, setIsRestaurantDetailOn] = useState<boolean>(false)
   const [restaurantDetail, setRestaurantDetail] = useState<RestaurantDetailResponse | null>(null)
@@ -129,6 +130,7 @@ const RestaurantVWorldMap = () => {
   // 음식점 선택
   const onClickRestaurantOverlay = (rid: string) => {
     setClickedRestaurantId(rid)
+    setFocusedRestaurantId(rid)
   }
 
   // 거리 업데이트
@@ -140,6 +142,7 @@ const RestaurantVWorldMap = () => {
   const onClickRestaurantDetail = async (rid: string) => {
     const response = await getRestaurantDetail(rid)
     setClickedRestaurantId(rid)
+    setFocusedRestaurantId(rid)
     setIsRestaurantDetailOn(true)
     setRestaurantDetail(response)
   }
@@ -147,9 +150,9 @@ const RestaurantVWorldMap = () => {
   const onClickCloseRestaurantDetail = () => {
     setClickedRestaurantId('')
     setIsRestaurantDetailOn(false)
+    setFocusedRestaurantId('')
     setRestaurantDetail(null)
   }
-
 
   return (
     <div className="rvm-container">
@@ -179,6 +182,7 @@ const RestaurantVWorldMap = () => {
           y={y}
           distance={distance}
           onClickRestaurantOverlay={onClickRestaurantOverlay}
+          focusedRestaurantId={focusedRestaurantId}
         />
       </div>
     </div>

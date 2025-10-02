@@ -2,7 +2,7 @@ import RestaurantList from './RestaurantList'
 import VWorldMap from './VWorldMap'
 import RestaurantDetail from './RestaurantDetail'
 import { useEffect, useState } from 'react'
-import { RestaurantNearbyResponse, RestaurantNearbyResponses, getRestaurantNearby, RestaurantDetailResponse, getRestaurantDetail } from '@/api/api'
+import { RestaurantNearbyResponse, getRestaurantNearby, RestaurantDetailResponse, getRestaurantDetail } from '@/api/api'
 import './RestaurantVWorldMap.css'
 
 export interface Category {
@@ -24,9 +24,7 @@ const RestaurantVWorldMap = () => {
   const [categories, setCategories] = useState<Category[]>([])
   const [restaurants, setRestaurants] = useState<Restaurant[]>([])
   const [clickedRestaurantId, setClickedRestaurantId] = useState<string>('')
-  const [focusedRestaurantId, setFocusedRestaurantId] = useState<string>('')
   // 디테일
-  const [isRestaurantDetailOn, setIsRestaurantDetailOn] = useState<boolean>(false)
   const [restaurantDetail, setRestaurantDetail] = useState<RestaurantDetailResponse | null>(null)
 
   // 위치 정보 가져오기
@@ -97,9 +95,8 @@ const RestaurantVWorldMap = () => {
     }
   }
 
-
   // 음식점 제거
-  const removeRestaurant = (restaurantId: number) => {
+  const onRemoveRestaurant = (restaurantId: number) => {
     // 음식점
     const restaurantArr = restaurants.map((r) => {
       if (r.id === restaurantId) {
@@ -122,15 +119,9 @@ const RestaurantVWorldMap = () => {
   }
 
   // 음식점 새로 고침
-  const onClickRefreshCategories = () => {
+  const onClickRefresh = () => {
     setCategories(categories.map((c) => ({ ...c, survived: true })))
     setRestaurants(restaurants.map((r) => ({ ...r, survived: true })))
-  }
-
-  // 음식점 선택
-  const onClickRestaurantOverlay = (rid: string) => {
-    setClickedRestaurantId(rid)
-    setFocusedRestaurantId(rid)
   }
 
   // 거리 업데이트
@@ -139,20 +130,27 @@ const RestaurantVWorldMap = () => {
     await loadRestaurants(x, y, newDistance)
   }
 
-  const onClickRestaurantDetail = async (rid: string) => {
-    const response = await getRestaurantDetail(rid)
-    setClickedRestaurantId(rid)
-    setFocusedRestaurantId(rid)
-    setIsRestaurantDetailOn(true)
-    setRestaurantDetail(response)
-  }
-
-  const onClickCloseRestaurantDetail = () => {
+  // 음식점 상세정보 닫기
+  const onCloseRestaurantDetail = () => {
     setClickedRestaurantId('')
-    setIsRestaurantDetailOn(false)
-    setFocusedRestaurantId('')
     setRestaurantDetail(null)
   }
+
+  // 음식점 선택 (리스트 또는 지도)
+  const onClickRestaurant = (rid: string) => {
+    setClickedRestaurantId(rid)
+  }
+
+  // 음식점 상세정보 가져오기
+  useEffect(() => {
+    const fetchRestaurantDetail = async () => {
+      if (clickedRestaurantId) {
+        const response = await getRestaurantDetail(clickedRestaurantId)
+        setRestaurantDetail(response)
+      }
+    }
+    fetchRestaurantDetail()
+  }, [clickedRestaurantId])
 
   return (
     <div className="rvm-container">
@@ -163,15 +161,16 @@ const RestaurantVWorldMap = () => {
           distance={distance}
           onClickCategory={onClickCategory}
           onClickDistance={onClickDistance}
-          onClickRestaurantDetail={onClickRestaurantDetail}
-          onClickRefreshCategories={onClickRefreshCategories}
+          onClickRefresh={onClickRefresh}
+          onRemoveRestaurant={onRemoveRestaurant}
+          onClickRestaurant={onClickRestaurant}
         />
       </div>
       <div className="rvm-restaurant-detail">
-        {isRestaurantDetailOn && restaurantDetail && (
+        {restaurantDetail && (
           <RestaurantDetail
             restaurantDetail={restaurantDetail}
-            onClickCloseRestaurantDetail={onClickCloseRestaurantDetail}
+            onCloseRestaurantDetail={onCloseRestaurantDetail}
           />
         )}
       </div>
@@ -181,8 +180,8 @@ const RestaurantVWorldMap = () => {
           x={x}
           y={y}
           distance={distance}
-          onClickRestaurantOverlay={onClickRestaurantOverlay}
-          focusedRestaurantId={focusedRestaurantId}
+          clickedRestaurantId={clickedRestaurantId}
+          onClickRestaurant={onClickRestaurant}
         />
       </div>
     </div>

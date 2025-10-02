@@ -2,7 +2,7 @@
   background-color: var(--black);
   padding: 0 30px;
   width: 100vw;
-  height: 70px;
+  height: 80px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -30,7 +30,7 @@
 .suggestion-header,
 .patchnote-header {
   width: auto;
-  height: 70px;
+  height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;

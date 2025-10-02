@@ -10,7 +10,7 @@
 
   .rl-header {
     padding: 30px;
-    box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid var(--gray);
 
     .rl-distance {
       display: flex;
@@ -135,7 +135,7 @@
       flex-direction: column;
 
       .rlr {
-        padding: 30px;
+        padding: 20px 30px;
         cursor: pointer;
 
         &:hover {
@@ -152,8 +152,38 @@
             left: 30px;
             right: 30px;
             height: 1px;
-            background-color: var(--light-gray);
+            background-color: var(--gray);
           }
+        }
+      }
+
+      .close-btn-wrap {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px 0;
+
+        .close-btn {
+          width: 22px;
+          height: 22px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          background: none;
+          border: none;
+          padding: 0;
+          color: var(--white);
+
+          &:hover {
+            color: var(--light-gray);
+          }
+        }
+
+        .close-icon {
+          transition: all 0.2s ease;
+          width: 22px;
+          height: 22px;
         }
       }
 
@@ -184,7 +214,7 @@
         justify-content: center;
         gap: 15px;
 
-        img {
+        .crying-face-icon {
           width: 50px;
           height: 50px;
         }
@@ -249,25 +279,34 @@
   }
 
   .rl-worldcup-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     position: absolute;
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    width: 200px;
-    height: 50px;
-    background-color: var(--dark-gray);
+    width: 240px;
+    height: 60px;
+    background-color: var(--black);
     border: none;
     cursor: pointer;
-    border-radius: 10px;
+    border-radius: 15px;
     padding: 10px;
-    font-size: 14px;
+    font-size: 18px;
     color: var(--white);
-    font-weight: 600;
+    font-weight: 700;
     z-index: 10;
+
+    .crying-face-icon {
+      width: 25px;
+      height: 25px;
+    }
+
 
     &:hover {
       transform: translateX(-50%) scale(1.05);
-      background-color: var(--gray);
     }
 
     &:active {
@@ -276,8 +315,8 @@
 
     &:disabled {
       background-color: var(--dark-gray);
+      color: var(--light-gray);
       cursor: not-allowed;
-      opacity: 0.6;
     }
   }
 }

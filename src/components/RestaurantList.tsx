@@ -9,6 +9,7 @@ import AddressIcon from '@/assets/address.png'
 import PriceIcon from '@/assets/price.png'
 import RefreshIcon from '@/assets/refresh-btn.png'
 import CryingFaceIcon from '@/assets/crying-face.png'
+import { CloseIcon } from '@/assets/CloseIcon'
 
 const NO_INFO = '정보없음'
 
@@ -18,12 +19,13 @@ interface RestaurantListProps {
   distance: number
   onClickCategory: (categoryName: string) => void
   onClickDistance: (newDistance: number) => void
-  onClickRestaurantDetail: (rid: string) => void
-  onClickRefreshCategories: () => void
+  onClickRestaurant: (rid: string) => void
+  onClickRefresh: () => void
+  onRemoveRestaurant: (restaurantId: number) => void
 }
 
 const RestaurantList: React.FC<RestaurantListProps> = ({
-  categories, restaurants, distance, onClickCategory, onClickDistance, onClickRestaurantDetail, onClickRefreshCategories
+  categories, restaurants, distance, onClickCategory, onClickDistance, onClickRestaurant, onClickRefresh, onRemoveRestaurant
 }) => {
   const [animationClass, setAnimationClass] = useState<string>('')
   const [displayDistance, setDisplayDistance] = useState(distance)
@@ -113,7 +115,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
             ))}
             <button
               className="refresh-btn"
-              onClick={onClickRefreshCategories}
+              onClick={onClickRefresh}
               onMouseMove={(e) => showTooltip(e, '카테고리 새로고침')}
               onMouseLeave={hideTooltip}
             >
@@ -142,10 +144,34 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                 <div
                   className="rlr"
                   key={restaurant.id}
-                  onClick={() => onClickRestaurantDetail(restaurant.rid)}
-                  onMouseMove={(e) => showTooltip(e, '상세정보 보기')}
+                  onClick={() => onClickRestaurant(restaurant.rid)}
+                  onMouseMove={(e) => {
+                    if (e.target instanceof Element && !e.target.closest('.close-btn')) {
+                      showTooltip(e, '상세정보 보기');
+                    }
+                  }}
                   onMouseLeave={hideTooltip}
                 >
+                  {/* 리스트 바디 - 음식점 닫기 */}
+                  <div
+                    className="close-btn-wrap"
+                    onMouseMove={(e) => showTooltip(e, '음식점 제거')}
+                    onMouseLeave={hideTooltip}
+                  >
+                    <button
+                      className="close-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveRestaurant(restaurant.id)
+                      }}
+                    >
+                      <CloseIcon
+                        className="close-icon"
+                        width={22}
+                        height={22}
+                      />
+                    </button>
+                  </div>
 
                   {/* 리스트 바디 - 음식점 헤더 */}
                   <div className="rlr-header">
@@ -202,15 +228,16 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
           </div>
         </div>
 
-
         {survivedRestaurants.length > 128 && (
           <button className="rl-worldcup-btn" disabled>
-            <span>음식점 128개 초과</span>
+            <span>음식점이 너무 많아요</span>
+            <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
           </button>
         )}
         {survivedRestaurants.length < 1 && (
           <button className="rl-worldcup-btn" disabled>
-            <span>음식점 1개 미만</span>
+            <span>음식점이 없어요</span>
+            <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
           </button>
         )}
         {survivedRestaurants.length >= 1 && survivedRestaurants.length <= 128 && (

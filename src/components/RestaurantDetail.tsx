@@ -7,6 +7,7 @@ import PriceIcon from '@/assets/price.png'
 import DescriptionIcon from '@/assets/description.png'
 import NoImageIcon from '@/assets/no-image.png'
 import { useTooltip } from '@/hooks/useTooltip'
+import CryingFaceIcon from '@/assets/crying-face.png'
 
 const NO_INFO = '정보없음'
 const tabs = [
@@ -22,12 +23,12 @@ const tabs = [
 
 interface RestaurantDetailProps {
   restaurantDetail: RestaurantDetailResponse
-  onClickCloseRestaurantDetail: () => void
+  onCloseRestaurantDetail: () => void
 }
 
 const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
   restaurantDetail,
-  onClickCloseRestaurantDetail,
+  onCloseRestaurantDetail,
 }) => {
   const [activeTab, setActiveTab] = useState(0)
   const { tooltip, showTooltip, hideTooltip } = useTooltip()
@@ -40,10 +41,6 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
     return info !== NO_INFO && info !== '' && info !== null && info !== undefined
   }
 
-  const onClickClose = () => {
-    onClickCloseRestaurantDetail()
-  }
-
   return (
     <>
       <div className="restaurant-detail-container">
@@ -52,11 +49,11 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
 
           <div className="rd-title">상세정보</div>
 
-          <button className="close-btn" onClick={() => onClickClose()}>
+          <button className="close-btn" onClick={() => onCloseRestaurantDetail()}>
             <CloseIcon
               className="close-icon"
-              width={16}
-              height={16}
+              width={22}
+              height={22}
             />
           </button>
         </div>
@@ -76,7 +73,7 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
           </div>
 
           {/* 메뉴 탭 */}
-          {activeTab === 0 && (
+          {activeTab === 0 && restaurantDetail.menus.length > 0 && (
             <div className="rd-menus scrollbar-custom">
               {restaurantDetail.menus.map((menu) => (
 
@@ -123,8 +120,15 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
             </div>
           )}
 
+          {activeTab === 0 && restaurantDetail.menus.length === 0 && (
+            <div className="no-item-wrap">
+              <div className="no-menu-text">메뉴가 없어요</div>
+              <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
+            </div>
+          )}
+
           {/* 리뷰 탭 */}
-          {activeTab === 1 && (
+          {activeTab === 1 && restaurantDetail.reviews.length > 0 && (
             <div className="rd-reviews scrollbar-custom">
               {restaurantDetail.reviews.map((review) => (
                 <a href={review.url}
@@ -151,21 +155,30 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
             </div>
           )}
 
+          {activeTab === 1 && restaurantDetail.reviews.length === 0 && (
+            <div className="no-item-wrap">
+              <div className="no-review-text">리뷰가 없어요</div>
+              <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
+            </div>
+          )}
+
         </div>
-      </div>
+      </div >
 
       {/* 툴팁 */}
-      {tooltip.visible && (
-        <div
-          className="tooltip show"
-          style={{
-            left: tooltip.x,
-            top: tooltip.y
-          }}
-        >
-          리뷰 새창으로 열기
-        </div>
-      )}
+      {
+        tooltip.visible && (
+          <div
+            className="tooltip show"
+            style={{
+              left: tooltip.x,
+              top: tooltip.y
+            }}
+          >
+            리뷰 새창으로 열기
+          </div>
+        )
+      }
     </>
   )
 }

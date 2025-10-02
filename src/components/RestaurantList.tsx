@@ -1,7 +1,7 @@
 import './RestaurantList.css'
 import { Category, Restaurant } from './RestaurantVWorldMap'
 import { TriangleLeftIcon, TriangleRightIcon } from '../assets/TrianlgeIcon'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import { useTooltip } from '../hooks/useTooltip'
 import MenuIcon from '@/assets/menu.png'
 import BizHourIcon from '@/assets/biz-hour.png'
@@ -17,6 +17,7 @@ interface RestaurantListProps {
   categories: Category[]
   restaurants: Restaurant[]
   distance: number
+  clickedRestaurantId: string
   onClickCategory: (categoryName: string) => void
   onClickDistance: (newDistance: number) => void
   onClickRestaurant: (rid: string) => void
@@ -25,16 +26,26 @@ interface RestaurantListProps {
 }
 
 const RestaurantList: React.FC<RestaurantListProps> = ({
-  categories, restaurants, distance, onClickCategory, onClickDistance, onClickRestaurant, onClickRefresh, onRemoveRestaurant
+  categories, restaurants, distance, clickedRestaurantId, onClickCategory, onClickDistance, onClickRestaurant, onClickRefresh, onRemoveRestaurant
 }) => {
   const [animationClass, setAnimationClass] = useState<string>('')
   const [displayDistance, setDisplayDistance] = useState(distance)
   const [pendingDistance, setPendingDistance] = useState<number | null>(null)
   const { tooltip, showTooltip, hideTooltip } = useTooltip()
+  const restaurantRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
   useEffect(() => {
     setDisplayDistance(distance)
   }, [distance])
+
+  useEffect(() => {
+    if (clickedRestaurantId) {
+      const restaurant = restaurantRefs.current.get(clickedRestaurantId)
+      if (restaurant) {
+        restaurant.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+  }, [clickedRestaurantId])
 
   const handleDistanceChange = (newDistance: number) => {
     const validDistances = [100, 200, 300, 400, 500]
@@ -142,15 +153,10 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
             {survivedRestaurants.length > 0 &&
               survivedRestaurants.map((restaurant, index) => (
                 <div
-                  className="rlr"
+                  className={`rlr ${clickedRestaurantId === restaurant.rid ? 'clicked' : ''}`}
+                  ref={(el) => { if (el) restaurantRefs.current.set(restaurant.rid, el) }}
                   key={restaurant.id}
                   onClick={() => onClickRestaurant(restaurant.rid)}
-                  onMouseMove={(e) => {
-                    if (e.target instanceof Element && !e.target.closest('.close-btn')) {
-                      showTooltip(e, '상세정보 보기');
-                    }
-                  }}
-                  onMouseLeave={hideTooltip}
                 >
                   {/* 리스트 바디 - 음식점 닫기 */}
                   <div
@@ -228,23 +234,40 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
           </div>
         </div>
 
-        {survivedRestaurants.length > 128 && (
-          <button className="rl-worldcup-btn" disabled>
-            <span>음식점이 너무 많아요</span>
-            <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
-          </button>
-        )}
-        {survivedRestaurants.length < 1 && (
-          <button className="rl-worldcup-btn" disabled>
-            <span>음식점이 없어요</span>
-            <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
-          </button>
-        )}
-        {survivedRestaurants.length >= 1 && survivedRestaurants.length <= 128 && (
-          <button className="rl-worldcup-btn">
-            <span>점심 월드컵 {survivedRestaurants.length}강 시작</span>
-          </button>
-        )}
+        <div className="btn-wrap">
+          {survivedRestaurants.length > 128 && (
+            <>
+              <button className="rl-worldcup btn disabled">
+                <span>음식점이 너무 많아요</span>
+                <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
+              </button>
+              <button className="share btn">
+                <span>공유하기</span>
+              </button>
+            </>
+          )}
+          {survivedRestaurants.length < 1 && (
+            <>
+              <button className="rl-worldcup btn disabled">
+                <span>음식점이 없어요</span>
+                <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
+              </button>
+              <button className="share btn">
+                <span>공유하기</span>
+              </button>
+            </>
+          )}
+          {survivedRestaurants.length >= 1 && survivedRestaurants.length <= 128 && (
+            <>
+              <button className="rl-worldcup btn">
+                <span>점심 월드컵 {survivedRestaurants.length}강 시작</span>
+              </button>
+              <button className="share btn">
+                <span>공유하기</span>
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* 툴팁 */}

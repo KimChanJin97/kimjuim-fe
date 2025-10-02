@@ -1,3 +1,13 @@
+.restaurant-detail-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 4999;
+  background: transparent;
+}
+
 .restaurant-detail-container {
   position: absolute;
   width: 360px;
@@ -9,7 +19,8 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  z-index: 1;
+  z-index: 5000;
+  animation: fromLeftToRight 0.2s ease;
 
   .rd-header {
     display: flex;
@@ -36,16 +47,6 @@
       border: none;
       padding: 0;
       color: var(--white);
-
-      &:before {
-        content: '';
-        left: -30px;
-        position: absolute;
-        width: 1px;
-        height: 20px;
-        background-color: var(--light-gray);
-        cursor: default;
-      }
 
       &:hover {
         color: var(--light-gray);
@@ -215,5 +216,17 @@
         }
       }
     }
+  }
+}
+
+@keyframes fromLeftToRight {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

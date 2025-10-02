@@ -159,6 +159,7 @@ const RestaurantVWorldMap = () => {
           categories={categories}
           restaurants={restaurants}
           distance={distance}
+          clickedRestaurantId={clickedRestaurantId}
           onClickCategory={onClickCategory}
           onClickDistance={onClickDistance}
           onClickRefresh={onClickRefresh}

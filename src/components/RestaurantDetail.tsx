@@ -43,6 +43,7 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
 
   return (
     <>
+      <div className="restaurant-detail-backdrop" onClick={() => onCloseRestaurantDetail()} />
       <div className="restaurant-detail-container">
 
         <div className="rd-header">

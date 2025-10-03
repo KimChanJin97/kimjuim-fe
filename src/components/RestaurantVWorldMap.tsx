@@ -20,6 +20,7 @@ const RestaurantVWorldMap = () => {
   const [x, setX] = useState<number>(0)
   const [y, setY] = useState<number>(0)
   const [distance, setDistance] = useState<number>(100)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   // 카테고리, 음식점
   const [categories, setCategories] = useState<Category[]>([])
   const [restaurants, setRestaurants] = useState<Restaurant[]>([])
@@ -44,6 +45,7 @@ const RestaurantVWorldMap = () => {
         await loadRestaurants(x, y, distance)
       } catch (error) {
         console.error('위치 정보를 가져올 수 없습니다:', error)
+        setIsLoading(false)
       }
     }
     getLocation()
@@ -51,6 +53,7 @@ const RestaurantVWorldMap = () => {
 
   // 음식점 정보 가져오기
   const loadRestaurants = async (x: number, y: number, d: number) => {
+    setIsLoading(true)
     try {
       const response = await getRestaurantNearby({ x, y, d })
       const restaurants = response.restaurantNearbyResponses
@@ -71,6 +74,8 @@ const RestaurantVWorldMap = () => {
 
     } catch (error) {
       console.error('음식점 정보를 가져올 수 없습니다:', error)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -120,12 +125,16 @@ const RestaurantVWorldMap = () => {
 
   // 음식점 새로 고침
   const onClickRefresh = () => {
+    setRestaurantDetail(null)
+    setClickedRestaurantId('')
     setCategories(categories.map((c) => ({ ...c, survived: true })))
     setRestaurants(restaurants.map((r) => ({ ...r, survived: true })))
   }
 
   // 거리 업데이트
   const onClickDistance = async (newDistance: number) => {
+    setRestaurantDetail(null)
+    setClickedRestaurantId('')
     setDistance(newDistance)
     await loadRestaurants(x, y, newDistance)
   }
@@ -159,6 +168,7 @@ const RestaurantVWorldMap = () => {
           categories={categories}
           restaurants={restaurants}
           distance={distance}
+          isLoading={isLoading}
           clickedRestaurantId={clickedRestaurantId}
           onClickCategory={onClickCategory}
           onClickDistance={onClickDistance}

@@ -2,7 +2,6 @@ import './RestaurantList.css'
 import { Category, Restaurant } from './RestaurantVWorldMap'
 import { TriangleLeftIcon, TriangleRightIcon } from '../assets/TrianlgeIcon'
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { useTooltip } from '../hooks/useTooltip'
 import MenuIcon from '@/assets/menu.png'
 import BizHourIcon from '@/assets/biz-hour.png'
 import AddressIcon from '@/assets/address.png'
@@ -10,6 +9,10 @@ import PriceIcon from '@/assets/price.png'
 import RefreshIcon from '@/assets/refresh-btn.png'
 import CryingFaceIcon from '@/assets/crying-face.png'
 import { CloseIcon } from '@/assets/CloseIcon'
+import ImageSkeleton from './ImageSkeleton'
+import Tooltip from './Tooltip'
+import { useTooltip } from '../hooks/useTooltip'
+
 
 const NO_INFO = '정보없음'
 
@@ -17,6 +20,7 @@ interface RestaurantListProps {
   categories: Category[]
   restaurants: Restaurant[]
   distance: number
+  isLoading: boolean
   clickedRestaurantId: string
   onClickCategory: (categoryName: string) => void
   onClickDistance: (newDistance: number) => void
@@ -25,14 +29,26 @@ interface RestaurantListProps {
   onRemoveRestaurant: (restaurantId: number) => void
 }
 
+// 이미지 스크롤 상수
+const IMAGE_WIDTH = 100
+const IMAGE_GAP = 10
+const ITEM_WIDTH = IMAGE_WIDTH + IMAGE_GAP // 110px
+const IMAGES_PER_VIEW = 4 // 한 번에 보이는 이미지 개수
+
 const RestaurantList: React.FC<RestaurantListProps> = ({
-  categories, restaurants, distance, clickedRestaurantId, onClickCategory, onClickDistance, onClickRestaurant, onClickRefresh, onRemoveRestaurant
+  categories, restaurants, distance, isLoading, clickedRestaurantId, onClickCategory, onClickDistance, onClickRestaurant, onClickRefresh, onRemoveRestaurant
 }) => {
   const [animationClass, setAnimationClass] = useState<string>('')
   const [displayDistance, setDisplayDistance] = useState(distance)
   const [pendingDistance, setPendingDistance] = useState<number | null>(null)
   const { tooltip, showTooltip, hideTooltip } = useTooltip()
   const restaurantRefs = useRef<Map<string, HTMLDivElement>>(new Map())
+  // 이미지 스크롤 인덱스
+  const [imageStartIndices, setImageStartIndices] = useState<Map<string, number>>(new Map())
+
+  const survivedRestaurants = useMemo(() => {
+    return restaurants.filter(restaurant => restaurant.survived)
+  }, [restaurants])
 
   useEffect(() => {
     setDisplayDistance(distance)
@@ -74,9 +90,73 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
     setAnimationClass('')
   }
 
-  const survivedRestaurants = useMemo(() => {
-    return restaurants.filter(restaurant => restaurant.survived)
-  }, [restaurants])
+  useEffect(() => {
+    if (clickedRestaurantId) {
+      const restaurant = restaurantRefs.current.get(clickedRestaurantId)
+      if (restaurant) {
+        restaurant.scrollIntoView({ behavior: 'smooth' })
+      }
+    }
+  }, [clickedRestaurantId])
+
+  // 레스토랑이 변경되면 이미지 인덱스 초기화
+  useEffect(() => {
+    const newMap = new Map<string, number>()
+    survivedRestaurants.forEach(restaurant => {
+      if (restaurant.images.length > 0) {
+        newMap.set(restaurant.rid, 0)
+      }
+    })
+    setImageStartIndices(newMap)
+  }, [survivedRestaurants])
+
+  // 이미지 스크롤 핸들러 (인덱스 기반)
+  const handleImageScroll = (rid: string, direction: 'left' | 'right') => {
+    const restaurant = survivedRestaurants.find(r => r.rid === rid)
+    if (!restaurant) return
+
+    const currentIndex = imageStartIndices.get(rid) || 0
+    const totalImages = restaurant.images.length
+
+    let nextIndex: number
+
+    if (direction === 'left') {
+      // 왼쪽: 4개 이전으로
+      nextIndex = Math.max(0, currentIndex - IMAGES_PER_VIEW)
+    } else {
+      // 오른쪽: 4개 다음으로
+      nextIndex = Math.min(
+        totalImages - IMAGES_PER_VIEW,
+        currentIndex + IMAGES_PER_VIEW
+      )
+    }
+
+    setImageStartIndices(prev => {
+      const newMap = new Map(prev)
+      newMap.set(rid, nextIndex)
+      return newMap
+    })
+  }
+
+  // 버튼 표시 여부 계산
+  const canScrollLeft = (rid: string): boolean => {
+    const currentIndex = imageStartIndices.get(rid) || 0
+    return currentIndex > 0
+  }
+
+  const canScrollRight = (rid: string, totalImages: number): boolean => {
+    const currentIndex = imageStartIndices.get(rid) || 0
+    return currentIndex + IMAGES_PER_VIEW < totalImages
+  }
+
+  // 이미지 컨테이너의 transform 값 계산
+  const getImageTransform = (rid: string): string => {
+    const currentIndex = imageStartIndices.get(rid) || 0
+    const translateX = -(currentIndex * ITEM_WIDTH)
+    return `translateX(${translateX}px)`
+  }
+
+
 
   const hasInfo = (info: string) => {
     return info !== NO_INFO && info !== '' && info !== null && info !== undefined
@@ -140,8 +220,8 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
         <div className="rl-body scrollbar-custom">
           <div className="rl-restaurants">
 
-            {/* 음식점이 없을 때 */}
-            {survivedRestaurants.length === 0 && (
+            {/* 로딩 끝난 후에도 음식점이 없을 때 */}
+            {!isLoading && survivedRestaurants.length === 0 && (
               <div className="no-restaurant-wrap">
                 <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
                 <div className="no-restaurant-text">죄송해요. 음식점이 없어요</div>
@@ -190,8 +270,54 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                   <ul className="rlr-body">
                     <li>
                       {restaurant.images.length > 0 && (
-                        <div className="rlr-images">
-                          {restaurant.images.map((image) => (<img src={image} alt={restaurant.name} key={image} />))}
+                        <div className="rlr-images-container">
+                          <div className="rlr-images-wrap">
+                            <div
+                              className="rlr-images"
+                              style={{
+                                transform: getImageTransform(restaurant.rid),
+                                transition: 'transform 0.3s ease-in-out'
+                              }}
+                            >
+                              {restaurant.images.map((image, idx) => (
+                                <div key={image} className="rlr-image-wrap">
+                                  <ImageSkeleton
+                                    src={image}
+                                    alt={`${restaurant.name}-${idx}`}
+                                    width={100}
+                                    height={100}
+                                    borderRadius="5px"
+                                  />
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* 왼쪽 화살표 버튼 */}
+                          {canScrollLeft(restaurant.rid) && (
+                            <button
+                              className="image-nav-btn left"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleImageScroll(restaurant.rid, 'left')
+                              }}
+                            >
+                              <TriangleLeftIcon />
+                            </button>
+                          )}
+
+                          {/* 오른쪽 화살표 버튼 */}
+                          {canScrollRight(restaurant.rid, restaurant.images.length) && (
+                            <button
+                              className="image-nav-btn right"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleImageScroll(restaurant.rid, 'right')
+                              }}
+                            >
+                              <TriangleRightIcon />
+                            </button>
+                          )}
                         </div>
                       )}
 
@@ -271,17 +397,12 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
       </div>
 
       {/* 툴팁 */}
-      {tooltip.visible && (
-        <div
-          className="tooltip show"
-          style={{
-            left: tooltip.x,
-            top: tooltip.y
-          }}
-        >
-          {tooltip.text}
-        </div>
-      )}
+      <Tooltip
+        visible={tooltip.visible}
+        x={tooltip.x}
+        y={tooltip.y}
+        text={tooltip.text}
+      />
     </>
   )
 }

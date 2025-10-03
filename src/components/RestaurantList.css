@@ -8,6 +8,7 @@
   overflow: hidden;
   position: relative;
   z-index: 5000;
+  border-right: 1px solid var(--gray);
 
   .rl-header {
     padding: 30px;
@@ -76,7 +77,7 @@
     .rl-categories {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 10px;
 
       .rl-category {
         padding: 5px 10px;
@@ -136,7 +137,7 @@
       flex-direction: column;
 
       .rlr {
-        padding: 20px 30px;
+        padding: 30px;
         cursor: pointer;
         transition: all 0.2s ease;
 
@@ -237,20 +238,67 @@
         flex-direction: column;
         gap: 10px;
 
-        .rlr-images {
-          min-width: 390px;
-          display: flex;
-          gap: 10px;
-          overflow-x: auto;
+        .rlr-images-container {
+          position: relative;
+          width: 100%;
           margin-bottom: 20px;
-        }
 
-        .rlr-images img {
-          width: 100px;
-          height: 100px;
-          object-fit: cover;
-          flex-shrink: 0;
-          border-radius: 5px;
+          .rlr-images-wrap {
+            width: 100%;
+            overflow: hidden;
+
+            .rlr-images {
+              display: flex;
+              gap: 10px;
+              /* transform과 transition은 인라인 스타일로 적용됨 */
+
+              .rlr-image-wrap {
+                width: 100px;
+                height: 100px;
+              }
+            }
+          }
+
+          .image-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 32px;
+            height: 32px;
+            background-color: var(--black);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--white);
+            transition: all 0.2s ease;
+
+            &:hover {
+              transform: translateY(-50%) scale(1.1);
+            }
+
+            svg {
+              width: 12px;
+              height: 14px;
+              position: relative;
+              top: 1px;
+            }
+
+            &.left {
+              left: 5px;
+
+              svg {
+                right: 2px;
+              }
+            }
+
+            &.right {
+              right: 5px;
+
+              svg {
+                left: 2px;
+              }
+            }
+          }
         }
 
         .rlr-row {
@@ -295,7 +343,7 @@
     width: 100%;
 
     .rl-worldcup {
-      width: 240px;
+      width: 260px;
       height: 60px;
       display: flex;
       align-items: center;
@@ -304,7 +352,7 @@
     }
 
     .share {
-      width: 130px;
+      width: 150px;
       height: 60px;
     }
 
@@ -317,7 +365,6 @@
       font-size: 18px;
       color: var(--white);
       font-weight: 700;
-      z-index: 10;
 
       &:hover {
         transform: scale(1.05);
@@ -333,8 +380,6 @@
         transform: none;
       }
     }
-
-
 
     .crying-face-icon {
       width: 25px;

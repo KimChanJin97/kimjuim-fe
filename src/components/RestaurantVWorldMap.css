@@ -4,9 +4,9 @@
 }
 
 .rvm-restaurant-list {
-  width: 450px;
+  width: 490px;
 }
 
 .rvm-vworld-map {
-  width: calc(100vw - 450px);
+  width: calc(100vw - 490px);
 }

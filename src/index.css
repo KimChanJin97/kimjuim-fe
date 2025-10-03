@@ -75,44 +75,6 @@ a:active {
   color: inherit;
 }
 
-/* 전역 툴팁 스타일 */
-.tooltip {
-  background-color: #000;
-  color: #fff;
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 12px;
-  white-space: nowrap;
-  pointer-events: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-  position: fixed;
-  z-index: 9000;
-}
-
-/* 툴팁 화살표 (선택사항) */
-.tooltip::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: -4px;
-  transform: translateY(-50%);
-  border: 4px solid transparent;
-  border-right-color: #000;
-  z-index: 9000;
-}
-
-/* 툴팁 애니메이션 */
-.tooltip {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0.2s ease;
-}
-
-.tooltip.show {
-  opacity: 1;
-  visibility: visible;
-}
-
 #root {
   height: 100vh;
   --vanilla: #E5E9D1;

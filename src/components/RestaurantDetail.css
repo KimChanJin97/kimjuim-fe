@@ -12,7 +12,7 @@
   position: absolute;
   width: 360px;
   top: calc(70px + 30px);
-  left: calc(450px + 30px);
+  left: calc(490px + 30px);
   color: var(--white);
   background-color: var(--light-black);
   border-radius: 5px;

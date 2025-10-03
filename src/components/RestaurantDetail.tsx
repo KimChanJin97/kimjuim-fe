@@ -6,8 +6,10 @@ import MenuIcon from '@/assets/menu.png'
 import PriceIcon from '@/assets/price.png'
 import DescriptionIcon from '@/assets/description.png'
 import NoImageIcon from '@/assets/no-image.png'
-import { useTooltip } from '@/hooks/useTooltip'
 import CryingFaceIcon from '@/assets/crying-face.png'
+import ImageSkeleton from './ImageSkeleton'
+import Tooltip from './Tooltip'
+import { useTooltip } from '../hooks/useTooltip'
 
 const NO_INFO = '정보없음'
 const tabs = [
@@ -43,7 +45,6 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
 
   return (
     <>
-      <div className="restaurant-detail-backdrop" onClick={() => onCloseRestaurantDetail()} />
       <div className="restaurant-detail-container">
 
         <div className="rd-header">
@@ -85,14 +86,26 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
                       {menu.isRecommended && (
                         <div className="rdm-badge">추천</div>
                       )}
-                      <img src={menu.menuImages[0].url || NoImageIcon} alt={menu.name} />
+                      <ImageSkeleton
+                        src={menu.menuImages[0].url || NoImageIcon}
+                        alt={menu.name}
+                        width={140}
+                        height={140}
+                        borderRadius="8px"
+                      />
                     </div>
                   ) : (
                     <div className="rdm-image-wrap">
                       {menu.isRecommended && (
                         <div className="rdm-badge">추천</div>
                       )}
-                      <img src={NoImageIcon} alt="이미지 없음" />
+                      <ImageSkeleton
+                        src={NoImageIcon}
+                        alt="이미지 없음"
+                        width={140}
+                        height={140}
+                        borderRadius="8px"
+                      />
                     </div>
                   )}
                   {/* 메뉴 이름 */}
@@ -167,19 +180,12 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
       </div >
 
       {/* 툴팁 */}
-      {
-        tooltip.visible && (
-          <div
-            className="tooltip show"
-            style={{
-              left: tooltip.x,
-              top: tooltip.y
-            }}
-          >
-            리뷰 새창으로 열기
-          </div>
-        )
-      }
+      <Tooltip
+        visible={tooltip.visible}
+        x={tooltip.x}
+        y={tooltip.y}
+        text={tooltip.text}
+      />
     </>
   )
 }

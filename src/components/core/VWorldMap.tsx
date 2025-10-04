@@ -190,7 +190,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     })
   }
 
-
+  // 음식점 레이어 클릭, 호버 핸들러
   useEffect(() => {
     if (!mapInstanceRef.current) return
 
@@ -241,7 +241,6 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         // 음식점 모달 처리
         const overlappedRids = features.map(f => f.get('rid'))
         const overlappedRestaurants = restaurants.filter(r => overlappedRids.includes(r.rid))
-
 
         // 모달창 위치 설정
         setOverlappedRestaurants(overlappedRestaurants)
@@ -319,7 +318,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     }
   }, [clickedRestaurantId, restaurants])
 
-  // 음식점 클릭시 줌인 처리
+  // 음식점 클릭시 줌인 처리 (리스트/지도)
   const zoomIn = (geometry: Geometry | undefined) => {
     if (!mapInstanceRef.current || !geometry) return
     if (geometry instanceof Point) {
@@ -328,7 +327,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         mapInstanceRef.current.getView().animate({
           center: coord,
           zoom: 19,
-          duration: 1000,
+          duration: 900,
         })
       }
     }
@@ -344,7 +343,10 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     // 상세정보 닫을 경우 클릭 해제 처리
     if (!clickedRestaurantId) {
       features.forEach(f => {
-        f.setStyle(new Style({ image: normalIcon }))
+        // 투명도, z-index 설정
+        const style = createMarkerStyle(normalIcon, 100)
+        style.getImage()?.setOpacity(1)
+        f.setStyle(style)
         f.set('markerState', MarkerState.NORMAL)
       })
       return
@@ -353,11 +355,13 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     // 포커싱
     const foundFeature = features.find(f => f.get('rid') === clickedRestaurantId)
     if (foundFeature) {
+      // 투명도, z-index 설정
+      const style = createMarkerStyle(clickedIcon, 100)
+      style.getImage()?.setOpacity(1)
+      foundFeature.setStyle(style)
+      foundFeature.set('markerState', MarkerState.CLICKED)
       // 뷰 중앙 이동
       zoomIn(foundFeature.getGeometry())
-      // 음식점 레이어 클릭 상태 변경
-      foundFeature.setStyle(new Style({ image: clickedIcon }))
-      foundFeature.set('markerState', MarkerState.CLICKED)
     }
   }, [clickedRestaurantId])
 

@@ -1,0 +1,21 @@
+.rvm-container {
+  display: flex;
+  width: 100vw;
+  height: calc(100vh - 80px);
+}
+
+.rvm-restaurant-list {
+  width: 490px;
+  height: calc(100vh - 80px);
+  flex-shrink: 0;
+}
+
+.rvm-vworld-map {
+  width: calc(100vw - 490px);
+  height: calc(100vh - 80px);
+}
+
+.rvm-tournament {
+  width: 100vw;
+  height: 100vh;
+}

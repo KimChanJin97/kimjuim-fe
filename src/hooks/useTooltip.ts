@@ -8,7 +8,7 @@ export const useTooltip = () => {
     text: '',
   })
 
-  const showTooltip = (e: MouseEvent, text: string) => {
+  const showTooltip = (e: MouseEvent | React.MouseEvent, text: string) => {
     setTooltip({
       visible: true,
       x: e.clientX + 10,

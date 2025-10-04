@@ -14,7 +14,7 @@ export const TriangleLeftIcon: React.FC<TriangleIconProps> = ({
   <svg
     width="14"
     height="16"
-    viewBox="0 0 14 16"
+    viewBox="2 0 14 16"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={className}
@@ -40,7 +40,7 @@ export const TriangleRightIcon: React.FC<TriangleIconProps> = ({
   <svg
     width="14"
     height="16"
-    viewBox="0 0 14 16"
+    viewBox="-2 0 14 16"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={className}

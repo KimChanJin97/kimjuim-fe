@@ -14,8 +14,8 @@ import { fromLonLat, toLonLat } from 'ol/proj'
 import { Restaurant } from './RestaurantVWorldMap'
 import markers from '@/assets/markers.png'
 import { MapBrowserEvent } from 'ol'
-import Tooltip from './Tooltip'
-import { useTooltip } from '../hooks/useTooltip'
+import Tooltip from '../common/Tooltip'
+import { useTooltip } from '../../hooks/useTooltip'
 import { Geometry } from 'ol/geom'
 
 const SMALL_MARKER_WIDTH = 50

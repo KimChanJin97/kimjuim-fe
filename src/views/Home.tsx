@@ -1,9 +1,9 @@
 import './Home.css'
-import RestaurantVWorldMap from '../components/RestaurantVWorldMap'
+import RestaurantVWorldMap from '../components/core/RestaurantVWorldMap'
 import { Route, Routes } from 'react-router-dom'
-import FAQ from '@/components/FAQ'
-import Patchnote from '@/components/Patchnote'
-import Suggestion from '@/components/Suggestion'
+import FAQ from '@/components/cs/FAQ'
+import Patchnote from '@/components/cs/Patchnote'
+import Suggestion from '@/components/cs/Suggestion'
 
 const Home = () => {
   return (

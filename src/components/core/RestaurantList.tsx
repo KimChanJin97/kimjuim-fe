@@ -1,6 +1,6 @@
 import './RestaurantList.css'
 import { Category, Restaurant } from './RestaurantVWorldMap'
-import { TriangleLeftIcon, TriangleRightIcon } from '../assets/TrianlgeIcon'
+import { TriangleLeftIcon, TriangleRightIcon } from '../../assets/TrianlgeIcon'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import MenuIcon from '@/assets/menu.png'
 import BizHourIcon from '@/assets/biz-hour.png'
@@ -9,10 +9,10 @@ import PriceIcon from '@/assets/price.png'
 import RefreshIcon from '@/assets/refresh-btn.png'
 import CryingFaceIcon from '@/assets/crying-face.png'
 import { CloseIcon } from '@/assets/CloseIcon'
-import ImageSkeleton from './ImageSkeleton'
-import Tooltip from './Tooltip'
-import { useTooltip } from '../hooks/useTooltip'
-
+import ImageSkeleton from '../common/ImageSkeleton'
+import Tooltip from '../common/Tooltip'
+import { useTooltip } from '../../hooks/useTooltip'
+import RestaurantImageSlider from '../common/RestaurantImageSlider'
 
 const NO_INFO = '정보없음'
 
@@ -27,6 +27,7 @@ interface RestaurantListProps {
   onClickRestaurant: (rid: string) => void
   onClickRefresh: () => void
   onRemoveRestaurant: (restaurantId: number) => void
+  onClickTournament: () => void
 }
 
 // 이미지 스크롤 상수
@@ -36,7 +37,17 @@ const ITEM_WIDTH = IMAGE_WIDTH + IMAGE_GAP // 110px
 const IMAGES_PER_VIEW = 4 // 한 번에 보이는 이미지 개수
 
 const RestaurantList: React.FC<RestaurantListProps> = ({
-  categories, restaurants, distance, isLoading, clickedRestaurantId, onClickCategory, onClickDistance, onClickRestaurant, onClickRefresh, onRemoveRestaurant
+  categories,
+  restaurants,
+  distance,
+  isLoading,
+  clickedRestaurantId,
+  onClickCategory,
+  onClickDistance,
+  onClickRestaurant,
+  onClickRefresh,
+  onRemoveRestaurant,
+  onClickTournament
 }) => {
   const [animationClass, setAnimationClass] = useState<string>('')
   const [displayDistance, setDisplayDistance] = useState(distance)
@@ -156,8 +167,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
     return `translateX(${translateX}px)`
   }
 
-
-
   const hasInfo = (info: string) => {
     return info !== NO_INFO && info !== '' && info !== null && info !== undefined
   }
@@ -239,87 +248,53 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                   onClick={() => onClickRestaurant(restaurant.rid)}
                 >
                   {/* 리스트 바디 - 음식점 닫기 */}
-                  <div
-                    className="close-btn-wrap"
-                    onMouseMove={(e) => showTooltip(e, '음식점 제거')}
-                    onMouseLeave={hideTooltip}
-                  >
-                    <button
-                      className="close-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onRemoveRestaurant(restaurant.id)
-                      }}
-                    >
-                      <CloseIcon
-                        className="close-icon"
-                        width={22}
-                        height={22}
-                      />
-                    </button>
-                  </div>
+
 
                   {/* 리스트 바디 - 음식점 헤더 */}
                   <div className="rlr-header">
-                    <div className="rlr-index">{index + 1}.</div>
-                    <div className="rlr-name">{restaurant.name}</div>
-                    <div className="rlr-category">{restaurant.category}</div>
+                    <div className="rlr-info">
+                      <div className="rlr-index">{index + 1}.</div>
+                      <div className="rlr-name">{restaurant.name}</div>
+                      <div className="rlr-category">{restaurant.category}</div>
+                    </div>
+
+                    <div
+                      className="rlr-close-btn-wrap"
+                      onMouseMove={(e) => showTooltip(e, '음식점 탈락')}
+                      onMouseLeave={hideTooltip}
+                    >
+                      <button
+                        className="rlr-close-btn"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onRemoveRestaurant(restaurant.id)
+                        }}
+                      >
+                        <CloseIcon
+                          className="close-icon"
+                          width={22}
+                          height={22}
+                        />
+                      </button>
+                    </div>
                   </div>
 
                   {/* 리스트 바디 - 음식점 바디 */}
                   <ul className="rlr-body">
                     <li>
-                      {restaurant.images.length > 0 && (
-                        <div className="rlr-images-container">
-                          <div className="rlr-images-wrap">
-                            <div
-                              className="rlr-images"
-                              style={{
-                                transform: getImageTransform(restaurant.rid),
-                                transition: 'transform 0.3s ease-in-out'
-                              }}
-                            >
-                              {restaurant.images.map((image, idx) => (
-                                <div key={image} className="rlr-image-wrap">
-                                  <ImageSkeleton
-                                    src={image}
-                                    alt={`${restaurant.name}-${idx}`}
-                                    width={100}
-                                    height={100}
-                                    borderRadius="5px"
-                                  />
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* 왼쪽 화살표 버튼 */}
-                          {canScrollLeft(restaurant.rid) && (
-                            <button
-                              className="image-nav-btn left"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleImageScroll(restaurant.rid, 'left')
-                              }}
-                            >
-                              <TriangleLeftIcon />
-                            </button>
-                          )}
-
-                          {/* 오른쪽 화살표 버튼 */}
-                          {canScrollRight(restaurant.rid, restaurant.images.length) && (
-                            <button
-                              className="image-nav-btn right"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                handleImageScroll(restaurant.rid, 'right')
-                              }}
-                            >
-                              <TriangleRightIcon />
-                            </button>
-                          )}
-                        </div>
-                      )}
+                      <div className="rlr-image-slider">
+                        {restaurant.images.length > 0 && (
+                          <RestaurantImageSlider
+                            images={restaurant.images}
+                            restaurantName={restaurant.name}
+                            mode="multiple"
+                            imageWidth={100}
+                            imageHeight={100}
+                            imagesPerView={4}
+                            borderRadius="5px"
+                          />
+                        )}
+                      </div>
 
                       {/* 메뉴 */}
                       {hasInfo(restaurant.menus) && (
@@ -372,10 +347,10 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
               </button>
             </>
           )}
-          {survivedRestaurants.length < 1 && (
+          {survivedRestaurants.length <= 1 && (
             <>
               <button className="rl-worldcup btn disabled">
-                <span>음식점이 없어요</span>
+                <span>점심 월드컵 불가</span>
                 <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
               </button>
               <button className="share btn">
@@ -383,9 +358,12 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
               </button>
             </>
           )}
-          {survivedRestaurants.length >= 1 && survivedRestaurants.length <= 128 && (
+          {survivedRestaurants.length > 1 && survivedRestaurants.length <= 128 && (
             <>
-              <button className="rl-worldcup btn">
+              <button
+                className="rl-worldcup btn"
+                onClick={onClickTournament}
+              >
                 <span>점심 월드컵 {survivedRestaurants.length}강 시작</span>
               </button>
               <button className="share btn">

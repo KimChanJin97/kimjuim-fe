@@ -4,6 +4,7 @@ import RestaurantDetail from './RestaurantDetail'
 import { useEffect, useState } from 'react'
 import { RestaurantNearbyResponse, getRestaurantNearby, RestaurantDetailResponse, getRestaurantDetail } from '@/api/api'
 import './RestaurantVWorldMap.css'
+import Tournament from './Tournament'
 
 export interface Category {
   name: string
@@ -27,6 +28,9 @@ const RestaurantVWorldMap = () => {
   const [clickedRestaurantId, setClickedRestaurantId] = useState<string>('')
   // 디테일
   const [restaurantDetail, setRestaurantDetail] = useState<RestaurantDetailResponse | null>(null)
+  // 토너먼트
+  const [isTournamentOpen, setIsTournamentOpen] = useState<boolean>(false)
+
 
   // 위치 정보 가져오기
   useEffect(() => {
@@ -150,6 +154,16 @@ const RestaurantVWorldMap = () => {
     setClickedRestaurantId(rid)
   }
 
+  // 토너먼트 열기
+  const onClickTournament = () => {
+    setIsTournamentOpen(true)
+  }
+
+  // 토너먼트 닫기
+  const onCloseTournament = () => {
+    setIsTournamentOpen(false)
+  }
+
   // 음식점 상세정보 가져오기
   useEffect(() => {
     const fetchRestaurantDetail = async () => {
@@ -175,6 +189,7 @@ const RestaurantVWorldMap = () => {
           onClickRefresh={onClickRefresh}
           onRemoveRestaurant={onRemoveRestaurant}
           onClickRestaurant={onClickRestaurant}
+          onClickTournament={onClickTournament}
         />
       </div>
       <div className="rvm-restaurant-detail">
@@ -194,6 +209,16 @@ const RestaurantVWorldMap = () => {
           clickedRestaurantId={clickedRestaurantId}
           onClickRestaurant={onClickRestaurant}
         />
+      </div>
+      <div className="rvm-tournament">
+        {isTournamentOpen && (
+          <Tournament
+            restaurants={restaurants}
+            onRemoveRestaurant={onRemoveRestaurant}
+            onCloseTournament={onCloseTournament}
+
+          />
+        )}
       </div>
     </div>
   )

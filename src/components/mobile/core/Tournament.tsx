@@ -2,7 +2,7 @@ import './Tournament.css'
 import { Restaurant } from './RestaurantVWorldMap'
 import { useState, useEffect } from 'react'
 import { CloseIcon } from '@/assets/CloseIcon'
-import { TriangleLeftIcon, TriangleRightIcon } from '../../assets/TrianlgeIcon'
+import { TriangleLeftIcon, TriangleRightIcon } from '../../../assets/TrianlgeIcon'
 import ImageSkeleton from '../common/ImageSkeleton'
 import NoImageIcon from '@/assets/no-image.png'
 import RestaurantImageSlider from '../common/RestaurantImageSlider'
@@ -39,6 +39,8 @@ const Tournament: React.FC<TournamentProps> = ({
     return power
   }
 
+
+
   // 토너먼트 초기화
   useEffect(() => {
     const survivedRestaurants = restaurants.filter(restaurant => restaurant.survived)
@@ -49,8 +51,14 @@ const Tournament: React.FC<TournamentProps> = ({
     setNextRoundWinners([])
   }, [])
 
+  useEffect(() => {
+    console.log('isClosing changed:', isClosing)
+  }, [isClosing])
+
   const closeTournament = (e: React.AnimationEvent) => {
-    if (e.target === e.currentTarget && e.animationName === 'slideDown' && isClosing) {
+    console.log('Animation name:', e.animationName, 'isClosing:', isClosing, 'target:', e.target, 'currentTarget:', e.currentTarget)
+    if (e.target === e.currentTarget && isClosing) {
+      console.log('Calling onCloseTournament')
       onCloseTournament()
     }
   }
@@ -126,7 +134,10 @@ const Tournament: React.FC<TournamentProps> = ({
       {!isFinished && currentMatch && currentMatch[0] && currentMatch[1] && (
         <>
           <div className="close-btn-wrap">
-            <div className="close-btn" onClick={() => setIsClosing(true)}>
+            <div className="close-btn" onClick={() => {
+              console.log('Close button clicked, setting isClosing to true')
+              setIsClosing(true)
+            }}>
               <CloseIcon
                 className="close-icon"
                 width={44}

@@ -62,11 +62,24 @@ export const getRestaurantNearby = async (params: {
   x: number
   y: number
   d: number
+  ex: string[]
 }): Promise<RestaurantNearbyResponses> => {
+  const queryParams: any = {
+    x: params.x,
+    y: params.y,
+    d: params.d,
+  }
+
+  // ex 배열이 있을 때만 추가
+  if (params.ex.length > 0) {
+    queryParams.ex = params.ex
+  }
+
   const response = await api.get<RestaurantNearbyResponses>('/restaurants/nearby', {
-    params: {
-      ...params,
-    },
+    params: queryParams,
+    paramsSerializer: {
+      indexes: null, // ?ex=rid1&ex=rid2 형태
+    }
   })
   return response.data
 }

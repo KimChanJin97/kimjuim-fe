@@ -9,7 +9,7 @@ import NoImageIcon from '@/assets/no-image.png'
 import CryingFaceIcon from '@/assets/crying-face.png'
 import ImageSkeleton from '../common/ImageSkeleton'
 import Tooltip from '../common/Tooltip'
-import { useTooltip } from '../../hooks/useTooltip'
+import { useTooltip } from '../../../hooks/useTooltip'
 
 const NO_INFO = '정보없음'
 const tabs = [

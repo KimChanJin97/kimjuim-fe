@@ -15,7 +15,7 @@ import { Restaurant } from './RestaurantVWorldMap'
 import markers from '@/assets/markers.png'
 import { MapBrowserEvent } from 'ol'
 import Tooltip from '../common/Tooltip'
-import { useTooltip } from '../../hooks/useTooltip'
+import { useTooltip } from '../../../hooks/useTooltip'
 import { Geometry } from 'ol/geom'
 
 const SMALL_MARKER_WIDTH = 50
@@ -136,18 +136,29 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     }
   }, [])
 
-  // 지도에 벡터 추가
+  // 사용자 위치, 반경에 따라 원 벡터 재설정
   useEffect(() => {
     if (!mapInstanceRef.current) return
 
     // 지도 중심
-    mapInstanceRef.current.getView().setCenter(fromLonLat([x, y]))
+    const view = mapInstanceRef.current.getView()
+    view.setCenter(fromLonLat([x, y]))
 
     // 반경 제거 및 초기화
     const circleSource = circleSourceRef.current
     circleSource.clear()
     const circleFeature = new Feature({ geometry: new Circle(fromLonLat([x, y]), distance) })
     circleSource.addFeature(circleFeature)
+
+    // 반경에 따라 줌 레벨 자동 조정
+    const circleGeometry = circleFeature.getGeometry()
+    if (circleGeometry) {
+      const extent = circleGeometry.getExtent()
+      view.fit(extent, {
+        padding: [50, 50, 50, 50],
+        duration: 1000,
+      })
+    }
   }, [x, y, distance])
 
   // 음식점 레이어 초기화

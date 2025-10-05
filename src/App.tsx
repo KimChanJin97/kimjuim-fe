@@ -1,12 +1,29 @@
-import Header from './views/Header'
-import Home from './views/Home'
+import PCHeader from './views/pc/Header'
+import PCHome from './views/pc/Home'
+import MobileHeader from './views/mobile/Header'
+import MobileHome from './views/mobile/Home'
 import './App.css'
+import { useLocation } from 'react-router-dom'
+import DeviceRedirect from './DeviceRedirect'
 
 const App = () => {
+  const location = useLocation()
+  const isMobilePath = location.pathname.startsWith('/m/') || location.pathname === '/m'
+
   return (
     <>
-      <Header />
-      <Home />
+      <DeviceRedirect />
+      {isMobilePath ? (
+        <div className="mobile">
+          <MobileHeader />
+          <MobileHome />
+        </div>
+      ) : (
+        <div className="pc">
+          <PCHeader />
+          <PCHome />
+        </div>
+      )}
     </>
   )
 }

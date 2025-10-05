@@ -1,6 +1,6 @@
 import './RestaurantImageSlider.css'
 import { useState } from 'react'
-import { TriangleLeftIcon, TriangleRightIcon } from '../../assets/TrianlgeIcon'
+import { TriangleLeftIcon, TriangleRightIcon } from '../../../assets/TrianlgeIcon'
 import ImageSkeleton from './ImageSkeleton'
 
 interface RestaurantImageSliderProps {

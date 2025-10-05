@@ -10,11 +10,11 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="logo-header" onClick={() => navigate('/restaurant-vworld-map')}>
+      <div className="logo-header" onClick={() => navigate('/')}>
         <span>김주임</span>
       </div>
       <div className="menu-header">
-        <div className={`map-header ${isActive('/restaurant-vworld-map') ? 'active' : ''}`} onClick={() => navigate('/restaurant-vworld-map')}>
+        <div className={`map-header ${isActive('/map') ? 'active' : ''}`} onClick={() => navigate('/map')}>
           <span>지도</span>
         </div>
         <div className={`faq-header ${isActive('/faq') ? 'active' : ''}`} onClick={() => navigate('/faq')}>

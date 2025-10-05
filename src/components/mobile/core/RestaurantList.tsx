@@ -1,6 +1,6 @@
 import './RestaurantList.css'
 import { Category, Restaurant } from './RestaurantVWorldMap'
-import { TriangleLeftIcon, TriangleRightIcon } from '../../assets/TrianlgeIcon'
+import { TriangleLeftIcon, TriangleRightIcon } from '../../../assets/TrianlgeIcon'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import MenuIcon from '@/assets/menu.png'
 import BizHourIcon from '@/assets/biz-hour.png'
@@ -11,7 +11,7 @@ import CryingFaceIcon from '@/assets/crying-face.png'
 import { CloseIcon } from '@/assets/CloseIcon'
 import ImageSkeleton from '../common/ImageSkeleton'
 import Tooltip from '../common/Tooltip'
-import { useTooltip } from '../../hooks/useTooltip'
+import { useTooltip } from '../../../hooks/useTooltip'
 import RestaurantImageSlider from '../common/RestaurantImageSlider'
 
 const NO_INFO = '정보없음'
@@ -28,6 +28,9 @@ interface RestaurantListProps {
   onClickRefresh: () => void
   onRemoveRestaurant: (restaurantId: number) => void
   onClickTournament: () => void
+  onClickShare: () => void
+  onToggleList: () => void
+  isListOpen: boolean
 }
 
 // 이미지 스크롤 상수
@@ -47,14 +50,16 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
   onClickRestaurant,
   onClickRefresh,
   onRemoveRestaurant,
-  onClickTournament
+  onClickTournament,
+  onClickShare,
+  onToggleList,
+  isListOpen
 }) => {
   const [animationClass, setAnimationClass] = useState<string>('')
   const [displayDistance, setDisplayDistance] = useState(distance)
   const [pendingDistance, setPendingDistance] = useState<number | null>(null)
   const { tooltip, showTooltip, hideTooltip } = useTooltip()
   const restaurantRefs = useRef<Map<string, HTMLDivElement>>(new Map())
-  // 이미지 스크롤 인덱스
   const [imageStartIndices, setImageStartIndices] = useState<Map<string, number>>(new Map())
 
   const survivedRestaurants = useMemo(() => {
@@ -173,7 +178,19 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
 
   return (
     <>
-      <div className="restaurant-list-container">
+      <div className={`restaurant-list-container ${isListOpen ? 'open' : 'closed'}`}>
+
+        <button
+          className="list-toggle-btn"
+          onClick={() => onToggleList()}
+          aria-label={isListOpen ? "리스트 닫기" : "리스트 열기"}
+        >
+          <span className={`toggle-arrow ${isListOpen ? 'open' : ''}`}>
+            &lt;
+          </span>
+        </button>
+
+
         <div className="rl-header">
 
           {/* 리스트 헤더 - 거리 */}
@@ -342,7 +359,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                 <span>음식점이 너무 많아요</span>
                 <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
               </button>
-              <button className="share btn">
+              <button className="share btn" onClick={onClickShare}>
                 <span>공유하기</span>
               </button>
             </>
@@ -353,8 +370,9 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                 <span>점심 월드컵 불가</span>
                 <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
               </button>
-              <button className="share btn">
-                <span>공유하기</span>
+              <button className="share btn disabled">
+                <span>공유 불가</span>
+                <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
               </button>
             </>
           )}
@@ -366,7 +384,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
               >
                 <span>점심 월드컵 {survivedRestaurants.length}강 시작</span>
               </button>
-              <button className="share btn">
+              <button className="share btn" onClick={onClickShare}>
                 <span>공유하기</span>
               </button>
             </>

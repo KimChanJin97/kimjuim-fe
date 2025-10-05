@@ -1,0 +1,84 @@
+/* multiple 모드 */
+.mobile {
+  .ris-multiple-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .ris-multiple-wrap {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .ris-multiple-images {
+    display: flex;
+    gap: 10px;
+  }
+
+  .ris-multiple-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
+  .ris-multiple-nav-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  .ris-multiple-nav-btn.left {
+    left: 5px;
+  }
+
+  .ris-multiple-nav-btn.right {
+    right: 5px;
+  }
+
+  /* single 모드 */
+  .ris-single-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .ris-single-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px;
+    height: 32px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    transition: all 0.2s ease;
+    z-index: 10;
+  }
+
+  .ris-single-nav-btn:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .ris-single-nav-btn.left {
+    left: 5px;
+  }
+
+  .ris-single-nav-btn.right {
+    right: 5px;
+  }
+}

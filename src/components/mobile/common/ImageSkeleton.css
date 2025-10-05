@@ -1,10 +1,10 @@
-.image-skeleton-wrapper {
+.mobile .image-skeleton-wrapper {
   position: relative;
   overflow: hidden;
   background-color: var(--dark-gray);
 }
 
-.skeleton-placeholder {
+.mobile .skeleton-placeholder {
   position: absolute;
   top: 0;
   left: 0;
@@ -18,18 +18,18 @@
   animation: skeleton-loading 1.5s ease-in-out infinite;
 }
 
-.skeleton-image {
+.mobile .skeleton-image {
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
   object-fit: cover;
   display: block;
 }
 
-.skeleton-image.loaded {
+.mobile .skeleton-image.loaded {
   opacity: 1;
 }
 
-.image-error {
+.mobile .image-error {
   display: flex;
   align-items: center;
   justify-content: center;

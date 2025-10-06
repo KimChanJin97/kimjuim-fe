@@ -17,6 +17,7 @@ import { MapBrowserEvent } from 'ol'
 import Tooltip from '../common/Tooltip'
 import { useTooltip } from '../../../hooks/useTooltip'
 import { Geometry } from 'ol/geom'
+import { useNavigate } from 'react-router-dom'
 
 const SMALL_MARKER_WIDTH = 50
 const SMALL_MARKER_HEIGHT = 50
@@ -49,6 +50,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   restaurants, x, y, distance, clickedRestaurantId, onClickRestaurant
 }) => {
 
+  const navigate = useNavigate()
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<OlMap | null>(null)
   const vectorSourceRef = useRef<VectorSource>(new VectorSource())
@@ -219,32 +221,8 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       return features
     }
 
-    // 음식점 레이어 호버 상태 복원 함수
-    const restoreHovered = (feature: Feature) => {
-      const markerState = feature.get('markerState')
-      if (markerState === MarkerState.NORMAL_HOVERED) {
-        feature.setStyle(new Style({ image: normalIcon }))
-        feature.set('markerState', MarkerState.NORMAL)
-      } else if (markerState === MarkerState.CLICKED_HOVERED) {
-        feature.setStyle(new Style({ image: clickedIcon }))
-        feature.set('markerState', MarkerState.CLICKED)
-      }
-    }
-
-    // 음식점 레이어 호버 상태 변경 함수
-    const setHovered = (feature: Feature) => {
-      const markerState = feature.get('markerState')
-      if (markerState === MarkerState.NORMAL) {
-        feature.setStyle(new Style({ image: normalHoveredIcon }))
-        feature.set('markerState', MarkerState.NORMAL_HOVERED)
-      } else if (markerState === MarkerState.CLICKED) {
-        feature.setStyle(new Style({ image: clickedHoveredIcon }))
-        feature.set('markerState', MarkerState.CLICKED_HOVERED)
-      }
-    }
-
     // 클릭 핸들러
-    const handleClick = (event: MapBrowserEvent<MouseEvent>) => {
+    const handleSingleClick = (event: MapBrowserEvent<MouseEvent>) => {
       const features: RestaurantFeature[] = getRestaurantFeatures(event.pixel)
 
       // 음식점 레이어가 여러 개 있을 경우
@@ -270,62 +248,10 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       }
     }
 
-    // 호버 핸들러
-    const handleHover = (event: MapBrowserEvent<MouseEvent>) => {
-      const newHoveredFeatures = getRestaurantFeatures(event.pixel)
-
-      // 음식점 레이어가 여러 개 있을 경우 호버링 처리
-      if (newHoveredFeatures.length > 1) {
-        // 툴팁 표시
-        showTooltip(event.originalEvent, `${newHoveredFeatures.length}개`)
-
-        // 과거 마우스 커서 아래에 있었던 음식점 레이어 호버링 복원
-        oldHoveredFeatures.forEach(ohf => {
-          if (!newHoveredFeatures.includes(ohf)) {
-            restoreHovered(ohf)
-          }
-        })
-
-        // 현재 마우스 커서 아래에 있는 음식점 레이어 호버링 처리
-        oldHoveredFeatures.clear()
-        newHoveredFeatures.forEach(nhf => {
-          setHovered(nhf)
-          oldHoveredFeatures.add(nhf)
-        })
-      }
-      // 음식점 레이어가 하나만 있을 경우 호버링 처리
-      else {
-        // 툴팁 숨기기
-        hideTooltip()
-        const newHoveredFeature = newHoveredFeatures[0]
-
-        // 과거 마우스 커서 아래에 있었던 음식점 레이어 호버링 복원
-        oldHoveredFeatures.forEach(ohf => {
-          if (ohf !== newHoveredFeature) {
-            restoreHovered(ohf)
-          }
-        })
-
-        // 현재 마우스 커서 아래에 있는 음식점 레이어 호버링 처리
-        if (newHoveredFeature) {
-          setHovered(newHoveredFeature)
-          oldHoveredFeatures.clear()
-          oldHoveredFeatures.add(newHoveredFeature)
-        } else {
-          oldHoveredFeatures.forEach(ohf => restoreHovered(ohf))
-          oldHoveredFeatures.clear()
-        }
-      }
-
-      map.getViewport().style.cursor = newHoveredFeatures.length > 0 ? 'pointer' : ''
-    }
-
-    map.on('click', handleClick)
-    map.on('pointermove', handleHover)
+    map.on('singleclick', handleSingleClick)
 
     return () => {
-      map.un('click', handleClick)
-      map.un('pointermove', handleHover)
+      map.un('singleclick', handleSingleClick)
     }
   }, [clickedRestaurantId, restaurants])
 
@@ -386,6 +312,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   return (
     <div className="vworld-map-container">
+
       <div ref={mapRef} className="rvm-vworld-map" />
 
       {/* 겹친 음식점 선택 레이어 */}

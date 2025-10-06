@@ -11,7 +11,6 @@ const Header = () => {
   return (
     <header className="header">
       <div className="logo-header" onClick={() => navigate('/')}>
-        <span>김주임</span>
       </div>
       <div className="menu-header">
         <div className={`map-header ${isActive('/map') ? 'active' : ''}`} onClick={() => navigate('/map')}>

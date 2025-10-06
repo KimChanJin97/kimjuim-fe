@@ -122,52 +122,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
     setImageStartIndices(newMap)
   }, [survivedRestaurants])
 
-  // 이미지 스크롤 핸들러 (인덱스 기반)
-  const handleImageScroll = (rid: string, direction: 'left' | 'right') => {
-    const restaurant = survivedRestaurants.find(r => r.rid === rid)
-    if (!restaurant) return
-
-    const currentIndex = imageStartIndices.get(rid) || 0
-    const totalImages = restaurant.images.length
-
-    let nextIndex: number
-
-    if (direction === 'left') {
-      // 왼쪽: 4개 이전으로
-      nextIndex = Math.max(0, currentIndex - IMAGES_PER_VIEW)
-    } else {
-      // 오른쪽: 4개 다음으로
-      nextIndex = Math.min(
-        totalImages - IMAGES_PER_VIEW,
-        currentIndex + IMAGES_PER_VIEW
-      )
-    }
-
-    setImageStartIndices(prev => {
-      const newMap = new Map(prev)
-      newMap.set(rid, nextIndex)
-      return newMap
-    })
-  }
-
-  // 버튼 표시 여부 계산
-  const canScrollLeft = (rid: string): boolean => {
-    const currentIndex = imageStartIndices.get(rid) || 0
-    return currentIndex > 0
-  }
-
-  const canScrollRight = (rid: string, totalImages: number): boolean => {
-    const currentIndex = imageStartIndices.get(rid) || 0
-    return currentIndex + IMAGES_PER_VIEW < totalImages
-  }
-
-  // 이미지 컨테이너의 transform 값 계산
-  const getImageTransform = (rid: string): string => {
-    const currentIndex = imageStartIndices.get(rid) || 0
-    const translateX = -(currentIndex * ITEM_WIDTH)
-    return `translateX(${translateX}px)`
-  }
-
   const hasInfo = (info: string) => {
     return info !== NO_INFO && info !== '' && info !== null && info !== undefined
   }

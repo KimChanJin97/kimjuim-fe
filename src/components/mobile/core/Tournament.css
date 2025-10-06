@@ -41,10 +41,6 @@
     transition: all 0.2s ease;
   }
 
-  .close-btn:hover {
-    color: var(--light-gray);
-  }
-
   .tournament-header {
     display: flex;
     flex-direction: column;
@@ -78,10 +74,6 @@
     gap: 20px;
   }
 
-  .tournament-card {
-    padding: 0 40px;
-  }
-
   .tc-content {
     display: flex;
     flex-direction: column;
@@ -94,15 +86,20 @@
   }
 
   .tc-content h1 {
-    font-size: 32px;
+    width: 120px;
+    height: 80px;
+    font-size: 22px;
     font-weight: 600;
     color: var(--white);
-    margin-bottom: 20px;
+    margin-bottom: 10px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .tc-vote-btn {
     width: 100%;
-    margin-bottom: 20px;
     background-color: var(--light-black);
     border: none;
     border-radius: 12px;
@@ -112,10 +109,6 @@
     font-weight: 700;
     cursor: pointer;
     transition: all 0.2s ease;
-  }
-
-  .tc-vote-btn:hover {
-    background-color: var(--dark-gray);
   }
 
   .tc-exit-btn {
@@ -132,12 +125,7 @@
     transition: all 0.2s ease;
   }
 
-  .tc-exit-btn:hover {
-    background-color: var(--dark-gray);
-  }
-
   .tournament-vs {
-    margin: 0 30px;
     font-size: 32px;
     font-weight: 600;
   }

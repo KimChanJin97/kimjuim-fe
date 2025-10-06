@@ -198,11 +198,15 @@ const RestaurantVWorldMap = () => {
   // 토너먼트 열기
   const onClickTournament = () => {
     setIsTournamentOpen(true)
+    setIsListOpen(false)
+    setIsDetailOpen(false)
   }
 
   // 토너먼트 닫기
   const onCloseTournament = () => {
     setIsTournamentOpen(false)
+    setIsListOpen(false)
+    setIsDetailOpen(false)
   }
 
   // 음식점 상세정보 가져오기
@@ -221,16 +225,57 @@ const RestaurantVWorldMap = () => {
     const jsonString = JSON.stringify(exceptedRestaurants)
     const compressed = LZString.compressToEncodedURIComponent(jsonString)
 
-    const url = `${window.location.origin}/map?ex=${compressed}`
-    navigator.clipboard.writeText(url)
+    // 현재 경로 기반으로 URL 생성
+    const isMobile = window.location.pathname.startsWith('/m')
+    const path = isMobile ? '/m/map' : '/map'
+    const url = `${window.location.origin}${path}?ex=${compressed}`
 
-    // 모달 표시
-    setIsShareModalOpen(true)
+    // clipboard API 지원 확인
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      // 최신 브라우저 (HTTPS 또는 localhost)
+      navigator.clipboard.writeText(url)
+        .then(() => {
+          setIsShareModalOpen(true)
+          setTimeout(() => {
+            setIsShareModalOpen(false)
+          }, 1500)
+        })
+        .catch(() => {
+          // 실패 시 구식 방법
+          legacyCopy(url)
+        })
+    } else {
+      // 구식 브라우저 또는 비보안 컨텍스트 (HTTP)
+      legacyCopy(url)
+    }
+  }
 
-    // 1.2초 후 자동으로 닫기
-    setTimeout(() => {
-      setIsShareModalOpen(false)
-    }, 1200)
+  const legacyCopy = (url: string) => {
+    try {
+      const textarea = document.createElement('textarea')
+      textarea.value = url
+      textarea.style.position = 'fixed'
+      textarea.style.opacity = '0'
+      textarea.style.left = '-9999px'
+      document.body.appendChild(textarea)
+      textarea.focus()
+      textarea.select()
+
+      const successful = document.execCommand('copy')
+      document.body.removeChild(textarea)
+
+      if (successful) {
+        setIsShareModalOpen(true)
+        setTimeout(() => {
+          setIsShareModalOpen(false)
+        }, 1500)
+      } else {
+        alert('링크 복사에 실패했습니다.')
+      }
+    } catch (err) {
+      console.error('복사 실패:', err)
+      alert('링크 복사에 실패했습니다.')
+    }
   }
 
   const onToggleList = () => {
@@ -264,7 +309,6 @@ const RestaurantVWorldMap = () => {
       <div className="rvm-restaurant-detail">
         <RestaurantDetail
           restaurantDetail={restaurantDetail}
-          onCloseRestaurantDetail={onCloseRestaurantDetail}
           onToggleDetail={onToggleDetail}
           isDetailOpen={isDetailOpen}
         />

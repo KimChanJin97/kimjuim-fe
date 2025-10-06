@@ -1,15 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './RestaurantDetail.css'
-import { RestaurantDetailResponse, MenuResponse, ReviewResponse } from '@/api/api'
-import { CloseIcon } from '@/assets/CloseIcon.tsx'
+import { RestaurantDetailResponse } from '@/api/api'
 import MenuIcon from '@/assets/menu.png'
 import PriceIcon from '@/assets/price.png'
 import DescriptionIcon from '@/assets/description.png'
 import NoImageIcon from '@/assets/no-image.png'
 import CryingFaceIcon from '@/assets/crying-face.png'
 import ImageSkeleton from '../common/ImageSkeleton'
-import Tooltip from '../common/Tooltip'
-import { useTooltip } from '../../../hooks/useTooltip'
+import ArrowLeftIcon from '@/assets/lt-arrow.png'
 
 const NO_INFO = '정보없음'
 const tabs = [
@@ -25,19 +23,18 @@ const tabs = [
 
 interface RestaurantDetailProps {
   restaurantDetail: RestaurantDetailResponse | null
-  onCloseRestaurantDetail: () => void
   onToggleDetail: () => void
   isDetailOpen: boolean
 }
 
 const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
   restaurantDetail,
-  onCloseRestaurantDetail,
   onToggleDetail,
   isDetailOpen
 }) => {
   const [activeTab, setActiveTab] = useState(0)
-  const { tooltip, showTooltip, hideTooltip } = useTooltip()
+  const [imageSize, setImageSize] = useState(140)
+  const rdBodyRef = useRef<HTMLDivElement>(null)
 
   const onClickTab = (index: number) => {
     setActiveTab(index)
@@ -46,6 +43,16 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
   const hasInfo = (info: string) => {
     return info !== NO_INFO && info !== '' && info !== null && info !== undefined
   }
+
+  useEffect(() => {
+    if (rdBodyRef.current && isDetailOpen) {
+      const bodyWidth = rdBodyRef.current.offsetWidth
+      // rd-menus의 패딩(좌우 60px), 컬럼 갭(15px)을 고려
+      const availableWidth = bodyWidth - 60 - 15
+      const size = Math.floor(availableWidth / 2)
+      setImageSize(size)
+    }
+  }, [isDetailOpen])
 
   return (
     <>
@@ -57,7 +64,7 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
           aria-label={isDetailOpen ? "상세정보 닫기" : "상세정보 열기"}
         >
           <span className={`toggle-arrow ${isDetailOpen ? 'open' : ''}`}>
-            &lt;
+            <img src={ArrowLeftIcon} alt="arrow-left" width={12} height={12} />
           </span>
         </button>
 
@@ -65,16 +72,9 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
 
           <div className="rd-title">상세정보</div>
 
-          <button className="close-btn" onClick={() => onCloseRestaurantDetail()}>
-            <CloseIcon
-              className="close-icon"
-              width={22}
-              height={22}
-            />
-          </button>
         </div>
 
-        <div className="rd-body">
+        <div className="rd-body" ref={rdBodyRef}>
 
           <div className="tabs">
             {tabs.map((tab) => (
@@ -103,8 +103,8 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
                       <ImageSkeleton
                         src={menu.menuImages[0].url || NoImageIcon}
                         alt={menu.name}
-                        width={140}
-                        height={140}
+                        width={imageSize}
+                        height={imageSize}
                         borderRadius="8px"
                       />
                     </div>
@@ -116,8 +116,8 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
                       <ImageSkeleton
                         src={NoImageIcon}
                         alt="이미지 없음"
-                        width={140}
-                        height={140}
+                        width={imageSize}
+                        height={imageSize}
                         borderRadius="8px"
                       />
                     </div>
@@ -148,12 +148,21 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
             </div>
           )}
 
+          {activeTab === 0 && !restaurantDetail && (
+            <div className="no-item-wrap">
+              <div className="no-menu-text">음식점을 선택해주세요</div>
+              <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
+            </div>
+          )}
+
           {activeTab === 0 && restaurantDetail && restaurantDetail.menus.length === 0 && (
             <div className="no-item-wrap">
               <div className="no-menu-text">메뉴가 없어요</div>
               <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
             </div>
           )}
+
+
 
           {/* 리뷰 탭 */}
           {activeTab === 1 && restaurantDetail && restaurantDetail.reviews.length > 0 && (
@@ -163,8 +172,6 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
                   target="_blank"
                   rel="noopener noreferrer"
                   key={review.id}
-                  onMouseMove={(e) => showTooltip(e, '리뷰 새창으로 열기')}
-                  onMouseLeave={hideTooltip}
                 >
                   <div className="rdv">
                     {/* 리뷰 프로필 이미지, 작성자 이름, 작성일 */}
@@ -183,6 +190,13 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
             </div>
           )}
 
+          {activeTab === 1 && !restaurantDetail && (
+            <div className="no-item-wrap">
+              <div className="no-menu-text">음식점을 선택해주세요</div>
+              <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
+            </div>
+          )}
+
           {activeTab === 1 && restaurantDetail && restaurantDetail.reviews.length === 0 && (
             <div className="no-item-wrap">
               <div className="no-review-text">리뷰가 없어요</div>
@@ -192,14 +206,6 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
 
         </div>
       </div >
-
-      {/* 툴팁 */}
-      <Tooltip
-        visible={tooltip.visible}
-        x={tooltip.x}
-        y={tooltip.y}
-        text={tooltip.text}
-      />
     </>
   )
 }

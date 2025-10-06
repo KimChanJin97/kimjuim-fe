@@ -10,9 +10,8 @@ import RefreshIcon from '@/assets/refresh-btn.png'
 import CryingFaceIcon from '@/assets/crying-face.png'
 import { CloseIcon } from '@/assets/CloseIcon'
 import ImageSkeleton from '../common/ImageSkeleton'
-import Tooltip from '../common/Tooltip'
-import { useTooltip } from '../../../hooks/useTooltip'
 import RestaurantImageSlider from '../common/RestaurantImageSlider'
+import ArrowLeftIcon from '@/assets/lt-arrow.png'
 
 const NO_INFO = '정보없음'
 
@@ -58,7 +57,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
   const [animationClass, setAnimationClass] = useState<string>('')
   const [displayDistance, setDisplayDistance] = useState(distance)
   const [pendingDistance, setPendingDistance] = useState<number | null>(null)
-  const { tooltip, showTooltip, hideTooltip } = useTooltip()
   const restaurantRefs = useRef<Map<string, HTMLDivElement>>(new Map())
   const [imageStartIndices, setImageStartIndices] = useState<Map<string, number>>(new Map())
 
@@ -126,52 +124,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
     setImageStartIndices(newMap)
   }, [survivedRestaurants])
 
-  // 이미지 스크롤 핸들러 (인덱스 기반)
-  const handleImageScroll = (rid: string, direction: 'left' | 'right') => {
-    const restaurant = survivedRestaurants.find(r => r.rid === rid)
-    if (!restaurant) return
-
-    const currentIndex = imageStartIndices.get(rid) || 0
-    const totalImages = restaurant.images.length
-
-    let nextIndex: number
-
-    if (direction === 'left') {
-      // 왼쪽: 4개 이전으로
-      nextIndex = Math.max(0, currentIndex - IMAGES_PER_VIEW)
-    } else {
-      // 오른쪽: 4개 다음으로
-      nextIndex = Math.min(
-        totalImages - IMAGES_PER_VIEW,
-        currentIndex + IMAGES_PER_VIEW
-      )
-    }
-
-    setImageStartIndices(prev => {
-      const newMap = new Map(prev)
-      newMap.set(rid, nextIndex)
-      return newMap
-    })
-  }
-
-  // 버튼 표시 여부 계산
-  const canScrollLeft = (rid: string): boolean => {
-    const currentIndex = imageStartIndices.get(rid) || 0
-    return currentIndex > 0
-  }
-
-  const canScrollRight = (rid: string, totalImages: number): boolean => {
-    const currentIndex = imageStartIndices.get(rid) || 0
-    return currentIndex + IMAGES_PER_VIEW < totalImages
-  }
-
-  // 이미지 컨테이너의 transform 값 계산
-  const getImageTransform = (rid: string): string => {
-    const currentIndex = imageStartIndices.get(rid) || 0
-    const translateX = -(currentIndex * ITEM_WIDTH)
-    return `translateX(${translateX}px)`
-  }
-
   const hasInfo = (info: string) => {
     return info !== NO_INFO && info !== '' && info !== null && info !== undefined
   }
@@ -186,7 +138,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
           aria-label={isListOpen ? "리스트 닫기" : "리스트 열기"}
         >
           <span className={`toggle-arrow ${isListOpen ? 'open' : ''}`}>
-            &lt;
+            <img src={ArrowLeftIcon} alt="arrow-left" width={12} height={12} />
           </span>
         </button>
 
@@ -214,7 +166,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
             >
               <TriangleRightIcon />
             </button>
-            <strong className="distance-text">이내 음식점 {survivedRestaurants.length} 곳이에요.</strong>
+            <strong className="distance-text">이내 {survivedRestaurants.length} 곳이에요</strong>
           </div>
 
           {/* 리스트 헤더 - 카테고리 */}
@@ -233,8 +185,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
             <button
               className="refresh-btn"
               onClick={onClickRefresh}
-              onMouseMove={(e) => showTooltip(e, '카테고리 새로고침')}
-              onMouseLeave={hideTooltip}
             >
               <img src={RefreshIcon} alt="refresh" />
             </button>
@@ -275,11 +225,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                       <div className="rlr-category">{restaurant.category}</div>
                     </div>
 
-                    <div
-                      className="rlr-close-btn-wrap"
-                      onMouseMove={(e) => showTooltip(e, '음식점 탈락')}
-                      onMouseLeave={hideTooltip}
-                    >
+                    <div className="rlr-close-btn-wrap">
                       <button
                         className="rlr-close-btn"
                         onClick={(e) => {
@@ -382,7 +328,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                 className="rl-worldcup btn"
                 onClick={onClickTournament}
               >
-                <span>점심 월드컵 {survivedRestaurants.length}강 시작</span>
+                <span>{survivedRestaurants.length}강 시작</span>
               </button>
               <button className="share btn" onClick={onClickShare}>
                 <span>공유하기</span>
@@ -391,14 +337,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
           )}
         </div>
       </div>
-
-      {/* 툴팁 */}
-      <Tooltip
-        visible={tooltip.visible}
-        x={tooltip.x}
-        y={tooltip.y}
-        text={tooltip.text}
-      />
     </>
   )
 }

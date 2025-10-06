@@ -1,8 +1,8 @@
 .mobile {
   .restaurant-list-container {
     position: fixed;
-    width: 80%;
-    height: calc(100vh - 80px);
+    width: 85%;
+    height: 100vh;
     color: var(--white);
     background-color: var(--light-black);
     display: flex;
@@ -40,7 +40,7 @@
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
     transition: all 0.2s ease;
   }
 
@@ -66,24 +66,30 @@
     border-bottom: 1px solid var(--gray);
   }
 
+  .distance-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
   .rl-distance {
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
-    margin-bottom: 20px;
-    gap: 10px;
+    gap: 5px;
   }
 
   .distance-number,
   .distance-text {
     display: block;
-    font-size: 20px;
+    font-size: 17px;
     font-weight: 600;
   }
 
   .distance-number {
     position: relative;
     transition: all 0.15s ease;
+    bottom: 2px;
   }
 
   .distance-number.sliding-left {
@@ -112,17 +118,6 @@
     transition: all 0.15s ease;
   }
 
-  .triangle-left:hover,
-  .triangle-right:hover {
-    color: var(--light-gray);
-    transform: scale(1.1);
-  }
-
-  .triangle-left:active,
-  .triangle-right:active {
-    transform: scale(0.95);
-  }
-
   .triangle-left svg,
   .triangle-right svg {
     width: 14px;
@@ -133,10 +128,11 @@
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    margin-top: 20px;
   }
 
   .rl-category {
-    padding: 5px 10px;
+    padding: 7px 7px;
     border-radius: 5px;
     color: var(--white);
     font-size: 14px;
@@ -149,19 +145,9 @@
     background-color: var(--light-gray);
   }
 
-  .rl-category.active:hover {
-    transform: scale(1.05);
-    background-color: var(--gray);
-  }
-
   .rl-category.deactive {
     background-color: var(--dark-gray);
     color: var(--light-gray);
-  }
-
-  .rl-category.deactive:hover {
-    transform: scale(1.05);
-    background-color: var(--gray);
   }
 
   .refresh-btn {
@@ -178,11 +164,6 @@
     height: 24px;
   }
 
-  .refresh-btn:hover {
-    transform: rotate(180deg);
-    transition: transform 0.2s ease-in-out;
-  }
-
   .rl-body {
     overflow-y: auto;
   }
@@ -190,16 +171,13 @@
   .rl-restaurants {
     display: flex;
     flex-direction: column;
+    padding-bottom: 170px;
   }
 
   .rlr {
     padding: 30px;
     cursor: pointer;
     transition: all 0.2s ease;
-  }
-
-  .rlr:hover {
-    background-color: var(--dark-gray);
   }
 
   .rlr.clicked {
@@ -239,10 +217,6 @@
     padding: 0;
     color: var(--white);
     transition: all 0.2s ease;
-  }
-
-  .rlr-close-btn-wrap .rlr-close-btn:hover {
-    color: var(--light-gray);
   }
 
   .rlr-header {
@@ -341,10 +315,10 @@
     bottom: 20px;
     width: 100%;
     z-index: 5001;
+    padding-bottom: 90px;
   }
 
   .rl-worldcup {
-    width: 260px;
     height: 60px;
     display: flex;
     align-items: center;
@@ -353,7 +327,6 @@
   }
 
   .share {
-    width: 150px;
     height: 60px;
     display: flex;
     align-items: center;
@@ -366,24 +339,16 @@
     border: none;
     cursor: pointer;
     border-radius: 12px;
-    padding: 10px;
+    padding: 20px 30px;
     font-size: 18px;
     color: var(--white);
     font-weight: 700;
-  }
-
-  .btn:hover {
-    transform: scale(1.05);
   }
 
   .disabled {
     background-color: var(--dark-gray);
     color: var(--light-gray);
     cursor: not-allowed;
-  }
-
-  .disabled:hover {
-    transform: none;
   }
 
   .btn-wrap .crying-face-icon {

@@ -39,8 +39,6 @@ const Tournament: React.FC<TournamentProps> = ({
     return power
   }
 
-
-
   // 토너먼트 초기화
   useEffect(() => {
     const survivedRestaurants = restaurants.filter(restaurant => restaurant.survived)
@@ -51,14 +49,8 @@ const Tournament: React.FC<TournamentProps> = ({
     setNextRoundWinners([])
   }, [])
 
-  useEffect(() => {
-    console.log('isClosing changed:', isClosing)
-  }, [isClosing])
-
   const closeTournament = (e: React.AnimationEvent) => {
-    console.log('Animation name:', e.animationName, 'isClosing:', isClosing, 'target:', e.target, 'currentTarget:', e.currentTarget)
     if (e.target === e.currentTarget && isClosing) {
-      console.log('Calling onCloseTournament')
       onCloseTournament()
     }
   }

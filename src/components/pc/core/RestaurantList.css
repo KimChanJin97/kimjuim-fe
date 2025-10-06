@@ -68,11 +68,6 @@
     transform: scale(1.1);
   }
 
-  .triangle-left:active,
-  .triangle-right:active {
-    transform: scale(0.95);
-  }
-
   .triangle-left svg,
   .triangle-right svg {
     width: 14px;

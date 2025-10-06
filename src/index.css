@@ -1,3 +1,12 @@
+#root {
+  --black: #121212;
+  --light-black: #242528;
+  --dark-gray: #333333;
+  --gray: #444444;
+  --light-gray: #555555;
+  --white: whitesmoke;
+}
+
 html,
 body {
   margin: 0;
@@ -73,17 +82,6 @@ a:visited {
 
 a:active {
   color: inherit;
-}
-
-#root {
-  height: 100vh;
-  --vanilla: #E5E9D1;
-  --black: #121212;
-  --light-black: #242528;
-  --dark-gray: #333333;
-  --gray: #444444;
-  --light-gray: #555555;
-  --white: whitesmoke;
 }
 
 /* 공통 스크롤 스타일 클래스 */

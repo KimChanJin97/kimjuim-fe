@@ -39,8 +39,6 @@ const Tournament: React.FC<TournamentProps> = ({
     return power
   }
 
-
-
   // 토너먼트 초기화
   useEffect(() => {
     const survivedRestaurants = restaurants.filter(restaurant => restaurant.survived)
@@ -51,14 +49,8 @@ const Tournament: React.FC<TournamentProps> = ({
     setNextRoundWinners([])
   }, [])
 
-  useEffect(() => {
-    console.log('isClosing changed:', isClosing)
-  }, [isClosing])
-
   const closeTournament = (e: React.AnimationEvent) => {
-    console.log('Animation name:', e.animationName, 'isClosing:', isClosing, 'target:', e.target, 'currentTarget:', e.currentTarget)
     if (e.target === e.currentTarget && isClosing) {
-      console.log('Calling onCloseTournament')
       onCloseTournament()
     }
   }
@@ -135,13 +127,12 @@ const Tournament: React.FC<TournamentProps> = ({
         <>
           <div className="close-btn-wrap">
             <div className="close-btn" onClick={() => {
-              console.log('Close button clicked, setting isClosing to true')
               setIsClosing(true)
             }}>
               <CloseIcon
                 className="close-icon"
-                width={44}
-                height={44}
+                width={32}
+                height={32}
               />
             </div>
           </div>
@@ -167,16 +158,16 @@ const Tournament: React.FC<TournamentProps> = ({
                       images={currentMatch[0].images}
                       restaurantName={currentMatch[0].name}
                       mode="single"
-                      imageWidth={300}
-                      imageHeight={300}
+                      imageWidth={120}
+                      imageHeight={120}
                       imagesPerView={1}
                     />
                   ) : (
                     <ImageSkeleton
                       src={NoImageIcon}
                       alt="이미지 없음"
-                      width={300}
-                      height={300} />
+                      width={120}
+                      height={120} />
                   )}
                 </div>
 
@@ -202,16 +193,16 @@ const Tournament: React.FC<TournamentProps> = ({
                       images={currentMatch[1].images}
                       restaurantName={currentMatch[1].name}
                       mode="single"
-                      imageWidth={300}
-                      imageHeight={300}
+                      imageWidth={120}
+                      imageHeight={120}
                       imagesPerView={1}
                     />
                   ) : (
                     <ImageSkeleton
                       src={NoImageIcon}
                       alt="이미지 없음"
-                      width={300}
-                      height={300}
+                      width={120}
+                      height={120}
                     />
                   )}
                 </div>
@@ -236,8 +227,8 @@ const Tournament: React.FC<TournamentProps> = ({
             <div className="close-btn" onClick={() => setIsClosing(true)}>
               <CloseIcon
                 className="close-icon"
-                width={44}
-                height={44}
+                width={32}
+                height={32}
               />
             </div>
           </div>
@@ -264,16 +255,16 @@ const Tournament: React.FC<TournamentProps> = ({
                     images={winner.images}
                     restaurantName={winner.name}
                     mode="single"
-                    imageWidth={300}
-                    imageHeight={300}
+                    imageWidth={120}
+                    imageHeight={120}
                     imagesPerView={1}
                   />
                 ) : (
                   <ImageSkeleton
                     src={NoImageIcon}
                     alt="이미지 없음"
-                    width={300}
-                    height={300} />
+                    width={120}
+                    height={120} />
                 )}
               </div>
             </div>

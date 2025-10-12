@@ -1,0 +1,135 @@
+.pc {
+  .intro-container {
+    width: 100vw;
+    height: calc(100vh - 70px);
+    overflow: auto;
+    background-color: var(--light-black);
+    color: var(--white);
+    box-sizing: border-box;
+  }
+
+  .intro-bg {
+    height: 520px;
+    background: linear-gradient(135deg, #242424 0%, #121212 50%, #000000 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .intro-header {
+
+    .ih-subtitle {
+      font-size: 22px;
+      margin-bottom: 40px;
+
+    }
+
+    .ih-dialog {
+      display: flex;
+      margin-bottom: 10px;
+      font-size: 22px;
+      gap: 40px;
+    }
+
+    .ih-left {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ih-right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ih-right {
+      color: var(--dark-white);
+    }
+
+    strong {
+      font-weight: 700;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .ih-content {
+      font-size: 20px;
+    }
+
+  }
+
+  .intro-body {
+    padding: 40px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+
+    .ib-first,
+    .ib-second,
+    .ib-third {
+      margin-top: 200px;
+      font-size: 20px;
+      position: relative;
+      max-width: 1000px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+
+      .ib-image {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+
+      .ib-text {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 40%;
+        padding: 24px;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(8px);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        justify-content: center;
+        border-radius: 8px 0 0 8px;
+      }
+
+      .ib-text-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+
+        .ib-text-header-image {
+          width: 30px;
+          height: 30px;
+          object-fit: contain;
+        }
+      }
+
+      .ib-text h3 {
+        margin-top: 5px;
+      }
+
+      .ib-text p {
+        margin-bottom: 100px;
+        line-height: 1.8;
+      }
+
+      .ib-text strong {
+        font-weight: 800;
+      }
+    }
+  }
+}

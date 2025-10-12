@@ -37,7 +37,7 @@
   .share-modal-content {
     background-color: var(--white);
     border-radius: 20px;
-    padding: 40px 60px;
+    padding: 30px 30px;
     text-align: center;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     animation: slideUp 0.3s ease-out;

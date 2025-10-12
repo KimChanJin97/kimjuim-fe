@@ -149,7 +149,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     // 반경 제거 및 초기화
     const circleSource = circleSourceRef.current
     circleSource.clear()
-    const circleFeature = new Feature({ geometry: new Circle(fromLonLat([x, y]), distance) })
+    const circleFeature = new Feature({ geometry: new Circle(fromLonLat([x, y]), distance + 50) })
     circleSource.addFeature(circleFeature)
 
     // 반경에 따라 줌 레벨 자동 조정

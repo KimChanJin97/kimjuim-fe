@@ -8,21 +8,26 @@ const Header = () => {
 
   const isActive = (path: string) => location.pathname === path
 
+  // 강력 새로고침 함수
+  const handleLogoClick = () => {
+    window.location.href = '/'
+  }
+
   return (
     <header className="header">
-      <div className="logo-header" onClick={() => navigate('/')}>
+      <div className="logo-header" onClick={handleLogoClick}>
       </div>
       <div className="menu-header">
-        <div className={`map-header ${isActive('/map') ? 'active' : ''}`} onClick={() => navigate('/map')}>
+        <div className={`map-header-tab ${isActive('/map') ? 'active' : ''}`} onClick={() => navigate('/map')}>
           <span>지도</span>
         </div>
-        <div className={`faq-header ${isActive('/faq') ? 'active' : ''}`} onClick={() => navigate('/faq')}>
-          <span>FAQ</span>
+        <div className={`introduction-header-tab ${isActive('/introduction') ? 'active' : ''}`} onClick={() => navigate('/introduction')}>
+          <span>소개</span>
         </div>
-        <div className={`suggestion-header ${isActive('/suggestion') ? 'active' : ''}`} onClick={() => navigate('/suggestion')}>
-          <span>건의사항</span>
+        <div className={`question-header-tab ${isActive('/question') ? 'active' : ''}`} onClick={() => navigate('/question')}>
+          <span>문의하기</span>
         </div>
-        <div className={`patchnote-header ${isActive('/patchnote') ? 'active' : ''}`} onClick={() => navigate('/patchnote')}>
+        <div className={`patchnote-header-tab ${isActive('/patchnote') ? 'active' : ''}`} onClick={() => navigate('/patchnote')}>
           <span>패치노트</span>
         </div>
       </div>

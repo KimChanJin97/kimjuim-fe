@@ -1,9 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
 #root {
   --black: #121212;
   --light-black: #242528;
   --dark-gray: #333333;
   --gray: #444444;
   --light-gray: #555555;
+  --dark-white: #b7bec2;
   --white: whitesmoke;
 }
 
@@ -82,6 +85,35 @@ a:visited {
 
 a:active {
   color: inherit;
+}
+
+/* 입력 요소 태그 */
+input,
+select,
+textarea {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  box-sizing: border-box;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* select의 기본 화살표 제거 */
+select::-ms-expand {
+  display: none;
 }
 
 /* 공통 스크롤 스타일 클래스 */

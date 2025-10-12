@@ -9,9 +9,14 @@ const Header = () => {
 
   const isActive = (path: string) => location.pathname === path
 
+  // 강력 새로고침 함수
+  const handleLogoClick = () => {
+    window.location.href = '/'
+  }
+
   return (
     <header className="header">
-      <div className="logo-header" onClick={() => navigate('/')}>
+      <div className="logo-header" onClick={handleLogoClick}>
         <img src={logo} alt="로고" />
       </div>
     </header>

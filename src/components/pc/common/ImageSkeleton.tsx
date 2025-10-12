@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './ImageSkeleton.css'
 
 interface ImageSkeletonProps {
-  src: string
+  src?: string
   alt: string
   width?: number | string
   height?: number | string
@@ -44,8 +44,8 @@ const ImageSkeleton: React.FC<ImageSkeletonProps> = ({
         <div className="skeleton-placeholder" />
       )}
 
-      {/* 실제 이미지 */}
-      {!hasError && (
+      {/* 실제 이미지 - src가 있을 때만 렌더링 */}
+      {src && !hasError && (
         <img
           src={src}
           alt={alt}

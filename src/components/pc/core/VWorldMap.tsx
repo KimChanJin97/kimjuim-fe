@@ -147,7 +147,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     // 반경 제거 및 초기화
     const circleSource = circleSourceRef.current
     circleSource.clear()
-    const circleFeature = new Feature({ geometry: new Circle(fromLonLat([x, y]), distance) })
+    const circleFeature = new Feature({ geometry: new Circle(fromLonLat([x, y]), distance + 50) })
     circleSource.addFeature(circleFeature)
 
     // 반경에 따라 줌 레벨 자동 조정
@@ -295,9 +295,20 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       }
       // 음식점 레이어가 하나만 있을 경우 호버링 처리
       else {
-        // 툴팁 숨기기
-        hideTooltip()
         const newHoveredFeature = newHoveredFeatures[0]
+
+        // 음식점이 있으면 이름과 카테고리 툴팁 표시
+        if (newHoveredFeature) {
+          const rid = newHoveredFeature.get('rid')
+          const restaurant = restaurants.find(r => r.rid === rid)
+
+          if (restaurant) {
+            showTooltip(event.originalEvent, `${restaurant.name} - ${restaurant.category}`)
+          }
+        } else {
+          // 음식점이 없으면 툴팁 숨기기
+          hideTooltip()
+        }
 
         // 과거 마우스 커서 아래에 있었던 음식점 레이어 호버링 복원
         oldHoveredFeatures.forEach(ohf => {

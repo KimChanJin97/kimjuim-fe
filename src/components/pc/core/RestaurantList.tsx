@@ -13,14 +13,12 @@ import ImageSkeleton from '../common/ImageSkeleton'
 import Tooltip from '../common/Tooltip'
 import { useTooltip } from '../../../hooks/useTooltip'
 import RestaurantImageSlider from '../common/RestaurantImageSlider'
-
-const NO_INFO = '정보없음'
+import { useInView } from 'react-intersection-observer'  // 추가
 
 interface RestaurantListProps {
   categories: Category[]
   restaurants: Restaurant[]
   distance: number
-  isLoading: boolean
   clickedRestaurantId: string
   onClickCategory: (categoryName: string) => void
   onClickDistance: (newDistance: number) => void
@@ -31,17 +29,152 @@ interface RestaurantListProps {
   onClickShare: () => void
 }
 
-// 이미지 스크롤 상수
-const IMAGE_WIDTH = 100
-const IMAGE_GAP = 10
-const ITEM_WIDTH = IMAGE_WIDTH + IMAGE_GAP // 110px
-const IMAGES_PER_VIEW = 4 // 한 번에 보이는 이미지 개수
+// 개별 음식점 아이템 컴포넌트 (같은 파일 내 추가)
+interface RestaurantItemProps {
+  restaurant: Restaurant
+  index: number
+  clickedRestaurantId: string
+  onClickRestaurant: (rid: string) => void
+  onRemoveRestaurant: (restaurantId: number) => void
+  showTooltip: (e: React.MouseEvent, text: string) => void
+  hideTooltip: () => void
+  restaurantRefs: React.MutableRefObject<Map<string, HTMLDivElement>>
+  hasInfo: (info: string) => boolean
+}
+
+const RestaurantItem: React.FC<RestaurantItemProps> = ({
+  restaurant,
+  index,
+  clickedRestaurantId,
+  onClickRestaurant,
+  onRemoveRestaurant,
+  showTooltip,
+  hideTooltip,
+  restaurantRefs,
+  hasInfo
+}) => {
+  // Intersection Observer 설정
+  const { ref: inViewRef, inView } = useInView({
+    triggerOnce: true,   // 한 번 보이면 계속 렌더링 유지
+    threshold: 0.1,      // 10%만 보여도 트리거
+    rootMargin: '100px'  // 100px 전에 미리 로드 시작
+  })
+
+  // ref 합치기 (스크롤용 ref + IntersectionObserver ref)
+  const setRefs = (el: HTMLDivElement | null) => {
+    if (el) {
+      restaurantRefs.current.set(restaurant.rid, el)
+    }
+    inViewRef(el)
+  }
+
+  return (
+    <div
+      className={`rlr ${clickedRestaurantId === restaurant.rid ? 'clicked' : ''}`}
+      ref={setRefs}
+      onClick={() => onClickRestaurant(restaurant.rid)}
+    >
+      {/* 리스트 바디 - 음식점 헤더 */}
+      <div className="rlr-header">
+        <div className="rlr-info">
+          <div className="rlr-index">{index + 1}.</div>
+          <div className="rlr-name">{restaurant.name}</div>
+          <div className="rlr-category">{restaurant.category}</div>
+        </div>
+
+        <div
+          className="rlr-close-btn-wrap"
+          onMouseMove={(e) => showTooltip(e, '음식점 탈락')}
+          onMouseLeave={hideTooltip}
+        >
+          <button
+            className="rlr-close-btn"
+            onClick={(e) => {
+              e.stopPropagation()
+              onRemoveRestaurant(restaurant.id)
+            }}
+          >
+            <CloseIcon
+              className="close-icon"
+              width={22}
+              height={22}
+            />
+          </button>
+        </div>
+      </div>
+
+      {/* 리스트 바디 - 음식점 바디 */}
+      <ul className="rlr-body">
+        <li>
+          <div className="rlr-image-slider">
+            {/* 뷰포트에 들어왔을 때만 실제 이미지 렌더링 */}
+            {inView && restaurant.images.length > 0 && (
+              <RestaurantImageSlider
+                images={restaurant.images}
+                restaurantName={restaurant.name}
+                mode="multiple"
+                imageWidth={100}
+                imageHeight={100}
+                imagesPerView={4}
+                borderRadius="5px"
+              />
+            )}
+            {/* 아직 뷰포트에 안 들어왔으면 스켈레톤 표시 */}
+            {!inView && restaurant.images.length > 0 && (
+              <div style={{ display: 'flex', gap: '10px' }}>
+                {[1, 2, 3, 4].map((i) => (
+                  <ImageSkeleton
+                    key={i}
+                    alt="loading"
+                    width={100}
+                    height={100}
+                    borderRadius="5px"
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* 메뉴 */}
+          {hasInfo(restaurant.menus) && (
+            <div className="rlr-row">
+              <img src={MenuIcon} alt="menu" />
+              <div className="rlr-menus">{restaurant.menus}</div>
+            </div>
+          )}
+
+          {/* 영업시간 */}
+          {hasInfo(restaurant.bizHour) && (
+            <div className="rlr-row">
+              <img src={BizHourIcon} alt="bizHour" />
+              <div className="rlr-bizHour">{restaurant.bizHour}</div>
+            </div>
+          )}
+
+          {/* 주소 */}
+          <div className="rlr-row">
+            <img src={AddressIcon} alt="address" />
+            <div className="rlr-address">{restaurant.address}</div>
+          </div>
+
+          {/* 가격 */}
+          {hasInfo(restaurant.recommendedPrice) && (
+            <div className="rlr-row">
+              <img src={PriceIcon} alt="price" height="16px" />
+              <div className="rlr-price">{restaurant.recommendedPrice}</div>
+            </div>
+          )}
+
+        </li>
+      </ul>
+    </div>
+  )
+}
 
 const RestaurantList: React.FC<RestaurantListProps> = ({
   categories,
   restaurants,
   distance,
-  isLoading,
   clickedRestaurantId,
   onClickCategory,
   onClickDistance,
@@ -56,7 +189,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
   const [pendingDistance, setPendingDistance] = useState<number | null>(null)
   const { tooltip, showTooltip, hideTooltip } = useTooltip()
   const restaurantRefs = useRef<Map<string, HTMLDivElement>>(new Map())
-  const [imageStartIndices, setImageStartIndices] = useState<Map<string, number>>(new Map())
 
   const survivedRestaurants = useMemo(() => {
     return restaurants.filter(restaurant => restaurant.survived)
@@ -79,18 +211,16 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
     const validDistances = [100, 200, 300, 400, 500]
 
     if (!validDistances.includes(newDistance)) {
-      // 잘못된 범위일 때 진동 효과
       setAnimationClass('shake')
       return
     }
 
-    // 정상적인 변경일 때 좌우 슬라이드 애니메이션
     setPendingDistance(newDistance)
 
     if (newDistance > distance) {
-      setAnimationClass('sliding-right') // 증가 시 오른쪽으로 슬라이드
+      setAnimationClass('sliding-right')
     } else {
-      setAnimationClass('sliding-left')  // 감소 시 왼쪽으로 슬라이드
+      setAnimationClass('sliding-left')
     }
   }
 
@@ -102,28 +232,8 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
     setAnimationClass('')
   }
 
-  useEffect(() => {
-    if (clickedRestaurantId) {
-      const restaurant = restaurantRefs.current.get(clickedRestaurantId)
-      if (restaurant) {
-        restaurant.scrollIntoView({ behavior: 'smooth' })
-      }
-    }
-  }, [clickedRestaurantId])
-
-  // 레스토랑이 변경되면 이미지 인덱스 초기화
-  useEffect(() => {
-    const newMap = new Map<string, number>()
-    survivedRestaurants.forEach(restaurant => {
-      if (restaurant.images.length > 0) {
-        newMap.set(restaurant.rid, 0)
-      }
-    })
-    setImageStartIndices(newMap)
-  }, [survivedRestaurants])
-
   const hasInfo = (info: string) => {
-    return info !== NO_INFO && info !== '' && info !== null && info !== undefined
+    return info !== '정보없음'
   }
 
   return (
@@ -132,7 +242,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
         <div className="rl-header">
 
           {/* 리스트 헤더 - 거리 */}
-
           <div className="rl-distance">
             <button
               className="triangle-left"
@@ -156,7 +265,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
           </div>
 
           {/* 리스트 헤더 - 카테고리 */}
-
           <div className="rl-categories">
             {categories.map((category) => (
               <button
@@ -166,7 +274,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
               >
                 {category.name}
               </button>
-
             ))}
             <button
               className="refresh-btn"
@@ -180,111 +287,32 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
         </div>
 
         {/* 리스트 바디 - 음식점 */}
-
         <div className="rl-body scrollbar-custom">
           <div className="rl-restaurants">
 
-            {/* 로딩 끝난 후에도 음식점이 없을 때 */}
-            {!isLoading && survivedRestaurants.length === 0 && (
+            {/* 음식점이 없을 때 */}
+            {survivedRestaurants.length === 0 && (
               <div className="no-restaurant-wrap">
                 <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
                 <div className="no-restaurant-text">죄송해요. 음식점이 없어요</div>
-                <div className="no-restaurant-text">( 현재는 서울/경기 지역만 서비스 중이에요 )</div>
               </div>
             )}
 
-            {/* 음식점이 있을 때 */}
+            {/* 음식점이 있을 때 - RestaurantItem 컴포넌트 사용 */}
             {survivedRestaurants.length > 0 &&
               survivedRestaurants.map((restaurant, index) => (
-                <div
-                  className={`rlr ${clickedRestaurantId === restaurant.rid ? 'clicked' : ''}`}
-                  ref={(el) => { if (el) restaurantRefs.current.set(restaurant.rid, el) }}
+                <RestaurantItem
                   key={restaurant.id}
-                  onClick={() => onClickRestaurant(restaurant.rid)}
-                >
-                  {/* 리스트 바디 - 음식점 닫기 */}
-
-
-                  {/* 리스트 바디 - 음식점 헤더 */}
-                  <div className="rlr-header">
-                    <div className="rlr-info">
-                      <div className="rlr-index">{index + 1}.</div>
-                      <div className="rlr-name">{restaurant.name}</div>
-                      <div className="rlr-category">{restaurant.category}</div>
-                    </div>
-
-                    <div
-                      className="rlr-close-btn-wrap"
-                      onMouseMove={(e) => showTooltip(e, '음식점 탈락')}
-                      onMouseLeave={hideTooltip}
-                    >
-                      <button
-                        className="rlr-close-btn"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onRemoveRestaurant(restaurant.id)
-                        }}
-                      >
-                        <CloseIcon
-                          className="close-icon"
-                          width={22}
-                          height={22}
-                        />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* 리스트 바디 - 음식점 바디 */}
-                  <ul className="rlr-body">
-                    <li>
-                      <div className="rlr-image-slider">
-                        {restaurant.images.length > 0 && (
-                          <RestaurantImageSlider
-                            images={restaurant.images}
-                            restaurantName={restaurant.name}
-                            mode="multiple"
-                            imageWidth={100}
-                            imageHeight={100}
-                            imagesPerView={4}
-                            borderRadius="5px"
-                          />
-                        )}
-                      </div>
-
-                      {/* 메뉴 */}
-                      {hasInfo(restaurant.menus) && (
-                        <div className="rlr-row">
-                          <img src={MenuIcon} alt="menu" />
-                          <div className="rlr-menus">{restaurant.menus}</div>
-                        </div>
-                      )}
-
-                      {/* 영업시간 */}
-                      {hasInfo(restaurant.bizHour) && (
-                        <div className="rlr-row">
-                          <img src={BizHourIcon} alt="bizHour" />
-                          <div className="rlr-bizHour">{restaurant.bizHour}</div>
-                        </div>
-                      )}
-
-                      {/* 주소 */}
-                      <div className="rlr-row">
-                        <img src={AddressIcon} alt="address" />
-                        <div className="rlr-address">{restaurant.address}</div>
-                      </div>
-
-                      {/* 가격 */}
-                      {hasInfo(restaurant.recommendedPrice) && (
-                        <div className="rlr-row">
-                          <img src={PriceIcon} alt="price" height="16px" />
-                          <div className="rlr-price">{restaurant.recommendedPrice}</div>
-                        </div>
-                      )}
-
-                    </li>
-                  </ul>
-
-                </div>
+                  restaurant={restaurant}
+                  index={index}
+                  clickedRestaurantId={clickedRestaurantId}
+                  onClickRestaurant={onClickRestaurant}
+                  onRemoveRestaurant={onRemoveRestaurant}
+                  showTooltip={showTooltip}
+                  hideTooltip={hideTooltip}
+                  restaurantRefs={restaurantRefs}
+                  hasInfo={hasInfo}
+                />
               ))
             }
           </div>

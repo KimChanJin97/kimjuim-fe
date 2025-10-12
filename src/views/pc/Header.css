@@ -25,10 +25,10 @@
     height: 60px;
   }
 
-  .map-header,
-  .faq-header,
-  .suggestion-header,
-  .patchnote-header {
+  .map-header-tab,
+  .introduction-header-tab,
+  .question-header-tab,
+  .patchnote-header-tab {
     width: auto;
     height: 80px;
     display: flex;

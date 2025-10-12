@@ -23,7 +23,6 @@ const RestaurantVWorldMap = () => {
   const [x, setX] = useState<number>(0)
   const [y, setY] = useState<number>(0)
   const [distance, setDistance] = useState<number>(100)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
   // 카테고리, 음식점
   const [categories, setCategories] = useState<Category[]>([])
   const [restaurants, setRestaurants] = useState<Restaurant[]>([])
@@ -41,16 +40,29 @@ const RestaurantVWorldMap = () => {
   useEffect(() => {
     const getLocation = async () => {
       try {
-        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject)
-        })
+        // URL에서 x, y 파라미터 확인
+        const xParam = searchParams.get('x')
+        const yParam = searchParams.get('y')
 
-        // const x = position.coords.longitude
-        // const y = position.coords.latitude
-        const x = 127.25093556196362
-        const y = 36.48482670839242
-        setX(x)
-        setY(y)
+        let finalX: number
+        let finalY: number
+
+        // x, y 파라미터가 있으면 사용, 없으면 geolocation 사용
+        if (xParam && yParam) {
+          finalX = parseFloat(xParam)
+          finalY = parseFloat(yParam)
+          setX(finalX)
+          setY(finalY)
+        } else {
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject)
+          })
+
+          finalX = position.coords.longitude
+          finalY = position.coords.latitude
+          setX(finalX)
+          setY(finalY)
+        }
 
         // 제외 음식점 추출
         const except = searchParams.get('ex')
@@ -67,13 +79,21 @@ const RestaurantVWorldMap = () => {
         }
         setExceptedRestaurants(ex)
 
-        await loadRestaurants(x, y, distance, ex)
+        // distance 파라미터 읽기
+        const distanceParam = searchParams.get('d')
+        const urlDistance = distanceParam ? parseInt(distanceParam, 10) : 100
+
+        // distance가 유효한 값인지 확인
+        const validDistances = [100, 200, 300, 400, 500]
+        const finalDistance = validDistances.includes(urlDistance) ? urlDistance : 100
+        setDistance(finalDistance)
+
+        await loadRestaurants(finalX, finalY, finalDistance, ex)
         if (ex.length > 0) {
           setIsTournamentOpen(true)
         }
       } catch (error) {
         console.error('위치 정보를 가져올 수 없습니다:', error)
-        setIsLoading(false)
       }
     }
     getLocation()
@@ -81,7 +101,6 @@ const RestaurantVWorldMap = () => {
 
   // 음식점 정보 가져오기
   const loadRestaurants = async (x: number, y: number, d: number, ex: string[]) => {
-    setIsLoading(true)
     try {
       const response = await getRestaurantNearby({ x, y, d, ex })
       const restaurants = response.restaurantNearbyResponses
@@ -102,8 +121,6 @@ const RestaurantVWorldMap = () => {
 
     } catch (error) {
       console.error('음식점 정보를 가져올 수 없습니다:', error)
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -214,16 +231,16 @@ const RestaurantVWorldMap = () => {
     const jsonString = JSON.stringify(exceptedRestaurants)
     const compressed = LZString.compressToEncodedURIComponent(jsonString)
 
-    const url = `${window.location.origin}/map?ex=${compressed}`
+    const url = `${window.location.origin}/map?ex=${compressed}&d=${distance}&x=${x}&y=${y}`
     navigator.clipboard.writeText(url)
 
     // 모달 표시
     setIsShareModalOpen(true)
 
-    // 1.2초 후 자동으로 닫기
+    // 1.5초 후 자동으로 닫기
     setTimeout(() => {
       setIsShareModalOpen(false)
-    }, 1200)
+    }, 1500)
   }
 
   return (
@@ -233,7 +250,6 @@ const RestaurantVWorldMap = () => {
           categories={categories}
           restaurants={restaurants}
           distance={distance}
-          isLoading={isLoading}
           clickedRestaurantId={clickedRestaurantId}
           onClickCategory={onClickCategory}
           onClickDistance={onClickDistance}

@@ -91,4 +91,40 @@ export const getRestaurantDetail = async (
   return response.data
 }
 
+export const sendMailMessage = async (
+  name: string,
+  email: string,
+  type: string,
+  title: string,
+  content: boolean,
+  agreement: boolean,
+  file: File
+) => {
+  const formData = new FormData();
+
+  const jsonData = {
+    name,
+    email,
+    type,
+    title,
+    content,
+    agreement
+  };
+
+  formData.append(
+    'data',
+    new Blob([JSON.stringify(jsonData)], { type: 'application/json' })
+  );
+
+  if (file) {
+    formData.append('file', file);
+  }
+
+  return api.post('/questions', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
+}
+
 export default api

@@ -235,13 +235,6 @@ const Tournament: React.FC<TournamentProps> = ({
           </div>
 
           <div className="tournament-header">
-            <div className="easter-egg">
-              {!winner.name.includes('순대') || !winner.name.includes('순댓') ? (
-                <h1 className="easter-egg">아싸! 순대국 안 먹어도 된다!</h1>
-              ) : (
-                <h1 className="easter-egg">이제 밥 먹으러 갈 수 있다!</h1>
-              )}
-            </div>
             <div className="tournament-winner">
               <h1>우승자: {winner.name}</h1>
             </div>

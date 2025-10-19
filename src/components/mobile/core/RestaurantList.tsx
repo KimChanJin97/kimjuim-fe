@@ -363,7 +363,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                 <span>음식점이</span>
                 <span>너무 많아요</span>
               </button>
-              <button className="share btn" onClick={onClickShare}>
+              <button className="rl-share btn" onClick={onClickShare}>
                 <span>공유하기</span>
               </button>
             </>
@@ -373,7 +373,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
               <button className="rl-worldcup btn disabled">
                 <span>월드컵 불가</span>
               </button>
-              <button className="share btn disabled">
+              <button className="rl-share btn disabled">
                 <span>공유 불가</span>
               </button>
             </>
@@ -386,7 +386,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
               >
                 <span>{calculateRound(survivedRestaurants.length)}강 시작</span>
               </button>
-              <button className="share btn" onClick={onClickShare}>
+              <button className="rl-share btn" onClick={onClickShare}>
                 <span>공유하기</span>
               </button>
             </>

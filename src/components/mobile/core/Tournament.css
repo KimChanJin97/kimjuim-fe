@@ -49,11 +49,6 @@
     color: var(--white);
   }
 
-  .tournament-header .easter-egg {
-    font-size: 60px;
-    margin-bottom: 40px;
-  }
-
   .tournament-header h1 {
     font-size: 32px;
     font-weight: 600;

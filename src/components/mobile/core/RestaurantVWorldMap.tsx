@@ -55,66 +55,37 @@ const RestaurantVWorldMap = () => {
         const dataParam = searchParams.get('data')
 
         if (dataParam) {
-          // 압축된 데이터가 있으면 디코딩
+          // 링크 접속
           try {
             const decompressed = LZString.decompressFromEncodedURIComponent(dataParam)
             const shareData = decompressed ? JSON.parse(decompressed) : null
 
             if (shareData) {
               ex = shareData.ex || []
-              finalX = shareData.x
-              finalY = shareData.y
+              finalX = shareData.x || 127.13229313772779
+              finalY = shareData.y || 37.41460591790208
               finalDistance = shareData.d || 100
-
-              console.log('Loaded share data:', { ex, finalX, finalY, finalDistance })
             } else {
               throw new Error('디코딩 실패')
             }
           } catch (error) {
             console.error('공유 데이터 디코딩 실패:', error)
-            // geolocation 사용
-            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-              navigator.geolocation.getCurrentPosition(resolve, reject)
-            })
-            finalX = position.coords.longitude
-            finalY = position.coords.latitude
+            // 기본값 사용
+            finalX = 127.13229313772779
+            finalY = 37.41460591790208
             finalDistance = 100
           }
         } else {
-          // 레거시 파라미터 또는 일반 접속
-          // URL에서 x, y 파라미터 확인
-          const xParam = searchParams.get('x')
-          const yParam = searchParams.get('y')
+          // 일반 접속
+          // const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          //   navigator.geolocation.getCurrentPosition(resolve, reject)
+          // })
 
-          if (xParam && yParam) {
-            finalX = parseFloat(xParam)
-            finalY = parseFloat(yParam)
-          } else {
-            // geolocation 사용
-            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-              navigator.geolocation.getCurrentPosition(resolve, reject)
-            })
-            finalX = position.coords.longitude
-            finalY = position.coords.latitude
-          }
-
-          // 제외 음식점 추출 (레거시)
-          const except = searchParams.get('ex')
-          if (except) {
-            try {
-              const decompressed = LZString.decompressFromEncodedURIComponent(except)
-              ex = decompressed ? JSON.parse(decompressed) : []
-            } catch (error) {
-              console.error('URL 파라미터 디코딩 실패:', error)
-              ex = []
-            }
-          }
-
-          // distance 파라미터 읽기 (레거시)
-          const distanceParam = searchParams.get('d')
-          const urlDistance = distanceParam ? parseInt(distanceParam, 10) : 100
-          const validDistances = [100, 200, 300, 400, 500]
-          finalDistance = validDistances.includes(urlDistance) ? urlDistance : 100
+          // finalX = position.coords.longitude
+          // finalY = position.coords.latitude
+          finalX = 127.13229313772779
+          finalY = 37.41460591790208
+          finalDistance = 100
         }
 
         // State 업데이트
@@ -124,7 +95,8 @@ const RestaurantVWorldMap = () => {
         setExceptedRestaurants(ex)
 
         await loadRestaurants(finalX, finalY, finalDistance, ex)
-        if (ex.length > 0) {
+
+        if (dataParam) {
           setIsTournamentOpen(true)
         }
       } catch (error) {

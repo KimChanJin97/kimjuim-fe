@@ -343,31 +343,33 @@
     position: absolute;
     bottom: 20px;
     width: 100%;
-    padding-bottom: 90px;
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 120px;
+    box-sizing: border-box;
   }
 
   .rl-worldcup {
-    width: 130px;
-    height: 60px;
+    width: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
   }
 
-  .share {
-    height: 60px;
+  .rl-share {
+    width: 50%;
   }
 
   .btn {
     background-color: var(--black);
     border: none;
     cursor: pointer;
-    border-radius: 12px;
-    padding: 15px 25px;
+    border-radius: 8px;
     font-size: 15px;
     color: var(--white);
     font-weight: 700;
+    padding: 10px 20px;
   }
 
   .disabled {

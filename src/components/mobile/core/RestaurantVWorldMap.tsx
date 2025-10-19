@@ -76,7 +76,7 @@ const RestaurantVWorldMap = () => {
             finalDistance = 100
           }
         } else {
-          // 일반 접속
+          // 일반 접속, 네트워크 직접 접속 (HTTPS 설정 이전)
           // const position = await new Promise<GeolocationPosition>((resolve, reject) => {
           //   navigator.geolocation.getCurrentPosition(resolve, reject)
           // })

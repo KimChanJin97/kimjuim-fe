@@ -339,7 +339,7 @@
   }
 
   .rl-worldcup {
-    width: 65%;
+    width: 55%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -347,12 +347,11 @@
   }
 
   .rl-share {
-    width: 30%;
+    width: 45%;
   }
 
   .btn {
-    width: 100%;
-    height: 60px;
+    height: 65px;
     background-color: var(--black);
     border: none;
     cursor: pointer;

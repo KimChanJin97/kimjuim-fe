@@ -71,15 +71,15 @@ const RestaurantVWorldMap = () => {
             finalDistance = 100
           }
         } else {
-          // 일반 접속
-          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject)
-          })
+          // 일반 접속, 네트워크 직접 접속 (HTTPS 설정 이전)
+          // const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          //   navigator.geolocation.getCurrentPosition(resolve, reject)
+          // })
 
-          finalX = position.coords.longitude
-          finalY = position.coords.latitude
-          // finalX = 127.13229313772779
-          // finalY = 37.41460591790208
+          // finalX = position.coords.longitude
+          // finalY = position.coords.latitude
+          finalX = 127.13229313772779
+          finalY = 37.41460591790208
           finalDistance = 100
         }
 

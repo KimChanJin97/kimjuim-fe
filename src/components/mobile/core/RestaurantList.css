@@ -350,7 +350,7 @@
   }
 
   .rl-worldcup {
-    width: 50%;
+    width: 55%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -358,10 +358,11 @@
   }
 
   .rl-share {
-    width: 50%;
+    width: 45%;
   }
 
   .btn {
+    height: 55px;
     background-color: var(--black);
     border: none;
     cursor: pointer;
@@ -376,11 +377,6 @@
     background-color: var(--dark-gray);
     color: var(--light-gray);
     cursor: not-allowed;
-  }
-
-  .btn-wrap .crying-face-icon {
-    width: 25px;
-    height: 25px;
   }
 }
 

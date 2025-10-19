@@ -17,12 +17,32 @@
     align-items: center;
   }
 
+  .logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
   .logo-header {
     cursor: pointer;
     background: url('@/assets/logo.png') no-repeat center center;
     background-size: contain;
     width: 120px;
     height: 60px;
+    position: relative;
+  }
+
+  .beta-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--white);
+    background-color: var(--dark-gray);
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
   }
 
   .map-header-tab,

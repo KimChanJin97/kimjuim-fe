@@ -30,7 +30,6 @@
     justify-content: center;
     color: var(--white);
     transition: all 0.2s ease;
-    z-index: 10;
   }
 
   .ris-multiple-nav-btn:hover {
@@ -67,7 +66,6 @@
     justify-content: center;
     color: var(--white);
     transition: all 0.2s ease;
-    z-index: 10;
   }
 
   .ris-single-nav-btn:hover {

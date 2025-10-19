@@ -7,6 +7,7 @@ import './RestaurantVWorldMap.css'
 import Tournament from './Tournament'
 import { useSearchParams } from 'react-router-dom'
 import LZString from 'lz-string'
+import { AddIcon } from '@/assets/AddIcon'
 
 export interface Category {
   name: string
@@ -40,53 +41,82 @@ const RestaurantVWorldMap = () => {
   useEffect(() => {
     const getLocation = async () => {
       try {
-        // URL에서 x, y 파라미터 확인
-        const xParam = searchParams.get('x')
-        const yParam = searchParams.get('y')
-
         let finalX: number
         let finalY: number
-
-        // x, y 파라미터가 있으면 사용, 없으면 geolocation 사용
-        if (xParam && yParam) {
-          finalX = parseFloat(xParam)
-          finalY = parseFloat(yParam)
-          setX(finalX)
-          setY(finalY)
-        } else {
-          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject)
-          })
-
-          finalX = position.coords.longitude
-          finalY = position.coords.latitude
-          setX(finalX)
-          setY(finalY)
-        }
-
-        // 제외 음식점 추출
-        const except = searchParams.get('ex')
+        let finalDistance: number
         let ex: string[] = []
-        if (except) {
+
+        // 압축된 데이터 파라미터 확인
+        const dataParam = searchParams.get('data')
+
+        if (dataParam) {
+          // 압축된 데이터가 있으면 디코딩
           try {
-            // 압축된 문자열 디코딩
-            const decompressed = LZString.decompressFromEncodedURIComponent(except)
-            ex = decompressed ? JSON.parse(decompressed) : []
+            const decompressed = LZString.decompressFromEncodedURIComponent(dataParam)
+            const shareData = decompressed ? JSON.parse(decompressed) : null
+
+            if (shareData) {
+              ex = shareData.ex || []
+              finalX = shareData.x
+              finalY = shareData.y
+              finalDistance = shareData.d || 100
+
+              console.log('Loaded share data:', { ex, finalX, finalY, finalDistance })
+            } else {
+              throw new Error('디코딩 실패')
+            }
           } catch (error) {
-            console.error('URL 파라미터 디코딩 실패:', error)
-            ex = []
+            console.error('공유 데이터 디코딩 실패:', error)
+            // geolocation 사용
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject)
+            })
+            finalX = position.coords.longitude
+            finalY = position.coords.latitude
+            finalDistance = 100
           }
+        } else {
+          // 레거시 파라미터 또는 일반 접속
+          // URL에서 x, y 파라미터 확인
+          const xParam = searchParams.get('x')
+          const yParam = searchParams.get('y')
+
+          if (xParam && yParam) {
+            finalX = parseFloat(xParam)
+            finalY = parseFloat(yParam)
+          } else {
+            // geolocation 사용
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject)
+            })
+            finalX = position.coords.longitude
+            finalY = position.coords.latitude
+          }
+
+          // 제외 음식점 추출 (레거시)
+          const except = searchParams.get('ex')
+          if (except) {
+            try {
+              const decompressed = LZString.decompressFromEncodedURIComponent(except)
+              ex = decompressed ? JSON.parse(decompressed) : []
+            } catch (error) {
+              console.error('URL 파라미터 디코딩 실패:', error)
+              ex = []
+            }
+          }
+
+          // distance 파라미터 읽기 (레거시)
+          const distanceParam = searchParams.get('d')
+          const urlDistance = distanceParam ? parseInt(distanceParam, 10) : 100
+          const validDistances = [100, 200, 300, 400, 500]
+          finalDistance = validDistances.includes(urlDistance) ? urlDistance : 100
         }
-        setExceptedRestaurants(ex)
 
-        // distance 파라미터 읽기
-        const distanceParam = searchParams.get('d')
-        const urlDistance = distanceParam ? parseInt(distanceParam, 10) : 100
-
-        // distance가 유효한 값인지 확인
-        const validDistances = [100, 200, 300, 400, 500]
-        const finalDistance = validDistances.includes(urlDistance) ? urlDistance : 100
+        // State 업데이트
+        setX(finalX)
+        setY(finalY)
         setDistance(finalDistance)
+        setExceptedRestaurants(ex)
 
         await loadRestaurants(finalX, finalY, finalDistance, ex)
         if (ex.length > 0) {
@@ -227,20 +257,26 @@ const RestaurantVWorldMap = () => {
   }, [clickedRestaurantId])
 
   const onClickShare = () => {
-    // JSON 문자열로 변환 후 압축
-    const jsonString = JSON.stringify(exceptedRestaurants)
+    // 모든 데이터를 객체로 만들어 압축
+    const shareData = {
+      ex: exceptedRestaurants,  // 제외할 음식점 배열
+      x: x,                      // x 좌표
+      y: y,                      // y 좌표
+      d: distance                // 거리
+    }
+    const jsonString = JSON.stringify(shareData)
     const compressed = LZString.compressToEncodedURIComponent(jsonString)
 
-    const url = `${window.location.origin}/map?ex=${compressed}&d=${distance}&x=${x}&y=${y}`
+    const url = `${window.location.origin}/map?data=${compressed}`
     navigator.clipboard.writeText(url)
 
     // 모달 표시
     setIsShareModalOpen(true)
 
-    // 1.5초 후 자동으로 닫기
+    // 2초 후 자동으로 닫기
     setTimeout(() => {
       setIsShareModalOpen(false)
-    }, 1500)
+    }, 2000)
   }
 
   return (
@@ -290,7 +326,7 @@ const RestaurantVWorldMap = () => {
       {isShareModalOpen && (
         <div className="share-modal-overlay">
           <div className="share-modal-content">
-            <div className="share-modal-icon">✓</div>
+            <AddIcon width={80} height={80} />
             <h2>공유 링크가 복사되었습니다!</h2>
             <p>클립보드에 링크가 저장되었습니다.</p>
           </div>

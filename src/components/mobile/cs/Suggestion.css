@@ -1,6 +1,0 @@
-.suggestion-container {
-  width: 100%;
-  height: calc(100vh - 70px);
-  background-color: var(--light-black);
-  color: var(--white);
-}

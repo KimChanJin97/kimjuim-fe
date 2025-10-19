@@ -1,16 +1,16 @@
 import { Route, Routes } from 'react-router-dom'
 import RestaurantVWorldMap from '@/components/mobile/core/RestaurantVWorldMap'
-import FAQ from '@/components/mobile/cs/FAQ'
-import Suggestion from '@/components/mobile/cs/Suggestion'
-import Patchnote from '@/components/mobile/cs/Patchnote'
+import Introduction from '@/components/mobile/cs/Introduction'
+import Question from '@/components/mobile/cs/Question'
+import Patchnote from '@/components/pc/cs/Patchnote'
 
 const Home = () => {
   return (
     <Routes>
       <Route path="/m" element={<RestaurantVWorldMap />} />
       <Route path="/m/map" element={<RestaurantVWorldMap />} />
-      <Route path="/m/faq" element={<FAQ />} />
-      <Route path="/m/suggestion" element={<Suggestion />} />
+      <Route path="/m/introduction" element={<Introduction />} />
+      <Route path="/m/question" element={<Question />} />
       <Route path="/m/patchnote" element={<Patchnote />} />
     </Routes>
   )

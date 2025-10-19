@@ -96,7 +96,7 @@ export const sendMailMessage = async (
   email: string,
   type: string,
   title: string,
-  content: boolean,
+  content: string,
   agreement: boolean,
   file: File
 ) => {

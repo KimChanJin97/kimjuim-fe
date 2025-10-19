@@ -1,20 +1,10 @@
 .mobile {
-  .restaurant-detail-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: 4999;
-    background: transparent;
-  }
-
   .restaurant-detail-container {
     position: fixed;
     width: 85%;
     height: 100vh;
     color: var(--white);
-    background-color: var(--light-black);
+    background-color: rgba(0, 0, 0, 0.9);
     display: flex;
     flex-direction: column;
     border-right: 1px solid var(--gray);
@@ -24,7 +14,7 @@
   }
 
   .restaurant-detail-container.closed {
-    z-index: 4700;
+    z-index: 4900;
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
       z-index 0s 0.4s;
     /* 닫힐 때: 0.4초 후 z-index 변경 */
@@ -32,7 +22,7 @@
 
   .restaurant-detail-container.open {
     transform: translateX(0);
-    z-index: 5100;
+    z-index: 5000;
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
       z-index 0s 0s;
     /* 열릴 때: 즉시 z-index 변경 */
@@ -40,7 +30,7 @@
 
   .detail-toggle-btn {
     position: absolute;
-    top: 150px;
+    top: 175px;
     right: -40px;
     width: 40px;
     height: 40px;
@@ -56,17 +46,15 @@
     transition: all 0.2s ease;
   }
 
-  .detail-toggle-btn:active {
-    background-color: var(--dark-gray);
-  }
-
   .toggle-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: rotate(180deg);
     color: var(--white);
     font-size: 20px;
     font-weight: bold;
-    display: inline-block;
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform: rotate(180deg);
   }
 
   .toggle-arrow.open {
@@ -76,7 +64,7 @@
   .rd-header {
     display: flex;
     justify-content: space-between;
-    padding: 15px 30px;
+    padding: 30px;
   }
 
   .rd-title {
@@ -107,8 +95,7 @@
   }
 
   .tabs {
-    padding: 0 30px;
-    margin-top: 10px;
+    padding: 20px 30px 0 30px;
     border-bottom: 1px solid var(--light-gray);
     display: flex;
     align-items: center;
@@ -141,17 +128,15 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 30px 15px;
     padding: 30px;
-    height: calc(100vh - 85px);
+    height: calc(100vh - 140px);
     overflow-y: auto;
   }
 
-  /* 가상 요소로 하단 여백 생성 */
   .rd-menus::after {
     content: '';
     display: block;
     height: 160px;
     grid-column: 1 / -1;
-    /* 전체 컬럼을 차지하도록 */
   }
 
   .rdm-row {
@@ -202,10 +187,11 @@
   }
 
   .no-item-wrap {
+    margin-top: 100px;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 30px;
   }
 
   .no-menu-text,
@@ -217,17 +203,17 @@
   }
 
   .no-item-wrap .crying-face-icon {
-    width: 25px;
-    height: 25px;
+    width: 50px;
+    height: 50px;
   }
 
   .rd-reviews {
     display: flex;
     flex-direction: column;
     gap: 30px;
-    padding: 30px;
+    padding: 30px 30px 160px 30px;
     overflow-y: auto;
-    height: calc(100vh - 200px);
+    height: calc(100vh - 140px - 160px);
   }
 
   .rdv {

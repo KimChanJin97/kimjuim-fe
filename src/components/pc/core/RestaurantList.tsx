@@ -9,11 +9,12 @@ import PriceIcon from '@/assets/price.png'
 import RefreshIcon from '@/assets/refresh-btn.png'
 import CryingFaceIcon from '@/assets/crying-face.png'
 import { CloseIcon } from '@/assets/CloseIcon'
+import { AddIcon } from '@/assets/AddIcon'
 import ImageSkeleton from '../common/ImageSkeleton'
 import Tooltip from '../common/Tooltip'
 import { useTooltip } from '../../../hooks/useTooltip'
 import RestaurantImageSlider from '../common/RestaurantImageSlider'
-import { useInView } from 'react-intersection-observer'  // 추가
+import { useInView } from 'react-intersection-observer'
 
 interface RestaurantListProps {
   categories: Category[]
@@ -55,10 +56,27 @@ const RestaurantItem: React.FC<RestaurantItemProps> = ({
 }) => {
   // Intersection Observer 설정
   const { ref: inViewRef, inView } = useInView({
-    triggerOnce: true,   // 한 번 보이면 계속 렌더링 유지
-    threshold: 0.1,      // 10%만 보여도 트리거
-    rootMargin: '100px'  // 100px 전에 미리 로드 시작
+    triggerOnce: false,
+    threshold: 0.1,
+    rootMargin: '100px'
   })
+
+  const [shouldRender, setShouldRender] = useState(false)
+
+  useEffect(() => {
+    if (inView) {
+      // 화면에 보이기 시작하면 1초 타이머 시작
+      const timer = setTimeout(() => {
+        setShouldRender(true)
+      }, 1000) // 1초
+
+      // 클린업: 1초 이내에 화면에서 사라지면 타이머 취소
+      return () => clearTimeout(timer)
+    } else {
+      // 화면에서 사라지면 shouldRender를 false로 리셋
+      setShouldRender(false)
+    }
+  }, [inView])
 
   // ref 합치기 (스크롤용 ref + IntersectionObserver ref)
   const setRefs = (el: HTMLDivElement | null) => {
@@ -107,8 +125,8 @@ const RestaurantItem: React.FC<RestaurantItemProps> = ({
       <ul className="rlr-body">
         <li>
           <div className="rlr-image-slider">
-            {/* 뷰포트에 들어왔을 때만 실제 이미지 렌더링 */}
-            {inView && restaurant.images.length > 0 && (
+            {/* 1초 이상 화면에 보였을 때만 실제 이미지 렌더링 */}
+            {shouldRender && restaurant.images.length > 0 && (
               <RestaurantImageSlider
                 images={restaurant.images}
                 restaurantName={restaurant.name}
@@ -119,17 +137,18 @@ const RestaurantItem: React.FC<RestaurantItemProps> = ({
                 borderRadius="5px"
               />
             )}
-            {/* 아직 뷰포트에 안 들어왔으면 스켈레톤 표시 */}
-            {!inView && restaurant.images.length > 0 && (
-              <div style={{ display: 'flex', gap: '10px' }}>
+            {/* 아직 1초가 안 지났으면 스켈레톤 표시 */}
+            {!shouldRender && restaurant.images.length > 0 && (
+              <div className="rlr-skeleton-slider">
                 {[1, 2, 3, 4].map((i) => (
-                  <ImageSkeleton
-                    key={i}
-                    alt="loading"
-                    width={100}
-                    height={100}
-                    borderRadius="5px"
-                  />
+                  <div key={i} className="rlr-skeleton">
+                    <ImageSkeleton
+                      alt="loading"
+                      width={100}
+                      height={100}
+                      borderRadius="5px"
+                    />
+                  </div>
                 ))}
               </div>
             )}
@@ -236,6 +255,14 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
     return info !== '정보없음'
   }
 
+  const calculateRound = (teams: number): number => {
+    let round = 1;
+    while (round < teams) {
+      round *= 2;
+    }
+    return round;
+  };
+
   return (
     <>
       <div className="restaurant-list-container">
@@ -265,24 +292,37 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
           </div>
 
           {/* 리스트 헤더 - 카테고리 */}
-          <div className="rl-categories">
+          <div className={`rl-categories ${categories.length === 0 ? 'empty' : ''}`}>
             {categories.map((category) => (
-              <button
-                className={`rl-category ${category.survived ? 'active' : 'deactive'}`}
+              <div
                 key={category.name}
-                onClick={() => onClickCategory(category.name)}
+                className={`rl-category-btn-wrap ${category.survived ? 'active' : 'deactive'}`}
               >
-                {category.name}
-              </button>
+                <button
+                  className="rl-category"
+                  onClick={() => onClickCategory(category.name)}
+                >
+                  {category.name}
+                </button>
+                <button
+                  className="rl-category-toggle-btn"
+                  onClick={() => onClickCategory(category.name)}
+                >
+                  {category.survived ? <CloseIcon width={16} height={16} /> : <AddIcon width={16} height={16} />}
+                </button>
+              </div>
             ))}
-            <button
-              className="refresh-btn"
-              onClick={onClickRefresh}
-              onMouseMove={(e) => showTooltip(e, '카테고리 새로고침')}
-              onMouseLeave={hideTooltip}
-            >
-              <img src={RefreshIcon} alt="refresh" />
-            </button>
+            {categories.length > 0 && (
+              <button
+                className="refresh-btn"
+                onClick={onClickRefresh}
+              >
+                <img src={RefreshIcon} alt="refresh" />
+              </button>
+            )}
+            {categories.length === 0 && (
+              <div className="no-category">반경을 늘려서 주변 음식점을 찾아보세요!</div>
+            )}
           </div>
         </div>
 
@@ -348,7 +388,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                 className="rl-worldcup btn"
                 onClick={onClickTournament}
               >
-                <span>점심 월드컵 {survivedRestaurants.length}강 시작</span>
+                <span>점심 월드컵 {calculateRound(survivedRestaurants.length)}강 시작</span>
               </button>
               <button className="share btn" onClick={onClickShare}>
                 <span>공유하기</span>

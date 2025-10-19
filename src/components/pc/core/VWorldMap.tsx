@@ -9,7 +9,7 @@ import VectorSource from 'ol/source/Vector'
 import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
 import Circle from 'ol/geom/Circle'
-import { Style, Icon, Fill, Stroke } from 'ol/style'
+import { Style, Icon, Fill, Stroke, Text } from 'ol/style'
 import { fromLonLat, toLonLat } from 'ol/proj'
 import { Restaurant } from './RestaurantVWorldMap'
 import markers from '@/assets/markers.png'
@@ -137,6 +137,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   }, [])
 
   // 사용자 위치, 반경에 따라 원 벡터 재설정
+  // 사용자 위치, 반경에 따라 원 벡터 재설정
   useEffect(() => {
     if (!mapInstanceRef.current) return
 
@@ -147,7 +148,36 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     // 반경 제거 및 초기화
     const circleSource = circleSourceRef.current
     circleSource.clear()
-    const circleFeature = new Feature({ geometry: new Circle(fromLonLat([x, y]), distance + 50) })
+
+    // 음식점 개수 확인
+    const survivedRestaurants = restaurants.filter(r => r.survived)
+    const hasNoRestaurants = survivedRestaurants.length === 0
+
+    const circleFeature = new Feature({
+      geometry: new Circle(fromLonLat([x, y]), distance + 50)
+    })
+
+    // 음식점이 없으면 텍스트 표시
+    circleFeature.setStyle(new Style({
+      fill: new Fill({
+        color: 'rgba(0, 0, 0, 0.1)',
+      }),
+      stroke: new Stroke({
+        color: 'rgba(0, 0, 0, 0.1)',
+        width: 2,
+        lineDash: [5, 5],
+      }),
+      text: hasNoRestaurants ? new Text({
+        text: '반경을 늘려서\n주변 음식점을 찾아보세요!',
+        font: 'bold 16px noto sans kr',
+        fill: new Fill({
+          color: '#555555',
+        }),
+        textAlign: 'center',
+        textBaseline: 'middle',
+      }) : undefined,
+    }))
+
     circleSource.addFeature(circleFeature)
 
     // 반경에 따라 줌 레벨 자동 조정
@@ -159,7 +189,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         duration: 1000,
       })
     }
-  }, [x, y, distance])
+  }, [x, y, distance, restaurants])
 
   // 음식점 레이어 초기화
   useEffect(() => {

@@ -15,7 +15,9 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="logo-header" onClick={handleLogoClick}>
+      <div className="logo-container">
+        <button className="logo-header" onClick={handleLogoClick}></button>
+        <span className="beta-badge">베타 버전</span>
       </div>
       <div className="menu-header">
         <div className={`map-header-tab ${isActive('/map') ? 'active' : ''}`} onClick={() => navigate('/map')}>

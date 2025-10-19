@@ -1,4 +1,4 @@
-interface CloseIconProps {
+export interface MinusIconProps {
   className?: string
   width?: number
   height?: number
@@ -6,26 +6,27 @@ interface CloseIconProps {
   strokeWidth?: number
 }
 
-export const CloseIcon: React.FC<CloseIconProps> = ({
+export const MinusIcon: React.FC<MinusIconProps> = ({
   className,
-  width = 16,
-  height = 16,
+  width = 24,
+  height = 24,
   color = 'currentColor',
-  strokeWidth = 1.8,
+  strokeWidth = 3,
 }) => (
   <svg
     className={className}
     width={width}
     height={height}
-    viewBox="0 0 16 16"
+    viewBox="0 0 24 24"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path
-      d="M12 4L4 12M4 4l8 8"
+      d="M5 12H19"
       stroke={color}
       strokeWidth={strokeWidth}
       strokeLinecap="round"
+      strokeLinejoin="round"
     />
   </svg>
 )

@@ -1,12 +1,64 @@
-.pc {
+.mobile {
   .intro-container {
-    width: 100vw;
-    height: calc(100vh - 70px);
-    overflow: auto;
-    background-color: var(--light-black);
+    position: fixed;
+    width: 85%;
+    height: 100vh;
     color: var(--white);
-    box-sizing: border-box;
-    padding-bottom: 300px;
+    background-color: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--gray);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .intro-container.closed {
+    z-index: 4900;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      z-index 0s 0.4s;
+    /* 닫힐 때: 0.4초 후 z-index 변경 */
+  }
+
+  .intro-container.open {
+    transform: translateX(0);
+    z-index: 5000;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      z-index 0s 0s;
+    /* 열릴 때: 즉시 z-index 변경 */
+  }
+
+  .intro-toggle-btn {
+    position: absolute;
+    top: 225px;
+    right: -40px;
+    width: 40px;
+    height: 40px;
+    background-color: var(--light-black);
+    border: 1px solid var(--gray);
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+  }
+
+  .toggle-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: rotate(180deg);
+    color: var(--white);
+    font-size: 20px;
+    font-weight: bold;
+  }
+
+  .toggle-arrow.open {
+    transform: rotate(0deg);
   }
 
   .intro-header {

@@ -25,12 +25,16 @@ interface RestaurantDetailProps {
   restaurantDetail: RestaurantDetailResponse | null
   onToggleDetail: () => void
   isDetailOpen: boolean
+  clickedRestaurantId: string
+  restaurantName: string
 }
 
 const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
   restaurantDetail,
   onToggleDetail,
-  isDetailOpen
+  isDetailOpen,
+  clickedRestaurantId,
+  restaurantName
 }) => {
   const [activeTab, setActiveTab] = useState(0)
   const [imageSize, setImageSize] = useState(140)
@@ -69,8 +73,12 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
         </button>
 
         <div className="rd-header">
-
-          <div className="rd-title">상세정보</div>
+          {restaurantName && (
+            <div className="rd-title">{restaurantName}</div>
+          )}
+          {!restaurantName && (
+            <div className="rd-title">음식점 상세정보</div>
+          )}
 
         </div>
 
@@ -148,21 +156,19 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
             </div>
           )}
 
-          {activeTab === 0 && !restaurantDetail && (
+          {activeTab === 0 && !restaurantDetail && !clickedRestaurantId && (
             <div className="no-item-wrap">
+              <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
               <div className="no-menu-text">음식점을 선택해주세요</div>
-              <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
             </div>
           )}
 
-          {activeTab === 0 && restaurantDetail && restaurantDetail.menus.length === 0 && (
+          {activeTab === 0 && restaurantDetail && clickedRestaurantId && restaurantDetail.menus.length === 0 && (
             <div className="no-item-wrap">
-              <div className="no-menu-text">메뉴가 없어요</div>
               <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
+              <div className="no-menu-text">메뉴가 없어요</div>
             </div>
           )}
-
-
 
           {/* 리뷰 탭 */}
           {activeTab === 1 && restaurantDetail && restaurantDetail.reviews.length > 0 && (
@@ -190,17 +196,17 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
             </div>
           )}
 
-          {activeTab === 1 && !restaurantDetail && (
+          {activeTab === 1 && !restaurantDetail && !clickedRestaurantId && (
             <div className="no-item-wrap">
-              <div className="no-menu-text">음식점을 선택해주세요</div>
               <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
+              <div className="no-menu-text">음식점을 선택해주세요</div>
             </div>
           )}
 
-          {activeTab === 1 && restaurantDetail && restaurantDetail.reviews.length === 0 && (
+          {activeTab === 1 && restaurantDetail && clickedRestaurantId && restaurantDetail.reviews.length === 0 && (
             <div className="no-item-wrap">
-              <div className="no-review-text">리뷰가 없어요</div>
               <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
+              <div className="no-review-text">리뷰가 없어요</div>
             </div>
           )}
 

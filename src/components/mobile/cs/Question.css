@@ -1,4 +1,4 @@
-.pc {
+.mobile {
   .question-container {
     height: calc(100vh - 70px);
     background-color: var(--light-black);

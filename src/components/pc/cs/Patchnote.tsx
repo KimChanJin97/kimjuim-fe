@@ -3,26 +3,36 @@ import './Patchnote.css'
 
 interface Patchnote {
   id: number
-  title: string
+  createdAt: string
+  version: string
   content: string
 }
 
 const Patchnote = () => {
   const [patchnotes] = useState<Patchnote[]>([
-    { id: 1, title: '1.0.1 업데이트', content: '버그 수정' },
-    { id: 2, title: '1.0.2 업데이트', content: 'UI 개선' },
+    { id: 1, createdAt: '2025-12-25', version: '1.0.0', content: '안녕하세요. 김주임입니다. 잘 부탁드립니다.' },
+    { id: 2, createdAt: '2025-12-26', version: '1.0.1', content: '검색 기능을 추가했습니다.' },
   ])
 
   return (
-    <div className="patchnote-container">
-      <h2>📢 패치노트</h2>
-      <ul>
-        {patchnotes.map((note) => (
-          <li key={note.id}>
-            <strong>{note.title}</strong> - {note.content}
-          </li>
-        ))}
-      </ul>
+    <div className="patchnote-container scrollbar-custom">
+
+      <div className="patchnote-header">
+        <h3>패치노트</h3>
+      </div>
+
+      <div className="patchnote-body">
+        <ul className="pb-list">
+          {patchnotes.slice().reverse().map((note) => (
+            <li key={note.id} className="pb-item">
+              <strong className="pb-item-title">김주임 {note.version} 업데이트 안내</strong>
+              <p className="pb-item-created-at">{note.createdAt}</p>
+              <p className="pb-item-content">{note.content}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
     </div>
   )
 }

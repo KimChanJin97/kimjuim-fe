@@ -1,5 +1,5 @@
 import './VWorldMap.css'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import OlMap from 'ol/Map'
 import View from 'ol/View'
 import TileLayer from 'ol/layer/Tile'
@@ -13,15 +13,11 @@ import { Style, Icon, Fill, Stroke, Text } from 'ol/style'
 import { fromLonLat, toLonLat } from 'ol/proj'
 import { Restaurant } from './RestaurantVWorldMap'
 import markers from '@/assets/markers.png'
-import { MapBrowserEvent } from 'ol'
+import { MapBrowserEvent, Overlay } from 'ol'
 import Tooltip from '../common/Tooltip'
 import { useTooltip } from '../../../hooks/useTooltip'
 import { Geometry } from 'ol/geom'
-
-const SMALL_MARKER_WIDTH = 50
-const SMALL_MARKER_HEIGHT = 50
-const LARGE_MARKER_WIDTH = 54
-const LARGE_MARKER_HEIGHT = 54
+import { CategoryType, mapCategoryToType, extractCategoryIcon } from '@/utils/extractCategoryIcon'
 
 interface VWorldMapProps {
   restaurants: Restaurant[]
@@ -29,12 +25,14 @@ interface VWorldMapProps {
   y: number
   distance: number
   clickedRestaurantId: string
-  onClickRestaurant: (rid: string) => void
+  onClickRestaurant: (rid: string, name: string) => void
 }
 
 interface RestaurantFeature extends Feature {
   get(key: 'rid'): string;
+  get(key: 'name'): string;
   get(key: 'type'): string;
+  get(key: 'categoryType'): CategoryType;
   get(key: 'markerState'): MarkerState;
 }
 
@@ -62,34 +60,12 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   const [overlapModalHeight, setOverlapModalHeight] = useState(0)
   // 툴팁
   const { tooltip, showTooltip, hideTooltip } = useTooltip()
-
-  // 스프라이트에서 음식점 이미지 추출
-  const extractFromSprite = (
-    offsetX: number,
-    offsetY: number,
-    width: number,
-    height: number,
-    centerX: number = width / 2,
-    centerY: number = height / 2
-  ): Icon => {
-    return new Icon({
-      src: markers,
-      size: [width, height],
-      offset: [offsetX, offsetY],
-      offsetOrigin: 'top-left',
-      anchor: [centerX / width, centerY / height],
-      scale: 0.6,
-    })
-  }
-
-  // 음식점 아이콘
-  const normalIcon = extractFromSprite(0, 0, SMALL_MARKER_WIDTH, SMALL_MARKER_HEIGHT)
-  const clickedIcon = extractFromSprite(50, 0, SMALL_MARKER_WIDTH, SMALL_MARKER_HEIGHT)
-  const normalHoveredIcon = extractFromSprite(100, 0, LARGE_MARKER_WIDTH, LARGE_MARKER_HEIGHT)
-  const clickedHoveredIcon = extractFromSprite(154, 0, LARGE_MARKER_WIDTH, LARGE_MARKER_HEIGHT)
+  // 라벨 오버레이
+  const labelOverlayRef = useRef<Overlay | null>(null)
+  const labelElementRef = useRef<HTMLDivElement>(null)
 
   // 지도 초기화
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!mapRef.current) return
 
     const map = new OlMap({
@@ -129,6 +105,16 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       controls: [],
     })
 
+    // Label Overlay 생성
+    const labelOverlay = new Overlay({
+      element: labelElementRef.current || undefined,
+      positioning: 'bottom-center',
+      offset: [0, -35],  // 마커 위로 35px
+      stopEvent: false,
+    })
+
+    map.addOverlay(labelOverlay)
+    labelOverlayRef.current = labelOverlay
     mapInstanceRef.current = map
 
     return () => {
@@ -136,7 +122,6 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     }
   }, [])
 
-  // 사용자 위치, 반경에 따라 원 벡터 재설정
   // 사용자 위치, 반경에 따라 원 벡터 재설정
   useEffect(() => {
     if (!mapInstanceRef.current) return
@@ -207,29 +192,25 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     restaurants
       .filter(r => r.survived)
       .forEach(r => {
-        const isClicked = clickedRestaurantId === r.rid
+        const categoryType = mapCategoryToType(r.category)
         const feature = new Feature({
           geometry: new Point(fromLonLat([r.x, r.y])),
           type: 'restaurant',
           rid: r.rid,
-          markerState: isClicked ? MarkerState.CLICKED : MarkerState.NORMAL,
+          name: r.name,
+          category: r.category,
+          categoryType: categoryType,
+          markerState: MarkerState.NORMAL,  // 항상 NORMAL
         })
 
-        const style = isClicked ? clickedIcon : normalIcon
-        feature.setStyle(new Style({ image: style }))
+        const icon = extractCategoryIcon(categoryType, false)  // 기본 아이콘
+        feature.setStyle(new Style({ image: icon }))
         newFeatures.push(feature)
       })
 
     // 벡터 소스에 추가
     newFeatures.forEach(f => vectorSource.addFeature(f))
   }, [restaurants, clickedRestaurantId])
-
-  const createMarkerStyle = (icon: Icon, zIndex: number = 500): Style => {
-    return new Style({
-      image: icon,
-      zIndex: zIndex
-    })
-  }
 
   // 음식점 레이어 클릭, 호버 핸들러
   useEffect(() => {
@@ -252,11 +233,14 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     // 음식점 레이어 호버 상태 복원 함수
     const restoreHovered = (feature: Feature) => {
       const markerState = feature.get('markerState')
+      const categoryType = feature.get('categoryType') as CategoryType
+      const normalIcon = extractCategoryIcon(categoryType, false)
+
       if (markerState === MarkerState.NORMAL_HOVERED) {
         feature.setStyle(new Style({ image: normalIcon }))
         feature.set('markerState', MarkerState.NORMAL)
       } else if (markerState === MarkerState.CLICKED_HOVERED) {
-        feature.setStyle(new Style({ image: clickedIcon }))
+        feature.setStyle(new Style({ image: normalIcon }))
         feature.set('markerState', MarkerState.CLICKED)
       }
     }
@@ -264,11 +248,14 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     // 음식점 레이어 호버 상태 변경 함수
     const setHovered = (feature: Feature) => {
       const markerState = feature.get('markerState')
+      const categoryType = feature.get('categoryType') as CategoryType
+      const hoveredIcon = extractCategoryIcon(categoryType, true)
+
       if (markerState === MarkerState.NORMAL) {
-        feature.setStyle(new Style({ image: normalHoveredIcon }))
+        feature.setStyle(new Style({ image: hoveredIcon }))
         feature.set('markerState', MarkerState.NORMAL_HOVERED)
       } else if (markerState === MarkerState.CLICKED) {
-        feature.setStyle(new Style({ image: clickedHoveredIcon }))
+        feature.setStyle(new Style({ image: hoveredIcon }))
         feature.set('markerState', MarkerState.CLICKED_HOVERED)
       }
     }
@@ -277,8 +264,13 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     const handleClick = (event: MapBrowserEvent<MouseEvent>) => {
       const features: RestaurantFeature[] = getRestaurantFeatures(event.pixel)
 
-      // 음식점 레이어가 여러 개 있을 경우
-      if (features.length > 1) {
+      // 아무 음식점도 클릭하지 않았을 경우
+      if (features.length === 0) {
+        onClickRestaurant('', '')
+      }
+
+      // 클릭된 음식점이 없고, 음식점 레이어가 여러 개 클릭되었을 경우
+      else if (features.length > 1) {
         // 음식점 모달 처리
         const overlappedRids = features.map(f => f.get('rid'))
         const overlappedRestaurants = restaurants.filter(r => overlappedRids.includes(r.rid))
@@ -290,13 +282,12 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           x: event.originalEvent.clientX,
           y: event.originalEvent.clientY
         })
-
-        return
       }
-      // 음식점 레이어가 하나만 있을 경우 클릭 처리
-      else {
+
+      // 클릭된 음식점이 없고, 음식점 레이어가 하나만 클릭되었을 경우
+      else if (features.length === 1) {
         const restaurantId = features[0].get('rid')
-        onClickRestaurant(restaurantId)
+        onClickRestaurant(restaurantId, features[0].get('name'))
       }
     }
 
@@ -304,58 +295,59 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     const handleHover = (event: MapBrowserEvent<MouseEvent>) => {
       const newHoveredFeatures = getRestaurantFeatures(event.pixel)
 
-      // 음식점 레이어가 여러 개 있을 경우 호버링 처리
-      if (newHoveredFeatures.length > 1) {
-        // 툴팁 표시
-        showTooltip(event.originalEvent, `${newHoveredFeatures.length}개`)
-
-        // 과거 마우스 커서 아래에 있었던 음식점 레이어 호버링 복원
+      // 공통 로직: 이전 호버 상태 복원 및 새 호버 상태 적용
+      const updateHoverState = (featuresToHover: Feature[]) => {
+        // 과거 호버된 것 중 현재 호버되지 않은 것 복원
         oldHoveredFeatures.forEach(ohf => {
-          if (!newHoveredFeatures.includes(ohf)) {
+          if (!featuresToHover.includes(ohf)) {
             restoreHovered(ohf)
           }
         })
 
-        // 현재 마우스 커서 아래에 있는 음식점 레이어 호버링 처리
+        // 새로운 호버 상태 적용
         oldHoveredFeatures.clear()
-        newHoveredFeatures.forEach(nhf => {
-          setHovered(nhf)
-          oldHoveredFeatures.add(nhf)
+        featuresToHover.forEach(f => {
+          setHovered(f)
+          oldHoveredFeatures.add(f)
         })
       }
-      // 음식점 레이어가 하나만 있을 경우 호버링 처리
-      else {
-        const newHoveredFeature = newHoveredFeatures[0]
 
-        // 음식점이 있으면 이름과 카테고리 툴팁 표시
-        if (newHoveredFeature) {
-          const rid = newHoveredFeature.get('rid')
-          const restaurant = restaurants.find(r => r.rid === rid)
+      // 공통 로직: 툴팁 표시
+      const showFeatureTooltip = (feature: Feature) => {
+        const name = feature.get('name')
+        const category = feature.get('category')
+        showTooltip(event.originalEvent, `${name} - ${category}`)
+      }
 
-          if (restaurant) {
-            showTooltip(event.originalEvent, `${restaurant.name} - ${restaurant.category}`)
-          }
+      // 클릭된 음식점이 있는 경우: 해당 음식점만 호버 가능
+      if (clickedRestaurantId) {
+        const clickedFeature = newHoveredFeatures.find(f => f.get('rid') === clickedRestaurantId)
+
+        if (clickedFeature) {
+          // showFeatureTooltip(clickedFeature)
+          updateHoverState([clickedFeature])
         } else {
-          // 음식점이 없으면 툴팁 숨기기
           hideTooltip()
+          updateHoverState([])
         }
 
-        // 과거 마우스 커서 아래에 있었던 음식점 레이어 호버링 복원
-        oldHoveredFeatures.forEach(ohf => {
-          if (ohf !== newHoveredFeature) {
-            restoreHovered(ohf)
-          }
-        })
+        map.getViewport().style.cursor = clickedFeature ? 'pointer' : ''
+        return
+      }
 
-        // 현재 마우스 커서 아래에 있는 음식점 레이어 호버링 처리
-        if (newHoveredFeature) {
-          setHovered(newHoveredFeature)
-          oldHoveredFeatures.clear()
-          oldHoveredFeatures.add(newHoveredFeature)
-        } else {
-          oldHoveredFeatures.forEach(ohf => restoreHovered(ohf))
-          oldHoveredFeatures.clear()
-        }
+      // 클릭된 음식점이 없는 경우: 모든 음식점 호버 가능
+      if (newHoveredFeatures.length > 1) {
+        // 여러 개 겹쳐있을 때
+        showTooltip(event.originalEvent, `${newHoveredFeatures.length}개`)
+        updateHoverState(newHoveredFeatures)
+      } else if (newHoveredFeatures.length === 1) {
+        // 하나만 있을 때
+        showFeatureTooltip(newHoveredFeatures[0])
+        updateHoverState([newHoveredFeatures[0]])
+      } else {
+        // 없을 때
+        hideTooltip()
+        updateHoverState([])
       }
 
       map.getViewport().style.cursor = newHoveredFeatures.length > 0 ? 'pointer' : ''
@@ -387,16 +379,21 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   // 음식점 클릭할 때 포커싱 처리
   useEffect(() => {
-    if (!mapInstanceRef.current) return
+    if (!mapInstanceRef.current || !labelOverlayRef.current) return
 
     const vectorSource = vectorSourceRef.current
     const features = vectorSource.getFeatures()
 
     // 상세정보 닫을 경우 클릭 해제 처리
     if (!clickedRestaurantId) {
+
+      // 라벨 숨기기
+      labelOverlayRef.current.setPosition(undefined)
+
       features.forEach(f => {
-        // 투명도, z-index 설정
-        const style = createMarkerStyle(normalIcon, 100)
+        const categoryType = f.get('categoryType') as CategoryType
+        const normalIcon = extractCategoryIcon(categoryType, false)
+        const style = new Style({ image: normalIcon })
         style.getImage()?.setOpacity(1)
         f.setStyle(style)
         f.set('markerState', MarkerState.NORMAL)
@@ -404,17 +401,31 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       return
     }
 
-    // 포커싱
-    const foundFeature = features.find(f => f.get('rid') === clickedRestaurantId)
-    if (foundFeature) {
-      // 투명도, z-index 설정
-      const style = createMarkerStyle(clickedIcon, 100)
-      style.getImage()?.setOpacity(1)
-      foundFeature.setStyle(style)
-      foundFeature.set('markerState', MarkerState.CLICKED)
-      // 뷰 중앙 이동
-      zoomIn(foundFeature.getGeometry())
-    }
+    features.forEach(f => {
+      const categoryType = f.get('categoryType') as CategoryType
+      const normalIcon = extractCategoryIcon(categoryType, false)
+      const isClicked = f.get('rid') === clickedRestaurantId
+
+      const style = new Style({ image: normalIcon })
+      style.getImage()?.setOpacity(isClicked ? 1 : 0.3)
+      f.setStyle(style)
+      f.set('markerState', MarkerState.NORMAL)
+
+      // 클릭된 마커에 라벨 표시
+      if (isClicked) {
+        const geometry = f.getGeometry()
+        if (geometry instanceof Point) {
+          const coordinates = geometry.getCoordinates()
+          labelOverlayRef.current?.setPosition(coordinates)
+
+          // 라벨 텍스트 업데이트
+          if (labelElementRef.current) {
+            labelElementRef.current.textContent = f.get('name')
+          }
+        }
+        zoomIn(geometry)
+      }
+    })
   }, [clickedRestaurantId])
 
   // 음식점 모달 높이 처리
@@ -428,6 +439,10 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   return (
     <div className="vworld-map-container">
       <div ref={mapRef} className="rvm-vworld-map" />
+
+      {/* 음식점 이름 라벨 */}
+      <div ref={labelElementRef} className="rvm-label-overlay" />
+
 
       {/* 겹친 음식점 선택 레이어 */}
       {isOverlapModalOpen && (
@@ -455,7 +470,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
                   key={restaurant.rid}
                   className="om-restaurant"
                   onClick={() => {
-                    onClickRestaurant(restaurant.rid)
+                    onClickRestaurant(restaurant.rid, restaurant.name)
                     setIsOverlapModalOpen(false)
                   }}
                 >

@@ -1,7 +1,7 @@
 .mobile {
   .restaurant-detail-container {
     position: fixed;
-    width: 85%;
+    width: 90%;
     height: 100vh;
     color: var(--white);
     background-color: rgba(0, 0, 0, 0.9);
@@ -17,7 +17,6 @@
     z-index: 4900;
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
       z-index 0s 0.4s;
-    /* 닫힐 때: 0.4초 후 z-index 변경 */
   }
 
   .restaurant-detail-container.open {
@@ -25,15 +24,14 @@
     z-index: 5000;
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
       z-index 0s 0s;
-    /* 열릴 때: 즉시 z-index 변경 */
   }
 
   .detail-toggle-btn {
     position: absolute;
-    top: 175px;
-    right: -40px;
-    width: 40px;
-    height: 40px;
+    top: 185px;
+    right: -30px;
+    width: 30px;
+    height: 80px;
     background-color: var(--light-black);
     border: 1px solid var(--gray);
     border-left: none;
@@ -248,6 +246,14 @@
   .rdv-created-at {
     font-size: 12px;
     color: var(--light-gray);
+  }
+
+  .restaurant-detail-overlay {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 4900;
   }
 }
 

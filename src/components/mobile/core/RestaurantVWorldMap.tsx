@@ -8,6 +8,8 @@ import Tournament from './Tournament'
 import { useSearchParams } from 'react-router-dom'
 import LZString from 'lz-string'
 import { AddIcon } from '@/assets/AddIcon'
+import { CheckIcon } from '@/assets/CheckIcon'
+import Introduction from '@/components/mobile/cs/Introduction'
 
 export interface Category {
   name: string
@@ -41,6 +43,9 @@ const RestaurantVWorldMap = () => {
   const [isListOpen, setIsListOpen] = useState<boolean>(false)
   // 디테일 토글
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false)
+  // 소개 토글
+  const [isIntroOpen, setIsIntroOpen] = useState<boolean>(false)
+
 
   // 위치 정보 가져오기
   useEffect(() => {
@@ -85,7 +90,7 @@ const RestaurantVWorldMap = () => {
           // finalY = position.coords.latitude
           finalX = 127.13229313772779
           finalY = 37.41460591790208
-          finalDistance = 100
+          finalDistance = 200
         }
 
         // State 업데이트
@@ -213,7 +218,7 @@ const RestaurantVWorldMap = () => {
     setClickedRestaurantId(rid)
     setClickedRestaurantName(name)
     // setRestaurantDetail useEffect 추적
-    setIsDetailOpen(true)
+    setIsDetailOpen(rid !== '')
   }
 
   // 토너먼트 열기
@@ -313,6 +318,10 @@ const RestaurantVWorldMap = () => {
     setIsDetailOpen(!isDetailOpen)
   }
 
+  const onToggleIntro = () => {
+    setIsIntroOpen(!isIntroOpen)
+  }
+
   return (
     <div className="rvm-container">
       <div className="rvm-restaurant-list">
@@ -360,10 +369,18 @@ const RestaurantVWorldMap = () => {
           />
         )}
       </div>
+
+      <div className="rvm-introduction">
+        <Introduction
+          isIntroOpen={isIntroOpen}
+          onToggleIntro={onToggleIntro}
+        />
+      </div>
+
       {isShareModalOpen && (
         <div className="share-modal-overlay">
           <div className="share-modal-content">
-            <AddIcon width={80} height={80} />
+            <CheckIcon width={80} height={80} />
             <h2>공유 링크가 복사되었습니다!</h2>
             <p>클립보드에 링크가 저장되었습니다.</p>
           </div>

@@ -32,9 +32,9 @@
 
     .pb-item {
       width: 600px;
-      padding: 10px;
       border-bottom: 1px solid var(--dark-gray);
       box-sizing: border-box;
+      padding-bottom: 10px;
     }
 
     .pb-item-title {

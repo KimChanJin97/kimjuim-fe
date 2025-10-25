@@ -1,5 +1,5 @@
 import './VWorldMap.css'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import OlMap from 'ol/Map'
 import View from 'ol/View'
 import TileLayer from 'ol/layer/Tile'
@@ -13,16 +13,11 @@ import { Style, Icon, Fill, Stroke, Text } from 'ol/style'
 import { fromLonLat, toLonLat } from 'ol/proj'
 import { Restaurant } from './RestaurantVWorldMap'
 import markers from '@/assets/markers.png'
-import { MapBrowserEvent } from 'ol'
+import { MapBrowserEvent, Overlay } from 'ol'
 import Tooltip from '../common/Tooltip'
 import { useTooltip } from '../../../hooks/useTooltip'
 import { Geometry } from 'ol/geom'
-import { useNavigate } from 'react-router-dom'
-
-const SMALL_MARKER_WIDTH = 50
-const SMALL_MARKER_HEIGHT = 50
-const LARGE_MARKER_WIDTH = 54
-const LARGE_MARKER_HEIGHT = 54
+import { CategoryType, mapCategoryToType, extractCategoryIcon } from '@/utils/extractCategoryIcon'
 
 interface VWorldMapProps {
   restaurants: Restaurant[]
@@ -35,7 +30,9 @@ interface VWorldMapProps {
 
 interface RestaurantFeature extends Feature {
   get(key: 'rid'): string;
+  get(key: 'name'): string;
   get(key: 'type'): string;
+  get(key: 'categoryType'): CategoryType;
   get(key: 'markerState'): MarkerState;
 }
 
@@ -50,13 +47,11 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   restaurants, x, y, distance, clickedRestaurantId, onClickRestaurant
 }) => {
 
-  const navigate = useNavigate()
   const mapRef = useRef<HTMLDivElement>(null)
   const mapInstanceRef = useRef<OlMap | null>(null)
   const vectorSourceRef = useRef<VectorSource>(new VectorSource())
   const circleSourceRef = useRef<VectorSource>(new VectorSource())
   const modalRef = useRef<HTMLDivElement>(null)
-  const hoveredFeaturesRef = useRef<Set<Feature>>(new Set())
   // 완전히 동일한 좌표를 가진 음식점 처리
   const [overlappedRestaurants, setOverlappedRestaurants] = useState<Restaurant[]>([])
   const [isOverlapModalOpen, setIsOverlapModalOpen] = useState(false)
@@ -64,34 +59,12 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   const [overlapModalHeight, setOverlapModalHeight] = useState(0)
   // 툴팁
   const { tooltip, showTooltip, hideTooltip } = useTooltip()
-
-  // 스프라이트에서 음식점 이미지 추출
-  const extractFromSprite = (
-    offsetX: number,
-    offsetY: number,
-    width: number,
-    height: number,
-    centerX: number = width / 2,
-    centerY: number = height / 2
-  ): Icon => {
-    return new Icon({
-      src: markers,
-      size: [width, height],
-      offset: [offsetX, offsetY],
-      offsetOrigin: 'top-left',
-      anchor: [centerX / width, centerY / height],
-      scale: 0.6,
-    })
-  }
-
-  // 음식점 아이콘
-  const normalIcon = extractFromSprite(0, 0, SMALL_MARKER_WIDTH, SMALL_MARKER_HEIGHT)
-  const clickedIcon = extractFromSprite(50, 0, SMALL_MARKER_WIDTH, SMALL_MARKER_HEIGHT)
-  const normalHoveredIcon = extractFromSprite(100, 0, LARGE_MARKER_WIDTH, LARGE_MARKER_HEIGHT)
-  const clickedHoveredIcon = extractFromSprite(154, 0, LARGE_MARKER_WIDTH, LARGE_MARKER_HEIGHT)
+  // 라벨 오버레이
+  const labelOverlayRef = useRef<Overlay | null>(null)
+  const labelElementRef = useRef<HTMLDivElement>(null)
 
   // 지도 초기화
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!mapRef.current) return
 
     const map = new OlMap({
@@ -131,6 +104,16 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       controls: [],
     })
 
+    // Label Overlay 생성
+    const labelOverlay = new Overlay({
+      element: labelElementRef.current || undefined,
+      positioning: 'bottom-center',
+      offset: [0, -35],  // 마커 위로 35px
+      stopEvent: false,
+    })
+
+    map.addOverlay(labelOverlay)
+    labelOverlayRef.current = labelOverlay
     mapInstanceRef.current = map
 
     return () => {
@@ -208,17 +191,19 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     restaurants
       .filter(r => r.survived)
       .forEach(r => {
-        const isClicked = clickedRestaurantId === r.rid
+        const categoryType = mapCategoryToType(r.category)
         const feature = new Feature({
           geometry: new Point(fromLonLat([r.x, r.y])),
           type: 'restaurant',
           rid: r.rid,
           name: r.name,
-          markerState: isClicked ? MarkerState.CLICKED : MarkerState.NORMAL,
+          category: r.category,
+          categoryType: categoryType,
+          markerState: MarkerState.NORMAL,  // 항상 NORMAL
         })
 
-        const style = isClicked ? clickedIcon : normalIcon
-        feature.setStyle(new Style({ image: style }))
+        const icon = extractCategoryIcon(categoryType, false)  // 기본 아이콘
+        feature.setStyle(new Style({ image: icon }))
         newFeatures.push(feature)
       })
 
@@ -226,19 +211,11 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     newFeatures.forEach(f => vectorSource.addFeature(f))
   }, [restaurants, clickedRestaurantId])
 
-  const createMarkerStyle = (icon: Icon, zIndex: number = 500): Style => {
-    return new Style({
-      image: icon,
-      zIndex: zIndex
-    })
-  }
-
-  // 음식점 레이어 클릭, 호버 핸들러
+  // 음식점 레이어 클릭 핸들러
   useEffect(() => {
     if (!mapInstanceRef.current) return
 
     const map = mapInstanceRef.current
-    const oldHoveredFeatures = hoveredFeaturesRef.current
 
     // 마우스 커서 아래의 음식점 레이어 수집
     const getRestaurantFeatures = (pixel: number[]): Feature[] => {
@@ -252,11 +229,16 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     }
 
     // 클릭 핸들러
-    const handleSingleClick = (event: MapBrowserEvent<MouseEvent>) => {
+    const handleClick = (event: MapBrowserEvent<MouseEvent>) => {
       const features: RestaurantFeature[] = getRestaurantFeatures(event.pixel)
 
-      // 음식점 레이어가 여러 개 있을 경우
-      if (features.length > 1) {
+      // 아무 음식점도 클릭하지 않았을 경우
+      if (features.length === 0) {
+        onClickRestaurant('', '')
+      }
+
+      // 클릭된 음식점이 없고, 음식점 레이어가 여러 개 클릭되었을 경우
+      else if (features.length > 1) {
         // 음식점 모달 처리
         const overlappedRids = features.map(f => f.get('rid'))
         const overlappedRestaurants = restaurants.filter(r => overlappedRids.includes(r.rid))
@@ -268,21 +250,19 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           x: event.originalEvent.clientX,
           y: event.originalEvent.clientY
         })
-
-        return
       }
-      // 음식점 레이어가 하나만 있을 경우 클릭 처리
-      else {
+
+      // 클릭된 음식점이 없고, 음식점 레이어가 하나만 클릭되었을 경우
+      else if (features.length === 1) {
         const restaurantId = features[0].get('rid')
-        const restaurantName = features[0].get('name')
-        onClickRestaurant(restaurantId, restaurantName)
+        onClickRestaurant(restaurantId, features[0].get('name'))
       }
     }
 
-    map.on('singleclick', handleSingleClick)
+    map.on('singleclick', handleClick)
 
     return () => {
-      map.un('singleclick', handleSingleClick)
+      map.un('singleclick', handleClick)
     }
   }, [clickedRestaurantId, restaurants])
 
@@ -303,16 +283,22 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   // 음식점 클릭할 때 포커싱 처리
   useEffect(() => {
-    if (!mapInstanceRef.current) return
+    if (!mapInstanceRef.current || !labelOverlayRef.current) return
 
     const vectorSource = vectorSourceRef.current
     const features = vectorSource.getFeatures()
 
     // 상세정보 닫을 경우 클릭 해제 처리
     if (!clickedRestaurantId) {
+
+      // 라벨 숨기기
+      labelOverlayRef.current.setPosition(undefined)
+
+      // 투명도 복원
       features.forEach(f => {
-        // 투명도, z-index 설정
-        const style = createMarkerStyle(normalIcon, 100)
+        const categoryType = f.get('categoryType') as CategoryType
+        const normalIcon = extractCategoryIcon(categoryType, false)
+        const style = new Style({ image: normalIcon })
         style.getImage()?.setOpacity(1)
         f.setStyle(style)
         f.set('markerState', MarkerState.NORMAL)
@@ -320,17 +306,31 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       return
     }
 
-    // 포커싱
-    const foundFeature = features.find(f => f.get('rid') === clickedRestaurantId)
-    if (foundFeature) {
-      // 투명도, z-index 설정
-      const style = createMarkerStyle(clickedIcon, 100)
-      style.getImage()?.setOpacity(1)
-      foundFeature.setStyle(style)
-      foundFeature.set('markerState', MarkerState.CLICKED)
-      // 뷰 중앙 이동
-      zoomIn(foundFeature.getGeometry())
-    }
+    features.forEach(f => {
+      const categoryType = f.get('categoryType') as CategoryType
+      const normalIcon = extractCategoryIcon(categoryType, false)
+      const isClicked = f.get('rid') === clickedRestaurantId
+
+      const style = new Style({ image: normalIcon })
+      style.getImage()?.setOpacity(isClicked ? 1 : 0.3)
+      f.setStyle(style)
+      f.set('markerState', MarkerState.NORMAL)
+
+      // 클릭된 마커에 라벨 표시
+      if (isClicked) {
+        const geometry = f.getGeometry()
+        if (geometry instanceof Point) {
+          const coordinates = geometry.getCoordinates()
+          labelOverlayRef.current?.setPosition(coordinates)
+
+          // 라벨 텍스트 업데이트
+          if (labelElementRef.current) {
+            labelElementRef.current.textContent = f.get('name')
+          }
+        }
+        zoomIn(geometry)
+      }
+    })
   }, [clickedRestaurantId])
 
   // 음식점 모달 높이 처리
@@ -343,8 +343,10 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
   return (
     <div className="vworld-map-container">
-
       <div ref={mapRef} className="rvm-vworld-map" />
+
+      {/* 음식점 이름 라벨 */}
+      <div ref={labelElementRef} className="rvm-label-overlay" />
 
       {/* 겹친 음식점 선택 레이어 */}
       {isOverlapModalOpen && (

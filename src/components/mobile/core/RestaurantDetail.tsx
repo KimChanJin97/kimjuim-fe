@@ -79,7 +79,6 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
           {!restaurantName && (
             <div className="rd-title">음식점 상세정보</div>
           )}
-
         </div>
 
         <div className="rd-body" ref={rdBodyRef}>
@@ -212,6 +211,8 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
 
         </div>
       </div >
+
+      {isDetailOpen && <div className="restaurant-detail-overlay" onClick={() => onToggleDetail()}></div>}
     </>
   )
 }

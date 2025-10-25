@@ -393,6 +393,8 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
           )}
         </div>
       </div>
+
+      {isListOpen && <div className="restaurant-list-overlay" onClick={() => onToggleList()}></div>}
     </>
   )
 }

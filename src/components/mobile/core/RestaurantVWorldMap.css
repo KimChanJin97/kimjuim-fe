@@ -34,20 +34,21 @@
     background-color: var(--white);
     border-radius: 20px;
     padding: 30px 30px;
+    margin: 20px 20px;
     text-align: center;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     animation: slideUp 0.3s ease-out;
   }
 
   .share-modal-content h2 {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--black);
     margin-bottom: 10px;
   }
 
   .share-modal-content p {
-    font-size: 16px;
+    font-size: 14px;
     color: var(--dark-gray);
     margin: 0;
   }

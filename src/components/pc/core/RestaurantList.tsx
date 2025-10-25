@@ -372,7 +372,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
           {survivedRestaurants.length <= 1 && (
             <>
               <button className="rl-worldcup btn disabled">
-                <span>점심 월드컵 불가</span>
+                <span>월드컵 불가</span>
               </button>
               <button className="rl-share btn disabled">
                 <span>공유 불가</span>
@@ -385,7 +385,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                 className="rl-worldcup btn"
                 onClick={onClickTournament}
               >
-                <span>점심 월드컵 {calculateRound(survivedRestaurants.length)}강 시작</span>
+                <span>월드컵 {calculateRound(survivedRestaurants.length)}강 시작</span>
               </button>
               <button className="rl-share btn" onClick={onClickShare}>
                 <span>공유하기</span>

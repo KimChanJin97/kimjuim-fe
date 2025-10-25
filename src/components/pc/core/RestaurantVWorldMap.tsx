@@ -8,6 +8,7 @@ import Tournament from './Tournament'
 import { useSearchParams } from 'react-router-dom'
 import LZString from 'lz-string'
 import { AddIcon } from '@/assets/AddIcon'
+import { CheckIcon } from '@/assets/CheckIcon'
 
 export interface Category {
   name: string
@@ -80,7 +81,7 @@ const RestaurantVWorldMap = () => {
           // finalY = position.coords.latitude
           finalX = 127.13229313772779
           finalY = 37.41460591790208
-          finalDistance = 100
+          finalDistance = 200
         }
 
         // State 업데이트
@@ -223,6 +224,8 @@ const RestaurantVWorldMap = () => {
       if (clickedRestaurantId) {
         const response = await getRestaurantDetail(clickedRestaurantId)
         setRestaurantDetail(response)
+      } else {
+        setRestaurantDetail(null)
       }
     }
     fetchRestaurantDetail()
@@ -273,6 +276,7 @@ const RestaurantVWorldMap = () => {
           <RestaurantDetail
             restaurantDetail={restaurantDetail}
             onCloseRestaurantDetail={onCloseRestaurantDetail}
+
           />
         )}
       </div>
@@ -298,7 +302,7 @@ const RestaurantVWorldMap = () => {
       {isShareModalOpen && (
         <div className="share-modal-overlay">
           <div className="share-modal-content">
-            <AddIcon width={80} height={80} />
+            <CheckIcon width={80} height={80} />
             <h2>공유 링크가 복사되었습니다!</h2>
             <p>클립보드에 링크가 저장되었습니다.</p>
           </div>

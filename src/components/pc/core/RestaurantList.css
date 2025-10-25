@@ -356,7 +356,7 @@
     border: none;
     cursor: pointer;
     border-radius: 8px;
-    font-size: 15px;
+    font-size: 1.2em;
     color: var(--white);
     font-weight: 700;
     padding: 10px 20px;

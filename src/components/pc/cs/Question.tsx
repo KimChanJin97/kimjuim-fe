@@ -142,7 +142,7 @@ const Question = () => {
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
                 >
-                  <option value="" disabled selected>문의 유형을 선택하세요</option>
+                  <option value="" disabled>문의 유형을 선택하세요</option>
                   <option value="버그 신고">버그 신고</option>
                   <option value="신기능 건의">신기능 건의</option>
                   <option value="음식점 신규 등록">음식점 신규 등록</option>

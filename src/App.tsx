@@ -78,7 +78,6 @@ const App = () => {
         </div>
       )}
 
-
       {isMobilePath ? (
         <div className="mobile">
           <MobileHeader />

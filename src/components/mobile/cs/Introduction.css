@@ -1,7 +1,9 @@
 .mobile {
   .intro-container {
     position: fixed;
-    width: 85%;
+    left: 0;
+    top: 0;
+    width: 90%;
     height: 100vh;
     color: var(--white);
     background-color: rgba(0, 0, 0, 0.9);
@@ -17,7 +19,6 @@
     z-index: 4900;
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
       z-index 0s 0.4s;
-    /* 닫힐 때: 0.4초 후 z-index 변경 */
   }
 
   .intro-container.open {
@@ -25,15 +26,14 @@
     z-index: 5000;
     transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
       z-index 0s 0s;
-    /* 열릴 때: 즉시 z-index 변경 */
   }
 
   .intro-toggle-btn {
     position: absolute;
-    top: 225px;
-    right: -40px;
-    width: 40px;
-    height: 40px;
+    top: 375px;
+    right: -30px;
+    width: 30px;
+    height: 80px;
     background-color: var(--light-black);
     border: 1px solid var(--gray);
     border-left: none;
@@ -61,37 +61,29 @@
     transform: rotate(0deg);
   }
 
-  .intro-header {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--white);
-    margin: 150px 0;
-    text-align: center;
-  }
-
   .intro-bg {
-    height: 520px;
+    height: 280px;
     background: linear-gradient(135deg, #242424 0%, #121212 50%, #000000 100%);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     position: relative;
+    flex-shrink: 0;
   }
 
   .intro-text {
     position: absolute;
-    top: -10px;
-    left: -15px;
-    font-size: 48px;
+    top: -12px;
+    left: -8px;
+    font-size: 16px;
     font-weight: 900;
     color: var(--white);
     opacity: 0.05;
-    line-height: 1.1;
+    line-height: 1.2;
     word-break: break-all;
     white-space: normal;
-    width: 101%;
-    /* 양 옆이 잘리도록 */
+    width: 105%;
     max-width: none;
     text-align: center;
     letter-spacing: -0.05em;
@@ -111,69 +103,79 @@
     transform: translate(-50%, -50%);
     text-align: center;
     color: var(--white);
+    width: 90%;
   }
 
   .intro-main-text h2 {
     margin: 0;
-    font-size: 56px;
+    font-size: 20px;
     font-weight: 700;
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
   .intro-main-text h2:first-child {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .intro-body {
-    display: grid;
-    grid-template-columns: auto auto;
-    gap: 60px;
-    align-items: center;
-    justify-content: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 30px 20px 160px 20px;
+    flex: 1;
+    overflow-y: auto;
+  }
 
-    .ib-first,
-    .ib-second,
-    .ib-third,
-    .ib-fourth,
-    .ib-fifth,
-    .ib-sixth {
-      width: 400px;
-      height: 240px;
-      background-color: var(--dark-gray);
-      border-radius: 10px;
-      padding: 40px;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      justify-content: flex-start;
-      line-height: 1.8;
-      box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.1);
-      transition: all 0.3s ease;
-
-      &:hover {
-        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.4);
-        transition: all 0.5s ease;
-        scale: 1.05;
-      }
-    }
-
-    strong {
-      font-size: 18px;
-      font-weight: 800;
-    }
+  .ib-first,
+  .ib-second,
+  .ib-third,
+  .ib-fourth,
+  .ib-fifth,
+  .ib-sixth {
+    width: 100%;
+    background-color: var(--dark-gray);
+    border-radius: 8px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
   .ib-text-header {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
+    gap: 12px;
+    margin-bottom: 4px;
+  }
+
+  .ib-text-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--white);
   }
 
   .ib-text-header-image {
-    margin-right: 15px;
+    width: 28px !important;
+    height: 28px !important;
     background-color: var(--light-black);
     border-radius: 5px;
-    padding: 5px;
+    padding: 4px;
+    flex-shrink: 0;
+  }
+
+  .intro-body p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.9);
+  }
+
+  .intro-body strong {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--white);
   }
 }

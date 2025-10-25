@@ -93,6 +93,20 @@
     font-size: 13px;
     color: var(--light-gray);
   }
+
+  .rvm-label-overlay {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    /* 클릭 이벤트 방지 */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
 }
 
 @keyframes fromUpToDown {

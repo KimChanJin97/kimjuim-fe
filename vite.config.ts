@@ -8,8 +8,14 @@ export default defineConfig({
     react(),
   ],
   server: {
-    host: '0.0.0.0', // 모든 네트워크 인터페이스에서 접근 가능
+    host: '0.0.0.0',
     port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://172.30.1.56:8080',
+        changeOrigin: true,
+      },
+    },
   },
   resolve: {
     alias: {

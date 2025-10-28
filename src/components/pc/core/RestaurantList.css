@@ -330,11 +330,9 @@
     align-items: center;
     gap: 15px;
     position: absolute;
-    bottom: 20px;
+    bottom: 60px;
     width: 100%;
-    padding-left: 30px;
-    padding-right: 30px;
-    padding-bottom: 60px;
+    padding: 0 30px;
     box-sizing: border-box;
   }
 

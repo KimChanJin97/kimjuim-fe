@@ -10,6 +10,8 @@ import LZString from 'lz-string'
 import { AddIcon } from '@/assets/AddIcon'
 import { CheckIcon } from '@/assets/CheckIcon'
 import Introduction from '@/components/mobile/cs/Introduction'
+import Patchnote from '@/components/mobile/cs/Patchnote'
+import Question from '@/components/mobile/cs/Question'
 
 export interface Category {
   name: string
@@ -45,7 +47,10 @@ const RestaurantVWorldMap = () => {
   const [isDetailOpen, setIsDetailOpen] = useState<boolean>(false)
   // 소개 토글
   const [isIntroOpen, setIsIntroOpen] = useState<boolean>(false)
-
+  // 패치노트 토글
+  const [isPatchnoteOpen, setIsPatchnoteOpen] = useState<boolean>(false)
+  // 문의하기 토글
+  const [isQuestionOpen, setIsQuestionOpen] = useState<boolean>(false)
 
   // 위치 정보 가져오기
   useEffect(() => {
@@ -114,8 +119,7 @@ const RestaurantVWorldMap = () => {
   // 음식점 정보 가져오기
   const loadRestaurants = async (x: number, y: number, d: number, ex: string[]) => {
     try {
-      const response = await getRestaurantNearby({ x, y, d, ex })
-      const restaurants = response.restaurantNearbyResponses
+      const restaurants = await getRestaurantNearby({ x, y, d, ex })
 
       // 카테고리
       const categoriesSet = new Set(restaurants.map((r) => r.category))
@@ -258,8 +262,8 @@ const RestaurantVWorldMap = () => {
     const compressed = LZString.compressToEncodedURIComponent(jsonString)
 
     // 현재 경로 기반으로 URL 생성
-    const isMobile = window.location.pathname.startsWith('/m')
-    const path = isMobile ? '/m/map' : '/map'
+    const isMobile = window.location.pathname.startsWith('/mobile')
+    const path = isMobile ? '/mobile/map' : '/map'
     const url = `${window.location.origin}${path}?data=${compressed}`
 
     // clipboard API 지원 확인
@@ -322,6 +326,14 @@ const RestaurantVWorldMap = () => {
     setIsIntroOpen(!isIntroOpen)
   }
 
+  const onTogglePatchnote = () => {
+    setIsPatchnoteOpen(!isPatchnoteOpen)
+  }
+
+  const onToggleQuestion = () => {
+    setIsQuestionOpen(!isQuestionOpen)
+  }
+
   return (
     <div className="rvm-container">
       <div className="rvm-restaurant-list">
@@ -374,6 +386,20 @@ const RestaurantVWorldMap = () => {
         <Introduction
           isIntroOpen={isIntroOpen}
           onToggleIntro={onToggleIntro}
+        />
+      </div>
+
+      <div className="rvm-patchnote">
+        <Patchnote
+          isPatchnoteOpen={isPatchnoteOpen}
+          onTogglePatchnote={onTogglePatchnote}
+        />
+      </div>
+
+      <div className="rvm-question">
+        <Question
+          isQuestionOpen={isQuestionOpen}
+          onToggleQuestion={onToggleQuestion}
         />
       </div>
 

@@ -4,8 +4,8 @@ import RestaurantVWorldMap from '@/components/mobile/core/RestaurantVWorldMap'
 const Home = () => {
   return (
     <Routes>
-      <Route path="/m" element={<RestaurantVWorldMap />} />
-      <Route path="/m/map" element={<RestaurantVWorldMap />} />
+      <Route path="/mobile" element={<RestaurantVWorldMap />} />
+      <Route path="/mobile/map" element={<RestaurantVWorldMap />} />
     </Routes>
   )
 }

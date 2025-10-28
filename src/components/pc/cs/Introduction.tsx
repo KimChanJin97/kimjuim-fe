@@ -12,16 +12,16 @@ const Introduction = () => {
     <div className="intro-container scrollbar-custom">
       <div className="intro-bg">
         <div className="intro-text">
-          <h1>김주임님, 메뉴 좀 골라주세요. 고기 드시죠? 점심부터 고기는 좀; 그럼 면 드실래요? 밥을 먹어야죠; 설렁탕 어때요? 설렁탕은 어제 먹었잖아요; 그럼 피자? 밀가루잖아요; 그럼 죽? 죽 쑬 일 있어요? 그럼 순두부 어때요? 입 데일 일 있어요? 좀 깔끔하고 담백한 메뉴 없을까요?</h1>
+          <h1>김쥠님, 메뉴 좀 골라주세요. 고기 드시죠? 점심부터 고기는 좀; 그럼 면 드실래요? 밥을 먹어야죠; 설렁탕 어때요? 설렁탕은 어제 먹었잖아요; 그럼 피자? 밀가루잖아요; 그럼 죽? 죽 쑬 일 있어요? 그럼 순두부 어때요? 입 데일 일 있어요? 좀 깔끔하고 담백한 메뉴 없을까요?</h1>
         </div>
         <div className="intro-main-text">
           <h2>직장인 최대 고민, 메뉴 고르기</h2>
-          <h2>김주임이 해결해드립니다.</h2>
+          <h2>김쥠님이 해결해드립니다.</h2>
         </div>
       </div>
 
       <div className="intro-header">
-        <h3>김주임은 일상의 고민에 작은 즐거움을 더해드리고자 합니다.</h3>
+        <h3>김쥠님은 일상의 고민에 작은 즐거움을 더해드립니다.</h3>
       </div>
 
       <div className="intro-body">
@@ -63,7 +63,7 @@ const Introduction = () => {
             <img src={PcMobileImage} width={30} alt="data Image" className="ib-text-header-image" />
             <h3>PC / Mobile 지원</h3>
           </div>
-          <p>PC / Mobile 버전을 모두 지원합니다. 더 나은 경험을 위해 <strong>Mobile</strong> 에서는 <strong>크롬 브라우저</strong> <br /> 사용을 권장드립니다.</p>
+          <p>PC / Mobile 버전을 모두 지원합니다. <strong>디바이스 종류</strong>와 관계없이 서비스를 이용하실 수 있습니다.</p>
         </div>
 
         <div className="ib-sixth">

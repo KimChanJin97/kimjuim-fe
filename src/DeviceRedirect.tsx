@@ -10,16 +10,16 @@ const DeviceRedirect = () => {
   useEffect(() => {
     const { pathname, search } = location
 
-    // 모바일/태블릿은 /m 경로로
-    if ((device.isMobile || device.isTablet) && !pathname.startsWith('/m/') && pathname !== '/m') {
+    // 모바일/태블릿은 /mobile 경로로
+    if ((device.isMobile || device.isTablet) && !pathname.startsWith('/mobile/') && pathname !== '/mobile') {
       let mobilePath: string
 
       if (pathname === '/') {
-        mobilePath = '/m'  // 홈
-      } else if (pathname === '/map') {
-        mobilePath = '/m/map'  // 지도
+        mobilePath = '/mobile'
+      } else if (pathname === '/map' || pathname === '/introduction' || pathname === '/question' || pathname === '/patchnote') {
+        mobilePath = '/mobile'
       } else {
-        mobilePath = `/m${pathname}`
+        mobilePath = `/mobile${pathname}`
       }
 
       console.log(`[${device.type}] → ${mobilePath}`)
@@ -27,9 +27,9 @@ const DeviceRedirect = () => {
       return
     }
 
-    // PC는 /m 경로에서 벗어나기
-    if (device.isPC && (pathname.startsWith('/m/') || pathname === '/m')) {
-      const pcPath = pathname.replace(/^\/m/, '') || '/'
+    // PC는 /mobile 경로에서 벗어나기
+    if (device.isPC && (pathname.startsWith('/mobile/') || pathname === '/mobile')) {
+      const pcPath = pathname.replace(/^\/mobile/, '') || '/'
       console.log(`[${device.type}] → ${pcPath}`)
       navigate(pcPath + search, { replace: true })
     }

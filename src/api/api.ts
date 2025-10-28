@@ -63,7 +63,7 @@ export const getRestaurantNearby = async (params: {
   y: number
   d: number
   ex: string[]
-}): Promise<RestaurantNearbyResponses> => {
+}): Promise<RestaurantNearbyResponse[]> => {
   const queryParams: any = {
     x: params.x,
     y: params.y,
@@ -75,7 +75,7 @@ export const getRestaurantNearby = async (params: {
     queryParams.ex = params.ex
   }
 
-  const response = await api.get<RestaurantNearbyResponses>('/restaurants/nearby', {
+  const response = await api.get<RestaurantNearbyResponse[]>('/restaurants/nearby', {
     params: queryParams,
     paramsSerializer: {
       indexes: null, // ?ex=rid1&ex=rid2 형태

@@ -4,16 +4,22 @@ import upIcon from '@/assets/up.png'
 import downIcon from '@/assets/down.png'
 import profileImage from '@/assets/profile.png'
 import { sendMailMessage } from '@/api/api'
-import { profile } from 'console'
+import ArrowLeftIcon from '@/assets/lt-arrow.png'
 
-const Question = () => {
+const Question = ({
+  isQuestionOpen,
+  onToggleQuestion,
+}: {
+  isQuestionOpen: boolean
+  onToggleQuestion: () => void
+}) => {
 
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null)
 
   const faqs = [
     {
       question: "서비스 이용은 무료인가요?",
-      answer: "넵, 김주임 서비스는 무료입니다."
+      answer: "넵, 김쥠님 서비스는 무료입니다."
     },
     {
       question: "음식점 업데이트가 필요해요.",
@@ -29,7 +35,7 @@ const Question = () => {
     },
     {
       question: "하얀색 화면만 보여요.",
-      answer: "김주임은 크롤링 방지를 위해 블랙리스트 로직이 구현되어 있습니다. 크롤링을 시도하지 않았지만 하얀색 화면만 보인다면 문의하기를 통해 이메일을 보내주시기 바랍니다."
+      answer: "김쥠님은 크롤링 방지를 위해 블랙리스트 로직이 구현되어 있습니다. 크롤링을 시도하지 않았지만 하얀색 화면만 보인다면 문의하기를 통해 이메일을 보내주시기 바랍니다."
     },
     {
       question: "서비스 운영 비용은 어떻게 충당하나요?",
@@ -98,113 +104,20 @@ const Question = () => {
 
 
   return (
-    <div className="question-container scrollbar-custom">
-      <div className="question-container-center">
+    <>
+      <div className={`question-container scrollbar-custom ${isQuestionOpen ? 'open' : 'closed'}`}>
 
-        {/* 문의하기 섹션 */}
-        <div className="question-section">
-          <div className="question-header">
-            <h3>문의하기</h3>
-          </div>
+        <button
+          className="question-toggle-btn"
+          onClick={() => onToggleQuestion()}
+          aria-label={isQuestionOpen ? "문의하기 닫기" : "문의하기 열기"}
+        >
+          <span className={`toggle-arrow ${isQuestionOpen ? 'open' : ''}`}>
+            <img src={ArrowLeftIcon} alt="arrow-left" width={12} height={12} />
+          </span>
+        </button>
 
-          <div className="question-body">
-            <div className="qb-form">
-
-              <div className="qbf-required">
-                <span>* 필수 입력 항목</span>
-              </div>
-
-              <div className="qbf-name">
-                <h4 className="qbf-key">이름 *</h4>
-                <input
-                  type="text"
-                  placeholder="이름을 작성해주세요."
-                  className={errors.name ? 'error' : ''}
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
-              </div>
-              <div className="qbf-email">
-                <h4 className="qbf-key">이메일 *</h4>
-                <input
-                  type="email"
-                  placeholder="이메일을 작성해주세요."
-                  className={errors.email ? 'error' : ''}
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-              </div>
-
-              <div className="qbf-type">
-                <h4 className="qbf-key">문의 유형 *</h4>
-                <select
-                  className={errors.type ? 'error' : ''}
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                >
-                  <option value="" disabled>문의 유형을 선택하세요</option>
-                  <option value="버그 신고">버그 신고</option>
-                  <option value="신기능 건의">신기능 건의</option>
-                  <option value="음식점 신규 등록">음식점 신규 등록</option>
-                  <option value="기타">기타</option>
-                </select>
-              </div>
-
-              <div className="qbf-title">
-                <h4 className="qbf-key">제목 *</h4>
-                <input
-                  type="text"
-                  placeholder="제목을 작성해주세요."
-                  className={errors.title ? 'error' : ''}
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                />
-              </div>
-
-              <div className="qbf-content">
-                <h4 className="qbf-key">내용 *</h4>
-                <textarea
-                  placeholder="내용을 작성해주세요."
-                  className={errors.content ? 'error' : ''}
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                />
-              </div>
-
-              <div className="qbf-file">
-                <h4 className="qbf-key">첨부 파일</h4>
-                <input
-                  type="file"
-                  onChange={(e) => setFormData({ ...formData, file: e.target.files?.[0] || null })}
-                />
-              </div>
-
-              <div className="qbf-agreement">
-                <div className="qbfa-row">
-                  <input
-                    type="checkbox"
-                    className={errors.agreement ? 'error' : ''}
-                    checked={formData.agreement}
-                    onChange={(e) => setFormData({ ...formData, agreement: e.target.checked })}
-                  />
-                  <h4 className="qbf-key-no-margin">개인정보 수집 및 이용 동의</h4>
-                </div>
-
-                <ul>
-                  <li>수집 항목: 이름, 이메일</li>
-                  <li>수집 목적: 의사소통 채널 확보 및 문의 사항 처리</li>
-                  <li>보유 기간: 문의 처리 완료시까지</li>
-                </ul>
-              </div>
-
-              <div className="qbf-submit">
-                <button onClick={handleSubmit}>제출</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="question-container-right">
+        <div className="question-container-center">
 
           {/* 프로필 섹션 */}
           <div className="profile-section">
@@ -221,7 +134,7 @@ const Question = () => {
                     <p>IT본부 / 주임</p>
                     <h3>김&nbsp;&nbsp;찬&nbsp;&nbsp;진
                       &nbsp;&nbsp;<span className="splitter">|</span>&nbsp;&nbsp;
-                      서버 개발자
+                      개&nbsp;&nbsp;발&nbsp;&nbsp;자
                     </h3>
                     <p>경기도 성남시 분당구</p>
                     <p>kimjuim.dev@gmail.com</p>
@@ -229,7 +142,7 @@ const Question = () => {
                 </div>
                 <div className="profile-image-info">
                   <ul>
-                    <li>김주임은 퇴근 이후와 주말 동안에만 개발되고 있습니다.</li>
+                    <li>김쥠님은 퇴근 이후와 주말 동안에만 개발되고 있습니다.</li>
                     <li>기획, 디자인, 개발을 혼자 수행하기 때문에 CS와 버그 패치가 다소 늦어질 수 있다는 점 양해해주시면 감사드리겠습니다.</li>
                     <li>빠르고 안정적인 서비스를 제공하기 위해 최선을 다하겠습니다.</li>
                   </ul>
@@ -238,6 +151,112 @@ const Question = () => {
 
             </div>
           </div>
+
+          {/* 문의하기 섹션 */}
+          <div className="question-section">
+            <div className="question-header">
+              <h3>문의하기</h3>
+            </div>
+
+            <div className="question-body">
+              <div className="qb-form">
+
+                <div className="qbf-required">
+                  <span>* 필수 입력 항목</span>
+                </div>
+
+                <div className="qbf-name">
+                  <h4 className="qbf-key">이름 *</h4>
+                  <input
+                    type="text"
+                    placeholder="이름을 작성해주세요."
+                    className={errors.name ? 'error' : ''}
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </div>
+                <div className="qbf-email">
+                  <h4 className="qbf-key">이메일 *</h4>
+                  <input
+                    type="email"
+                    placeholder="이메일을 작성해주세요."
+                    className={errors.email ? 'error' : ''}
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  />
+                </div>
+
+                <div className="qbf-type">
+                  <h4 className="qbf-key">문의 유형 *</h4>
+                  <select
+                    className={errors.type ? 'error' : ''}
+                    value={formData.type}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                  >
+                    <option value="" disabled>문의 유형을 선택하세요</option>
+                    <option value="버그 신고">버그 신고</option>
+                    <option value="신기능 건의">신기능 건의</option>
+                    <option value="음식점 신규 등록">음식점 신규 등록</option>
+                    <option value="기타">기타</option>
+                  </select>
+                </div>
+
+                <div className="qbf-title">
+                  <h4 className="qbf-key">제목 *</h4>
+                  <input
+                    type="text"
+                    placeholder="제목을 작성해주세요."
+                    className={errors.title ? 'error' : ''}
+                    value={formData.title}
+                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  />
+                </div>
+
+                <div className="qbf-content">
+                  <h4 className="qbf-key">내용 *</h4>
+                  <textarea
+                    placeholder="내용을 작성해주세요."
+                    className={errors.content ? 'error' : ''}
+                    value={formData.content}
+                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                  />
+                </div>
+
+                <div className="qbf-file">
+                  <h4 className="qbf-key">첨부 파일</h4>
+                  <input
+                    type="file"
+                    onChange={(e) => setFormData({ ...formData, file: e.target.files?.[0] || null })}
+                  />
+                </div>
+
+                <div className="qbf-agreement">
+                  <div className="qbfa-row">
+                    <input
+                      type="checkbox"
+                      className={errors.agreement ? 'error' : ''}
+                      checked={formData.agreement}
+                      onChange={(e) => setFormData({ ...formData, agreement: e.target.checked })}
+                    />
+                    <h4 className="qbf-key-no-margin">개인정보 수집 및 이용 동의</h4>
+                  </div>
+
+                  <ul>
+                    <li>수집 항목: 이름, 이메일</li>
+                    <li>수집 목적: 의사소통 채널 확보 및 문의 사항 처리</li>
+                    <li>보유 기간: 문의 처리 완료시까지</li>
+                  </ul>
+                </div>
+
+                <div className="qbf-submit">
+                  <button onClick={handleSubmit}>제출</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+
 
           {/* FAQ 섹션 */}
           <div className="faq-section">
@@ -270,9 +289,10 @@ const Question = () => {
           </div>
 
         </div>
-
       </div>
-    </div>
+
+      {isQuestionOpen && <div className="question-overlay" onClick={() => onToggleQuestion()}></div>}
+    </>
   )
 }
 

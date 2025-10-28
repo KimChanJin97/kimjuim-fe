@@ -105,8 +105,7 @@ const RestaurantVWorldMap = () => {
   // 음식점 정보 가져오기
   const loadRestaurants = async (x: number, y: number, d: number, ex: string[]) => {
     try {
-      const response = await getRestaurantNearby({ x, y, d, ex })
-      const restaurants = response.restaurantNearbyResponses
+      const restaurants = await getRestaurantNearby({ x, y, d, ex })
 
       // 카테고리
       const categoriesSet = new Set(restaurants.map((r) => r.category))

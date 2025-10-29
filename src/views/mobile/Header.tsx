@@ -1,6 +1,7 @@
 import './Header.css'
 import { useNavigate, Routes, Route, useLocation } from 'react-router-dom'
 import logo from '@/assets/logo.png'
+import { EllipseCanvas } from '@/assets/EllipseCanvas'
 
 const Header = () => {
 
@@ -17,7 +18,7 @@ const Header = () => {
   return (
     <header className="header">
       <div className="logo-header" onClick={handleLogoClick}>
-        <img src={logo} alt="로고" />
+        <EllipseCanvas />
       </div>
     </header>
   )

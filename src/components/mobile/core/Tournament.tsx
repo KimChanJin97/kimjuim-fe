@@ -172,7 +172,7 @@ const Tournament: React.FC<TournamentProps> = ({
 
                 <button
                   className="tc-vote-btn"
-                  onClick={() => win(currentMatch[1])}>
+                  onClick={() => win(currentMatch[0])}>
                   진출
                 </button>
 

@@ -294,23 +294,16 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
           {/* 리스트 헤더 - 카테고리 */}
           <div className="rl-categories">
             {categories.map((category) => (
-              <div
+              <button
                 key={category.name}
-                className={`rl-category-btn-wrap ${category.survived ? 'active' : 'deactive'}`}
+                className={`rl-category ${category.survived ? 'active' : 'inactive'}`}
+                onClick={() => onClickCategory(category.name)}
               >
-                <button
-                  className="rl-category"
-                  onClick={() => onClickCategory(category.name)}
-                >
-                  {category.name}
-                </button>
-                <button
-                  className="rl-category-toggle-btn"
-                  onClick={() => onClickCategory(category.name)}
-                >
+                <span>{category.name}</span>
+                <span className="rl-category-icon">
                   {category.survived ? <CloseIcon width={16} height={16} /> : <AddIcon width={16} height={16} />}
-                </button>
-              </div>
+                </span>
+              </button>
             ))}
             {categories.length > 0 && (
               <button

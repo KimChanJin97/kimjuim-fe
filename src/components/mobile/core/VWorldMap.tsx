@@ -55,6 +55,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   // 완전히 동일한 좌표를 가진 음식점 처리
   const [overlappedRestaurants, setOverlappedRestaurants] = useState<Restaurant[]>([])
   const [isOverlapModalOpen, setIsOverlapModalOpen] = useState(false)
+  const touchStartRef = useRef<{ x: number; y: number } | null>(null)
   const [overlapModalPosition, setOverlapModalPosition] = useState({ x: 0, y: 0 })
   const [overlapModalHeight, setOverlapModalHeight] = useState(0)
   // 툴팁
@@ -220,11 +221,17 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     // 마우스 커서 아래의 음식점 레이어 수집
     const getRestaurantFeatures = (pixel: number[]): Feature[] => {
       const features: Feature[] = []
-      map.forEachFeatureAtPixel(pixel, (feature) => {
-        if (feature instanceof Feature && feature.get('type') === 'restaurant') {
-          features.push(feature)
+      map.forEachFeatureAtPixel(
+        pixel,
+        (feature) => {
+          if (feature instanceof Feature && feature.get('type') === 'restaurant') {
+            features.push(feature)
+          }
+        },
+        {
+          hitTolerance: 10  // 클릭 지점 주변 10px 영역까지 감지
         }
-      })
+      )
       return features
     }
 
@@ -341,6 +348,20 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     }
   }, [isOverlapModalOpen, overlappedRestaurants])
 
+  // 터치 시작 위치 저장
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartRef.current = {
+      x: e.touches[0].clientX,
+      y: e.touches[0].clientY
+    }
+  }
+
+  // 터치 종료 시 모달 닫기
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    setIsOverlapModalOpen(false)
+    touchStartRef.current = null
+  }
+
   return (
     <div className="vworld-map-container">
       <div ref={mapRef} className="rvm-vworld-map" />
@@ -355,6 +376,8 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           <div
             className="overlap-modal-backdrop"
             onClick={() => setIsOverlapModalOpen(false)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
           />
 
           {/* 말풍선 모달 */}

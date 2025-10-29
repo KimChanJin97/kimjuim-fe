@@ -1,5 +1,6 @@
 import './Header.css'
 import { useNavigate, Routes, Route, useLocation } from 'react-router-dom'
+import { Ellipse } from '@/assets/Ellipse'
 
 const Header = () => {
 
@@ -15,8 +16,8 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="logo-container">
-        <button className="logo-header" onClick={handleLogoClick}></button>
+      <div className="logo-container" >
+        <button onClick={handleLogoClick}><Ellipse /></button>
         <span className="beta-badge">베타 버전</span>
       </div>
       <div className="menu-header">

@@ -24,15 +24,6 @@
     gap: 10px;
   }
 
-  .logo-header {
-    cursor: pointer;
-    background: url('@/assets/logo.png') no-repeat center center;
-    background-size: contain;
-    width: 120px;
-    height: 60px;
-    position: relative;
-  }
-
   .beta-badge {
     font-size: 12px;
     font-weight: 600;

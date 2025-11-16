@@ -6,7 +6,6 @@ import ImageSkeleton from '../common/ImageSkeleton'
 import NoImageIcon from '@/assets/no-image.png'
 import RestaurantImageSlider from '../common/RestaurantImageSlider'
 
-
 interface TournamentProps {
   restaurants: Restaurant[]
   onRemoveRestaurant: (restaurantId: number) => void

@@ -7,7 +7,6 @@ import DescriptionIcon from '@/assets/description.png'
 import NoImageIcon from '@/assets/no-image.png'
 import CryingFaceIcon from '@/assets/crying-face.png'
 import ImageSkeleton from '../common/ImageSkeleton'
-import ArrowLeftIcon from '@/assets/lt-arrow.png'
 
 const NO_INFO = '정보없음'
 const tabs = [
@@ -67,8 +66,8 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
           onClick={() => onToggleDetail()}
           aria-label={isDetailOpen ? "상세정보 닫기" : "상세정보 열기"}
         >
-          <span className={`toggle-arrow ${isDetailOpen ? 'open' : ''}`}>
-            <img src={ArrowLeftIcon} alt="arrow-left" width={12} height={12} />
+          <span className="toggle-text">
+            상세
           </span>
         </button>
 

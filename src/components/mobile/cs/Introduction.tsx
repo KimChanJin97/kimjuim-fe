@@ -5,7 +5,6 @@ import SearchImage from '@/assets/search.png'
 import DataImage from '@/assets/data.png'
 import PcMobileImage from '@/assets/pc-mobile.png'
 import PatchnoteImage from '@/assets/patchnote.png'
-import ArrowLeftIcon from '@/assets/lt-arrow.png'
 
 const Introduction = ({
   isIntroOpen,
@@ -23,8 +22,8 @@ const Introduction = ({
           onClick={() => onToggleIntro()}
           aria-label={isIntroOpen ? "상세정보 닫기" : "상세정보 열기"}
         >
-          <span className={`toggle-arrow ${isIntroOpen ? 'open' : ''}`}>
-            <img src={ArrowLeftIcon} alt="arrow-left" width={12} height={12} />
+          <span className="toggle-text">
+            소개
           </span>
         </button>
 

@@ -30,8 +30,8 @@ const Patchnote = ({
           onClick={() => onTogglePatchnote()}
           aria-label={isPatchnoteOpen ? "패치노트 닫기" : "패치노트 열기"}
         >
-          <span className={`toggle-arrow ${isPatchnoteOpen ? 'open' : ''}`}>
-            <img src={ArrowLeftIcon} alt="arrow-left" width={12} height={12} />
+          <span className="toggle-text">
+            패치
           </span>
         </button>
 

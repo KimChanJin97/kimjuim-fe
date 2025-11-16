@@ -12,6 +12,7 @@
   }
 
   .rvm-vworld-map {
+    position: relative;
     width: calc(100vw - 490px);
     height: calc(100vh - 80px);
   }

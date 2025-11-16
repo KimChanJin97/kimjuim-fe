@@ -42,22 +42,21 @@
     cursor: pointer;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
     transition: all 0.2s ease;
+    padding: 10px 0;
   }
 
-  .toggle-arrow {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform: rotate(180deg);
+  .toggle-text {
     color: var(--white);
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 14px;
+    font-weight: 600;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    letter-spacing: 8px;
+    user-select: none;
+    transform: translateY(4px);
+    /* letter-spacing의 절반 정도 아래로 이동 */
   }
 
-  .toggle-arrow.open {
-    transform: rotate(0deg);
-  }
 
   .rd-header {
     display: flex;

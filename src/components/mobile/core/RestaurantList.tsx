@@ -1,7 +1,7 @@
 import './RestaurantList.css'
 import { Category, Restaurant } from './RestaurantVWorldMap'
 import { TriangleLeftIcon, TriangleRightIcon } from '../../../assets/TrianlgeIcon'
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback, memo } from 'react'
 import MenuIcon from '@/assets/menu.png'
 import BizHourIcon from '@/assets/biz-hour.png'
 import AddressIcon from '@/assets/address.png'
@@ -12,7 +12,6 @@ import { CloseIcon } from '@/assets/CloseIcon'
 import { AddIcon } from '@/assets/AddIcon'
 import ImageSkeleton from '../common/ImageSkeleton'
 import RestaurantImageSlider from '../common/RestaurantImageSlider'
-import ArrowLeftIcon from '@/assets/lt-arrow.png'
 import { useInView } from 'react-intersection-observer'
 
 interface RestaurantListProps {
@@ -29,6 +28,7 @@ interface RestaurantListProps {
   onClickShare: () => void
   onToggleList: () => void
   isListOpen: boolean
+  isSearchMode: boolean
 }
 
 interface RestaurantItemProps {
@@ -38,57 +38,65 @@ interface RestaurantItemProps {
   onClickRestaurant: (rid: string, name: string) => void
   onRemoveRestaurant: (restaurantId: number) => void
   restaurantRefs: React.MutableRefObject<Map<string, HTMLDivElement>>
-  hasInfo: (info: string) => boolean
 }
 
-const RestaurantItem: React.FC<RestaurantItemProps> = ({
+const hasInfo = (info: string) => {
+  return info !== '정보없음'
+}
+
+const SKELETON_ITEMS = [1, 2, 3, 4]
+
+// React.memo로 RestaurantItem 최적화
+const RestaurantItem = memo<RestaurantItemProps>(({
   restaurant,
   index,
   clickedRestaurantId,
   onClickRestaurant,
   onRemoveRestaurant,
   restaurantRefs,
-  hasInfo
 }) => {
-  // Intersection Observer 설정
   const { ref: inViewRef, inView } = useInView({
-    triggerOnce: true,   // 한 번 보이면 계속 렌더링 유지
-    threshold: 0.1,      // 10%만 보여도 트리거
-    rootMargin: '100px'  // 100px 전에 미리 로드 시작
+    triggerOnce: true,  // 한번만 감지 (성능 향상)
+    threshold: 0.1,
+    rootMargin: '100px'
   })
 
   const [shouldRender, setShouldRender] = useState(false)
 
   useEffect(() => {
     if (inView) {
-      // 화면에 보이기 시작하면 1초 타이머 시작
       const timer = setTimeout(() => {
         setShouldRender(true)
-      }, 1000) // 1초
+      }, 1500)
 
-      // 클린업: 1초 이내에 화면에서 사라지면 타이머 취소
       return () => clearTimeout(timer)
-    } else {
-      // 화면에서 사라지면 shouldRender를 false로 리셋
-      setShouldRender(false)
     }
   }, [inView])
 
-  // ref 합치기 (스크롤용 ref + IntersectionObserver ref)
-  const setRefs = (el: HTMLDivElement | null) => {
+  // useCallback으로 setRefs 메모이제이션
+  const setRefs = useCallback((el: HTMLDivElement | null) => {
     if (el) {
       restaurantRefs.current.set(restaurant.rid, el)
     }
     inViewRef(el)
-  }
+  }, [restaurant.rid, restaurantRefs, inViewRef])
+
+  // useCallback으로 클릭 핸들러 메모이제이션
+  const handleClick = useCallback(() => {
+    onClickRestaurant(restaurant.rid, restaurant.name)
+  }, [onClickRestaurant, restaurant.rid, restaurant.name])
+
+  const handleRemove = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation()
+    onRemoveRestaurant(restaurant.id)
+  }, [onRemoveRestaurant, restaurant.id])
 
   return (
     <div
       className='rlr'
       ref={setRefs}
-      onClick={() => onClickRestaurant(restaurant.rid, restaurant.name)}
+      onClick={handleClick}
     >
-      {/* 리스트 바디 - 음식점 헤더 */}
       <div className="rlr-header">
         <div className="rlr-info">
           <div className="rlr-category">{restaurant.category}</div>
@@ -96,10 +104,7 @@ const RestaurantItem: React.FC<RestaurantItemProps> = ({
         </div>
         <button
           className="rlr-close-btn"
-          onClick={(e) => {
-            e.stopPropagation()
-            onRemoveRestaurant(restaurant.id)
-          }}
+          onClick={handleRemove}
         >
           <CloseIcon
             className="close-icon"
@@ -109,11 +114,9 @@ const RestaurantItem: React.FC<RestaurantItemProps> = ({
         </button>
       </div>
 
-      {/* 리스트 바디 - 음식점 바디 */}
       <ul className="rlr-body">
         <li>
           <div className="rlr-image-slider">
-            {/* 1초 이상 화면에 보였을 때만 실제 이미지 렌더링 */}
             {shouldRender && restaurant.images.length > 0 && (
               <RestaurantImageSlider
                 images={restaurant.images}
@@ -125,10 +128,9 @@ const RestaurantItem: React.FC<RestaurantItemProps> = ({
                 borderRadius="5px"
               />
             )}
-            {/* 아직 1초가 안 지났으면 스켈레톤 표시 */}
             {!shouldRender && restaurant.images.length > 0 && (
               <div className="rlr-skeleton-slider">
-                {[1, 2, 3, 4].map((i) => (
+                {SKELETON_ITEMS.map((i) => (
                   <div key={i} className="rlr-skeleton">
                     <ImageSkeleton
                       alt="loading"
@@ -142,7 +144,6 @@ const RestaurantItem: React.FC<RestaurantItemProps> = ({
             )}
           </div>
 
-          {/* 메뉴 */}
           {hasInfo(restaurant.menus) && (
             <div className="rlr-row">
               <img src={MenuIcon} alt="menu" />
@@ -150,7 +151,6 @@ const RestaurantItem: React.FC<RestaurantItemProps> = ({
             </div>
           )}
 
-          {/* 영업시간 */}
           {hasInfo(restaurant.bizHour) && (
             <div className="rlr-row">
               <img src={BizHourIcon} alt="bizHour" />
@@ -158,25 +158,36 @@ const RestaurantItem: React.FC<RestaurantItemProps> = ({
             </div>
           )}
 
-          {/* 주소 */}
           <div className="rlr-row">
             <img src={AddressIcon} alt="address" />
             <div className="rlr-address">{restaurant.address}</div>
           </div>
 
-          {/* 가격 */}
           {hasInfo(restaurant.recommendedPrice) && (
             <div className="rlr-row">
               <img src={PriceIcon} alt="price" height="16px" />
               <div className="rlr-price">{restaurant.recommendedPrice}</div>
             </div>
           )}
-
         </li>
       </ul>
     </div>
   )
-}
+}, (prevProps, nextProps) => {
+  // 필요한 props만 비교
+  return (
+    prevProps.restaurant.id === nextProps.restaurant.id &&
+    prevProps.restaurant.rid === nextProps.restaurant.rid &&
+    prevProps.restaurant.name === nextProps.restaurant.name &&
+    prevProps.index === nextProps.index &&
+    prevProps.clickedRestaurantId === nextProps.clickedRestaurantId &&
+    prevProps.restaurant.survived === nextProps.restaurant.survived &&
+    prevProps.onClickRestaurant === nextProps.onClickRestaurant &&
+    prevProps.onRemoveRestaurant === nextProps.onRemoveRestaurant
+  )
+})
+
+RestaurantItem.displayName = 'RestaurantItem'
 
 const RestaurantList: React.FC<RestaurantListProps> = ({
   categories,
@@ -191,13 +202,15 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
   onClickTournament,
   onClickShare,
   onToggleList,
-  isListOpen
+  isListOpen,
+  isSearchMode
 }) => {
   const [animationClass, setAnimationClass] = useState<string>('')
   const [displayDistance, setDisplayDistance] = useState(distance)
   const [pendingDistance, setPendingDistance] = useState<number | null>(null)
   const restaurantRefs = useRef<Map<string, HTMLDivElement>>(new Map())
 
+  // survivedRestaurants를 useMemo로 최적화
   const survivedRestaurants = useMemo(() => {
     return restaurants.filter(restaurant => restaurant.survived)
   }, [restaurants])
@@ -210,12 +223,13 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
     if (clickedRestaurantId) {
       const restaurant = restaurantRefs.current.get(clickedRestaurantId)
       if (restaurant) {
-        restaurant.scrollIntoView({ behavior: 'smooth' })
+        restaurant.scrollIntoView({ behavior: 'auto' })
       }
     }
   }, [clickedRestaurantId])
 
-  const handleDistanceChange = (newDistance: number) => {
+  // useCallback으로 함수들 메모이제이션
+  const handleDistanceChange = useCallback((newDistance: number) => {
     const validDistances = [100, 200, 300, 400, 500]
 
     if (!validDistances.includes(newDistance)) {
@@ -230,27 +244,37 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
     } else {
       setAnimationClass('sliding-left')
     }
-  }
+  }, [distance])
 
-  const handleAnimationEnd = () => {
+  const handleAnimationEnd = useCallback(() => {
     if (pendingDistance !== null) {
       onClickDistance(pendingDistance)
       setPendingDistance(null)
     }
     setAnimationClass('')
-  }
+  }, [pendingDistance, onClickDistance])
 
-  const hasInfo = (info: string) => {
-    return info !== '정보없음'
-  }
+  const handleDistanceDecrease = useCallback(() => {
+    handleDistanceChange(distance - 100)
+  }, [handleDistanceChange, distance])
 
-  const calculateRound = (teams: number): number => {
-    let round = 1;
+  const handleDistanceIncrease = useCallback(() => {
+    handleDistanceChange(distance + 100)
+  }, [handleDistanceChange, distance])
+
+  // calculateRound를 useCallback으로
+  const calculateRound = useCallback((teams: number): number => {
+    let round = 1
     while (round < teams) {
-      round *= 2;
+      round *= 2
     }
-    return round;
-  };
+    return round
+  }, [])
+
+  const roundText = useMemo(() =>
+    calculateRound(survivedRestaurants.length),
+    [survivedRestaurants.length, calculateRound]
+  )
 
   return (
     <>
@@ -258,40 +282,45 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
 
         <button
           className="list-toggle-btn"
-          onClick={() => onToggleList()}
+          onClick={onToggleList}
           aria-label={isListOpen ? "리스트 닫기" : "리스트 열기"}
         >
-          <span className={`toggle-arrow ${isListOpen ? 'open' : ''}`}>
-            <img src={ArrowLeftIcon} alt="arrow-left" width={12} height={12} />
+          <span className="toggle-text">
+            목록
           </span>
         </button>
 
         <div className="rl-header">
+          {!isSearchMode && (
+            <div className="rl-distance">
+              <button
+                className="triangle-left"
+                onClick={handleDistanceDecrease}
+              >
+                <TriangleLeftIcon />
+              </button>
+              <strong
+                className={`distance-number ${animationClass}`}
+                onAnimationEnd={handleAnimationEnd}
+              >
+                {displayDistance}m
+              </strong>
+              <button
+                className="triangle-right"
+                onClick={handleDistanceIncrease}
+              >
+                <TriangleRightIcon />
+              </button>
+              <strong className="distance-text">이내 {survivedRestaurants.length} 곳이에요</strong>
+            </div>
+          )}
 
-          {/* 리스트 헤더 - 거리 */}
-          <div className="rl-distance">
-            <button
-              className="triangle-left"
-              onClick={() => handleDistanceChange(distance - 100)}
-            >
-              <TriangleLeftIcon />
-            </button>
-            <strong
-              className={`distance-number ${animationClass}`}
-              onAnimationEnd={handleAnimationEnd}
-            >
-              {displayDistance}m
-            </strong>
-            <button
-              className="triangle-right"
-              onClick={() => handleDistanceChange(distance + 100)}
-            >
-              <TriangleRightIcon />
-            </button>
-            <strong className="distance-text">이내 {survivedRestaurants.length} 곳이에요</strong>
-          </div>
+          {isSearchMode && (
+            <div className="rl-distance">
+              <strong className="distance-text">검색하신 음식점 {survivedRestaurants.length} 곳이에요</strong>
+            </div>
+          )}
 
-          {/* 리스트 헤더 - 카테고리 */}
           <div className="rl-categories">
             {categories.map((category) => (
               <button
@@ -314,16 +343,13 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
               </button>
             )}
             {categories.length === 0 && (
-              <div className="no-category">반경을 늘려서 주변 음식점을 찾아보세요!</div>
+              <div className="no-category">반경을 늘리거나 재검색해서 주변 음식점을 찾아보세요!</div>
             )}
           </div>
         </div>
 
-        {/* 리스트 바디 - 음식점 */}
         <div className="rl-body scrollbar-custom">
           <div className="rl-restaurants">
-
-            {/* 음식점이 없을 때 */}
             {survivedRestaurants.length === 0 && (
               <div className="no-restaurant-wrap">
                 <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
@@ -331,7 +357,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
               </div>
             )}
 
-            {/* 음식점이 있을 때 - RestaurantItem 컴포넌트 사용 */}
             {survivedRestaurants.length > 0 &&
               survivedRestaurants.map((restaurant, index) => (
                 <RestaurantItem
@@ -342,7 +367,6 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                   onClickRestaurant={onClickRestaurant}
                   onRemoveRestaurant={onRemoveRestaurant}
                   restaurantRefs={restaurantRefs}
-                  hasInfo={hasInfo}
                 />
               ))
             }
@@ -377,7 +401,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                 className="rl-worldcup btn"
                 onClick={onClickTournament}
               >
-                <span>{calculateRound(survivedRestaurants.length)}강 시작</span>
+                <span>{roundText}강 시작</span>
               </button>
               <button className="rl-share btn" onClick={onClickShare}>
                 <span>공유하기</span>
@@ -387,7 +411,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
         </div>
       </div>
 
-      {isListOpen && <div className="restaurant-list-overlay" onClick={() => onToggleList()}></div>}
+      {isListOpen && <div className="restaurant-list-overlay" onClick={onToggleList}></div>}
     </>
   )
 }

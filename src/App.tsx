@@ -16,8 +16,8 @@ const App = () => {
 
       {isMobilePath ? (
         <div className="mobile">
-          <MobileHeader />
           <MobileHome />
+          <MobileHeader />
         </div>
       ) : (
         <div className="pc">

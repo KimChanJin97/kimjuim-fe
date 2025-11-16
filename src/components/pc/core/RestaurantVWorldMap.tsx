@@ -2,13 +2,14 @@ import RestaurantList from './RestaurantList'
 import VWorldMap from './VWorldMap'
 import RestaurantDetail from './RestaurantDetail'
 import { useEffect, useState } from 'react'
-import { RestaurantNearbyResponse, getRestaurantNearby, RestaurantDetailResponse, getRestaurantDetail } from '@/api/api'
+import { RestaurantNearbyResponse, getRestaurantNearby, RestaurantDetailResponse, getRestaurantDetail, searchRestaurants } from '@/api/api'
 import './RestaurantVWorldMap.css'
 import Tournament from './Tournament'
 import { useSearchParams } from 'react-router-dom'
 import LZString from 'lz-string'
 import { AddIcon } from '@/assets/AddIcon'
 import { CheckIcon } from '@/assets/CheckIcon'
+import RestaurantSearch from './RestaurantSearch'
 
 export interface Category {
   name: string
@@ -37,66 +38,77 @@ const RestaurantVWorldMap = () => {
   const [exceptedRestaurants, setExceptedRestaurants] = useState<string[]>([])
   // 공유 모달
   const [isShareModalOpen, setIsShareModalOpen] = useState<boolean>(false)
+  // 검색 상태 추가
+  const [isSearchMode, setIsSearchMode] = useState<boolean>(false)
+  const [searchKeyword, setSearchKeyword] = useState<string>('')
 
   // 위치 정보 가져오기
   useEffect(() => {
     const getLocation = async () => {
       try {
-        let finalX: number
-        let finalY: number
-        let finalDistance: number
+        let finalX: number | undefined
+        let finalY: number | undefined
+        let finalDistance: number | undefined
         let ex: string[] = []
+        let keyword: string = ''
 
         // 압축된 데이터 파라미터 확인
         const dataParam = searchParams.get('data')
 
         if (dataParam) {
-          // 링크 접속
+          // 공유 링크로 접속
           try {
             const decompressed = LZString.decompressFromEncodedURIComponent(dataParam)
             const shareData = decompressed ? JSON.parse(decompressed) : null
 
             if (shareData) {
               ex = shareData.ex || []
-              finalX = shareData.x || 127.13229313772779
-              finalY = shareData.y || 37.41460591790208
-              finalDistance = shareData.d || 100
+              finalX = shareData.x
+              finalY = shareData.y
+              finalDistance = shareData.d
+              keyword = shareData.k || ''
             } else {
               throw new Error('디코딩 실패')
             }
           } catch (error) {
             console.error('공유 데이터 디코딩 실패:', error)
-            // 기본값 사용
-            finalX = 127.13229313772779
-            finalY = 37.41460591790208
-            finalDistance = 100
+            // 디코딩 실패 시 사용자 위치로 폴백
+            alert('공유 링크가 유효하지 않습니다. 현재 위치로 설정됩니다.')
           }
-        } else {
-          // 일반 접속, 네트워크 직접 접속 (HTTPS 설정 이전)
-          // const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-          //   navigator.geolocation.getCurrentPosition(resolve, reject)
-          // })
-
-          // finalX = position.coords.longitude
-          // finalY = position.coords.latitude
-          finalX = 127.13229313772779
-          finalY = 37.41460591790208
-          finalDistance = 200
         }
 
-        // State 업데이트
+        // 공유 링크가 없거나 디코딩 실패 시 사용자 위치 사용
+        if (finalX === undefined || finalY === undefined) {
+          // 일반 접속 또는 공유 링크 디코딩 실패
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject)
+          })
+
+          finalX = position.coords.longitude
+          finalY = position.coords.latitude
+          finalDistance = finalDistance || 100
+        }
+
         setX(finalX)
         setY(finalY)
-        setDistance(finalDistance)
+        setDistance(finalDistance || 100)
         setExceptedRestaurants(ex)
 
-        await loadRestaurants(finalX, finalY, finalDistance, ex)
+        // 검색 키워드가 있으면 검색 수행, 없으면 위치 기반 로딩
+        if (keyword) {
+          setSearchKeyword(keyword)
+          await onSearchRestaurants(keyword, ex)
+        } else {
+          await loadRestaurants(finalX, finalY, finalDistance || 100, ex)
+        }
 
-        if (dataParam) {
+        // 공유 링크로 접속했고 데이터가 유효한 경우에만 토너먼트 열기
+        if (dataParam && finalDistance !== undefined) {
           setIsTournamentOpen(true)
         }
       } catch (error) {
         console.error('위치 정보를 가져올 수 없습니다:', error)
+        alert('위치 정보를 가져올 수 없습니다. 위치 권한을 확인해주세요.')
       }
     }
     getLocation()
@@ -233,10 +245,11 @@ const RestaurantVWorldMap = () => {
   const onClickShare = () => {
     // 모든 데이터를 객체로 만들어 압축
     const shareData = {
-      ex: exceptedRestaurants,  // 제외할 음식점 배열
-      x: x,                      // x 좌표
-      y: y,                      // y 좌표
-      d: distance                // 거리
+      ex: exceptedRestaurants,
+      x: x,
+      y: y,
+      d: distance,
+      k: isSearchMode ? searchKeyword : ''
     }
     const jsonString = JSON.stringify(shareData)
     const compressed = LZString.compressToEncodedURIComponent(jsonString)
@@ -251,6 +264,46 @@ const RestaurantVWorldMap = () => {
     setTimeout(() => {
       setIsShareModalOpen(false)
     }, 2000)
+  }
+
+  // 음식점 검색
+  const onSearchRestaurants = async (keyword: string, excludedRids: string[] = []) => {
+    try {
+      const searchResults = await searchRestaurants(keyword)
+
+      // 카테고리 (제외된 음식점을 고려)
+      const filteredResults = searchResults.filter(r => !excludedRids.includes(r.rid))
+      const categoriesSet = new Set(filteredResults.map((r) => r.category))
+      const categories = Array.from(categoriesSet).map(name => ({
+        name,
+        survived: true,
+      }))
+      setCategories(categories)
+
+      // 음식점 (제외된 음식점은 survived: false로 설정)
+      const restaurantArr = searchResults.map((r) => ({
+        ...r,
+        survived: !excludedRids.includes(r.rid),
+      }))
+      setRestaurants(restaurantArr)
+      setIsSearchMode(true)
+      setSearchKeyword(keyword)
+
+      // 디테일 초기화
+      setRestaurantDetail(null)
+      setClickedRestaurantId('')
+    } catch (error) {
+      console.error('음식점 검색 실패:', error)
+    }
+  }
+
+  // 음식점 검색 초기화
+  const onResetSearchRestaurants = async () => {
+    setIsSearchMode(false)
+    setSearchKeyword('')
+    await loadRestaurants(x, y, distance, exceptedRestaurants)
+    setRestaurantDetail(null)
+    setClickedRestaurantId('')
   }
 
   return (
@@ -268,6 +321,7 @@ const RestaurantVWorldMap = () => {
           onClickRestaurant={onClickRestaurant}
           onClickTournament={onClickTournament}
           onClickShare={onClickShare}
+          isSearchMode={isSearchMode}
         />
       </div>
       <div className="rvm-restaurant-detail">
@@ -280,6 +334,10 @@ const RestaurantVWorldMap = () => {
         )}
       </div>
       <div className="rvm-vworld-map">
+        <RestaurantSearch
+          onSearchRestaurants={onSearchRestaurants}
+          onResetSearchRestaurants={onResetSearchRestaurants}
+        />
         <VWorldMap
           restaurants={restaurants}
           x={x}
@@ -287,6 +345,7 @@ const RestaurantVWorldMap = () => {
           distance={distance}
           clickedRestaurantId={clickedRestaurantId}
           onClickRestaurant={onClickRestaurant}
+          isSearchMode={isSearchMode}
         />
       </div>
       <div className="rvm-tournament">

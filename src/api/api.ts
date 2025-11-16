@@ -23,8 +23,11 @@ export interface RestaurantNearbyResponse {
   bizHour: string
 }
 
-export interface RestaurantNearbyResponses {
-  restaurantNearbyResponses: RestaurantNearbyResponse[]
+export interface RestaurantAutocompleteResponse {
+  id: number
+  name: string
+  address: string
+  category: string
 }
 
 // 음식점 상세 조회
@@ -125,6 +128,24 @@ export const sendMailMessage = async (
       'Content-Type': 'multipart/form-data'
     }
   });
+}
+
+export const searchRestaurants = async (
+  keyword: string
+): Promise<RestaurantNearbyResponse[]> => {
+  const response = await api.get<RestaurantNearbyResponse[]>('/search/restaurants', {
+    params: { keyword: keyword }
+  })
+  return response.data
+}
+
+export const getRestaurantAutocomplete = async (
+  keyword: string
+): Promise<RestaurantAutocompleteResponse[]> => {
+  const response = await api.get<RestaurantAutocompleteResponse[]>('/search/autocomplete', {
+    params: { keyword: keyword }
+  })
+  return response.data
 }
 
 export default api

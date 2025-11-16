@@ -4,7 +4,6 @@ import upIcon from '@/assets/up.png'
 import downIcon from '@/assets/down.png'
 import profileImage from '@/assets/profile.png'
 import { sendMailMessage } from '@/api/api'
-import ArrowLeftIcon from '@/assets/lt-arrow.png'
 
 const Question = ({
   isQuestionOpen,
@@ -112,9 +111,7 @@ const Question = ({
           onClick={() => onToggleQuestion()}
           aria-label={isQuestionOpen ? "문의하기 닫기" : "문의하기 열기"}
         >
-          <span className={`toggle-arrow ${isQuestionOpen ? 'open' : ''}`}>
-            <img src={ArrowLeftIcon} alt="arrow-left" width={12} height={12} />
-          </span>
+          <span className="toggle-text">문의</span>
         </button>
 
         <div className="question-container-center">

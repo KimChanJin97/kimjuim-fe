@@ -29,8 +29,8 @@ dist-ssr/
 *.sw?
 
 # Environment variables
-.env
-.env.*.local
+# .env
+# .env.*.local
 
 # TypeScript
 *.tsbuildinfo

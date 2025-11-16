@@ -14,7 +14,7 @@ interface EllipseProps {
 export const Ellipse = ({
   width = 120,
   height = 60,
-  strokeWidth = 10,
+  strokeWidth = 7,
   strokeColor = '#000000',
   fillColor = '#FFFFFF',
   textColor = '#000000',

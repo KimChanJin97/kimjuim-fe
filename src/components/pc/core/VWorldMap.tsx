@@ -18,6 +18,8 @@ import Tooltip from '../common/Tooltip'
 import { useTooltip } from '../../../hooks/useTooltip'
 import { Geometry } from 'ol/geom'
 import { CategoryType, mapCategoryToType, extractCategoryIcon } from '@/utils/extractCategoryIcon'
+import { getCenter } from 'ol/extent'
+import { getDistance } from 'ol/sphere'
 
 interface VWorldMapProps {
   restaurants: Restaurant[]
@@ -26,6 +28,7 @@ interface VWorldMapProps {
   distance: number
   clickedRestaurantId: string
   onClickRestaurant: (rid: string, name: string) => void
+  isSearchMode?: boolean
 }
 
 interface RestaurantFeature extends Feature {
@@ -44,7 +47,7 @@ enum MarkerState {
 }
 
 const VWorldMap: React.FC<VWorldMapProps> = ({
-  restaurants, x, y, distance, clickedRestaurantId, onClickRestaurant
+  restaurants, x, y, distance, clickedRestaurantId, onClickRestaurant, isSearchMode
 }) => {
 
   const mapRef = useRef<HTMLDivElement>(null)
@@ -98,9 +101,8 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       view: new View({
         projection: 'EPSG:3857',
         center: fromLonLat([127.024612, 36.5146]),
-        zoom: 18,
-        minZoom: 14,
-        maxZoom: 19,
+        minZoom: 12,
+        maxZoom: 18,
       }),
       controls: [],
     })
@@ -121,60 +123,6 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       map.setTarget(undefined)
     }
   }, [])
-
-  // 사용자 위치, 반경에 따라 원 벡터 재설정
-  useEffect(() => {
-    if (!mapInstanceRef.current) return
-
-    // 지도 중심
-    const view = mapInstanceRef.current.getView()
-    view.setCenter(fromLonLat([x, y]))
-
-    // 반경 제거 및 초기화
-    const circleSource = circleSourceRef.current
-    circleSource.clear()
-
-    // 음식점 개수 확인
-    const survivedRestaurants = restaurants.filter(r => r.survived)
-    const hasNoRestaurants = survivedRestaurants.length === 0
-
-    const circleFeature = new Feature({
-      geometry: new Circle(fromLonLat([x, y]), distance + 50)
-    })
-
-    // 음식점이 없으면 텍스트 표시
-    circleFeature.setStyle(new Style({
-      fill: new Fill({
-        color: 'rgba(0, 0, 0, 0.1)',
-      }),
-      stroke: new Stroke({
-        color: 'rgba(0, 0, 0, 0.1)',
-        width: 2,
-        lineDash: [5, 5],
-      }),
-      text: hasNoRestaurants ? new Text({
-        text: '반경을 늘려서\n주변 음식점을 찾아보세요!',
-        font: 'bold 16px noto sans kr',
-        fill: new Fill({
-          color: '#555555',
-        }),
-        textAlign: 'center',
-        textBaseline: 'middle',
-      }) : undefined,
-    }))
-
-    circleSource.addFeature(circleFeature)
-
-    // 반경에 따라 줌 레벨 자동 조정
-    const circleGeometry = circleFeature.getGeometry()
-    if (circleGeometry) {
-      const extent = circleGeometry.getExtent()
-      view.fit(extent, {
-        padding: [50, 50, 50, 50],
-        duration: 1000,
-      })
-    }
-  }, [x, y, distance, restaurants])
 
   // 음식점 레이어 초기화
   useEffect(() => {
@@ -211,6 +159,116 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     // 벡터 소스에 추가
     newFeatures.forEach(f => vectorSource.addFeature(f))
   }, [restaurants, clickedRestaurantId])
+
+  // 사용자 위치, 반경에 따라 원 벡터 재설정
+  useEffect(() => {
+    if (!mapInstanceRef.current) return
+
+    // 지도 중심
+    const view = mapInstanceRef.current.getView()
+
+    // 반경 제거 및 초기화
+    const circleSource = circleSourceRef.current
+    circleSource.clear()
+
+    // 음식점 개수 확인
+    const survivedRestaurants = restaurants.filter(r => r.survived)
+    const hasNoRestaurants = survivedRestaurants.length === 0
+
+    if (isSearchMode && survivedRestaurants.length > 0) {
+      // vectorSource에서 모든 음식점 feature의 extent 가져오기
+      const vectorSource = vectorSourceRef.current
+      const extent = vectorSource.getExtent()
+
+      // extent의 중심점 구하기
+      const center = getCenter(extent)
+
+      // extent의 네 코너와 중심 사이의 거리를 투영 좌표계에서 직접 계산
+      const [minX, minY, maxX, maxY] = extent
+
+      // 네 코너의 좌표
+      const corners = [
+        [minX, minY],
+        [maxX, minY],
+        [minX, maxY],
+        [maxX, maxY]
+      ]
+
+      // 중심에서 각 코너까지의 거리를 투영 좌표계에서 계산
+      const distances = corners.map(corner => {
+        const dx = corner[0] - center[0]
+        const dy = corner[1] - center[1]
+        return Math.sqrt(dx * dx + dy * dy)
+      })
+
+      // 가장 먼 코너까지의 거리를 반경으로 사용 (여유 공간 추가)
+      const searchRadius = Math.max(...distances) * 1.1 // 10% 여유 공간
+
+      const circleFeature = new Feature({
+        geometry: new Circle(center, searchRadius)
+      })
+
+      circleFeature.setStyle(new Style({
+        fill: new Fill({
+          color: 'rgba(0, 0, 0, 0.1)',
+        }),
+        stroke: new Stroke({
+          color: 'rgba(0, 0, 0, 0.1)',
+          width: 2,
+          lineDash: [5, 5],
+        }),
+      }))
+
+      circleSource.addFeature(circleFeature)
+
+      // extent를 기반으로 view fit (원의 geometry가 아닌 extent 직접 사용)
+      view.fit(extent, {
+        padding: [100, 100, 100, 100],
+        duration: 1000,
+        maxZoom: 13,
+      })
+    } else {
+      // 기존 로직 (사용자 위치 기반)
+      view.setCenter(fromLonLat([x, y]))
+
+      const circleFeature = new Feature({
+        geometry: new Circle(fromLonLat([x, y]), distance + 50)
+      })
+
+      // 음식점이 없으면 텍스트 표시
+      circleFeature.setStyle(new Style({
+        fill: new Fill({
+          color: 'rgba(0, 0, 0, 0.1)',
+        }),
+        stroke: new Stroke({
+          color: 'rgba(0, 0, 0, 0.1)',
+          width: 2,
+          lineDash: [5, 5],
+        }),
+        text: hasNoRestaurants ? new Text({
+          text: '반경을 늘리거나 재검색해서\n주변 음식점을 찾아보세요!',
+          font: 'bold 16px noto sans kr',
+          fill: new Fill({
+            color: '#555555',
+          }),
+          textAlign: 'center',
+          textBaseline: 'middle',
+        }) : undefined,
+      }))
+
+      circleSource.addFeature(circleFeature)
+
+      // 반경에 따라 줌 레벨 자동 조정
+      const circleGeometry = circleFeature.getGeometry()
+      if (circleGeometry) {
+        const extent = circleGeometry.getExtent()
+        view.fit(extent, {
+          padding: [50, 50, 50, 50],
+          duration: 1000,
+        })
+      }
+    }
+  }, [x, y, distance, restaurants, isSearchMode])
 
   // 음식점 레이어 클릭, 호버 핸들러
   useEffect(() => {

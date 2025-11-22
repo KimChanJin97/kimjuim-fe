@@ -23,7 +23,7 @@ const Introduction = ({
           aria-label={isIntroOpen ? "상세정보 닫기" : "상세정보 열기"}
         >
           <span className="toggle-text">
-            소개
+            {isIntroOpen ? '소개닫기' : '소개열기'}
           </span>
         </button>
 

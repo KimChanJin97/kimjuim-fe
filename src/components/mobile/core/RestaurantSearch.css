@@ -46,7 +46,8 @@
   .rs-input {
     border: none;
     outline: none;
-    font-size: 14px;
+    font-size: 16px;
+    /* 16px 이상이어야 iOS에서 자동 줌인 방지 */
     padding: 4px;
     background: transparent;
     color: var(--white);
@@ -73,7 +74,7 @@
   .rs-suggestion-wrapper {
     position: absolute;
     top: 70px;
-    left: 20px;
+    left: 40px;
     right: 20px;
     z-index: 999;
     display: flex;

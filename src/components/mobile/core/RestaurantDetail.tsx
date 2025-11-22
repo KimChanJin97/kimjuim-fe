@@ -67,7 +67,7 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
           aria-label={isDetailOpen ? "상세정보 닫기" : "상세정보 열기"}
         >
           <span className="toggle-text">
-            상세
+            {isDetailOpen ? '상세닫기' : '상세열기'}
           </span>
         </button>
 

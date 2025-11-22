@@ -60,7 +60,7 @@ const RestaurantItem = memo<RestaurantItemProps>(({
   restaurantRefs,
 }) => {
   const { ref: inViewRef, inView } = useInView({
-    triggerOnce: true,  // 한번만 감지
+    triggerOnce: true,
     threshold: 0.1,
     rootMargin: '100px'
   })
@@ -68,12 +68,11 @@ const RestaurantItem = memo<RestaurantItemProps>(({
   const [shouldRender, setShouldRender] = useState(false)
 
   useEffect(() => {
-    if (inView) {
+    if (inView) { // 음식점이 보이면 
       const timer = setTimeout(() => {
-        setShouldRender(true)
+        setShouldRender(true) // 1.5초 대기 후 렌더링 허용
       }, 1500)
-
-      return () => clearTimeout(timer)
+      return () => clearTimeout(timer) // 타이머 해제
     }
   }, [inView])
 
@@ -135,6 +134,7 @@ const RestaurantItem = memo<RestaurantItemProps>(({
       <ul className="rlr-body">
         <li>
           <div className="rlr-image-slider">
+            {/* 렌더링 허용이라면 실제 이미지 컴포넌트 렌더링 */}
             {shouldRender && restaurant.images.length > 0 && (
               <RestaurantImageSlider
                 images={restaurant.images}
@@ -146,6 +146,7 @@ const RestaurantItem = memo<RestaurantItemProps>(({
                 borderRadius="5px"
               />
             )}
+            {/* 렌더링 허용이 아니라면 스켈레톤 UI 렌더링 */}
             {!shouldRender && restaurant.images.length > 0 && (
               <div className="rlr-skeleton-slider">
                 {SKELETON_ITEMS.map((i) => (
@@ -349,35 +350,8 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
               </button>
             )}
             {categories.length === 0 && (
-              <div className="no-category">반경을 늘리거나 재검색해서 주변 음식점을 찾아보세요!</div>
+              <div className="no-category">반경을 늘리거나 검색해서 음식점을 찾아주세요!</div>
             )}
-          </div>
-        </div>
-
-        <div className="rl-body scrollbar-custom">
-          <div className="rl-restaurants">
-            {survivedRestaurants.length === 0 && (
-              <div className="no-restaurant-wrap">
-                <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
-                <div className="no-restaurant-text">죄송해요. 음식점이 없어요</div>
-              </div>
-            )}
-
-            {survivedRestaurants.length > 0 &&
-              survivedRestaurants.map((restaurant, index) => (
-                <RestaurantItem
-                  key={restaurant.id}
-                  restaurant={restaurant}
-                  index={index}
-                  clickedRestaurantId={clickedRestaurantId}
-                  onClickRestaurant={onClickRestaurant}
-                  onRemoveRestaurant={onRemoveRestaurant}
-                  showTooltip={showTooltip}
-                  hideTooltip={hideTooltip}
-                  restaurantRefs={restaurantRefs}
-                />
-              ))
-            }
           </div>
         </div>
 
@@ -416,6 +390,35 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
             </>
           )}
         </div>
+
+        <div className="rl-body scrollbar-custom">
+          <div className="rl-restaurants">
+            {survivedRestaurants.length === 0 && (
+              <div className="no-restaurant-wrap">
+                <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
+                <div className="no-restaurant-text">죄송해요. 음식점이 없어요</div>
+              </div>
+            )}
+
+            {survivedRestaurants.length > 0 &&
+              survivedRestaurants.map((restaurant, index) => (
+                <RestaurantItem
+                  key={restaurant.id}
+                  restaurant={restaurant}
+                  index={index}
+                  clickedRestaurantId={clickedRestaurantId}
+                  onClickRestaurant={onClickRestaurant}
+                  onRemoveRestaurant={onRemoveRestaurant}
+                  showTooltip={showTooltip}
+                  hideTooltip={hideTooltip}
+                  restaurantRefs={restaurantRefs}
+                />
+              ))
+            }
+          </div>
+        </div>
+
+
       </div>
 
       <Tooltip

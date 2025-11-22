@@ -50,7 +50,7 @@
   }
 
   .tournament-header h1 {
-    font-size: 32px;
+    font-size: 24px;
     font-weight: 600;
     margin-bottom: 30px;
   }
@@ -83,7 +83,7 @@
   .tc-content h1 {
     width: 120px;
     height: 80px;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--white);
     margin-bottom: 10px;

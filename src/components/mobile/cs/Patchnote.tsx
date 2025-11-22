@@ -31,7 +31,7 @@ const Patchnote = ({
           aria-label={isPatchnoteOpen ? "패치노트 닫기" : "패치노트 열기"}
         >
           <span className="toggle-text">
-            패치
+            {isPatchnoteOpen ? '패치닫기' : '패치열기'}
           </span>
         </button>
 

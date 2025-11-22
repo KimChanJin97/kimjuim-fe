@@ -33,10 +33,10 @@
 
   .list-toggle-btn {
     position: absolute;
-    top: 95px;
-    right: -30px;
-    width: 30px;
-    height: 80px;
+    top: 90px;
+    right: -40px;
+    width: 40px;
+    height: 100px;
     background-color: var(--light-black);
     border: 1px solid var(--gray);
     border-left: none;
@@ -60,9 +60,9 @@
     font-weight: 600;
     writing-mode: vertical-rl;
     text-orientation: upright;
-    letter-spacing: 8px;
+    letter-spacing: 4px;
     user-select: none;
-    transform: translateY(4px);
+    transform: translateY(2px);
     /* letter-spacing의 절반 정도 아래로 이동 */
   }
 
@@ -87,7 +87,7 @@
   .distance-number,
   .distance-text {
     display: block;
-    font-size: 17px;
+    font-size: 15px;
     font-weight: 600;
   }
 
@@ -173,7 +173,7 @@
   }
 
   .no-category {
-    font-size: 13px;
+    font-size: 12px;
   }
 
   .refresh-btn {
@@ -304,7 +304,7 @@
   .rlr-row {
     display: flex;
     gap: 15px;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 10px;
   }
 
@@ -337,12 +337,9 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 11px;
-    position: absolute;
-    width: 100%;
-    padding: 0 30px;
-    bottom: 110px;
-    box-sizing: border-box;
+    gap: 15px;
+    padding: 15px 15px;
+    border-bottom: 1px solid var(--gray);
   }
 
   .rl-worldcup {
@@ -355,15 +352,19 @@
 
   .rl-share {
     width: 45%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   .btn {
-    height: 55px;
+    height: 50px;
     background-color: var(--black);
     border: none;
     cursor: pointer;
     border-radius: 8px;
-    font-size: 1em;
+    font-size: 16px;
     color: var(--white);
     font-weight: 700;
     padding: 10px 20px;

@@ -56,7 +56,7 @@ const RestaurantItem = memo<RestaurantItemProps>(({
   restaurantRefs,
 }) => {
   const { ref: inViewRef, inView } = useInView({
-    triggerOnce: true,  // 한번만 감지 (성능 향상)
+    triggerOnce: true,
     threshold: 0.1,
     rootMargin: '100px'
   })
@@ -91,9 +91,15 @@ const RestaurantItem = memo<RestaurantItemProps>(({
     onRemoveRestaurant(restaurant.id)
   }, [onRemoveRestaurant, restaurant.id])
 
+  // isClicked를 useMemo로 계산
+  const isClicked = useMemo(() =>
+    clickedRestaurantId === restaurant.rid,
+    [clickedRestaurantId, restaurant.rid]
+  )
+
   return (
     <div
-      className='rlr'
+      className={`rlr ${isClicked ? 'clicked' : ''}`}
       ref={setRefs}
       onClick={handleClick}
     >
@@ -286,7 +292,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
           aria-label={isListOpen ? "리스트 닫기" : "리스트 열기"}
         >
           <span className="toggle-text">
-            목록
+            {isListOpen ? '목록닫기' : '목록열기'}
           </span>
         </button>
 
@@ -343,33 +349,8 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
               </button>
             )}
             {categories.length === 0 && (
-              <div className="no-category">반경을 늘리거나 재검색해서 주변 음식점을 찾아보세요!</div>
+              <div className="no-category">반경을 늘리거나 검색해서 음식점을 찾아주세요!</div>
             )}
-          </div>
-        </div>
-
-        <div className="rl-body scrollbar-custom">
-          <div className="rl-restaurants">
-            {survivedRestaurants.length === 0 && (
-              <div className="no-restaurant-wrap">
-                <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
-                <div className="no-restaurant-text">죄송해요. 음식점이 없어요</div>
-              </div>
-            )}
-
-            {survivedRestaurants.length > 0 &&
-              survivedRestaurants.map((restaurant, index) => (
-                <RestaurantItem
-                  key={restaurant.id}
-                  restaurant={restaurant}
-                  index={index}
-                  clickedRestaurantId={clickedRestaurantId}
-                  onClickRestaurant={onClickRestaurant}
-                  onRemoveRestaurant={onRemoveRestaurant}
-                  restaurantRefs={restaurantRefs}
-                />
-              ))
-            }
           </div>
         </div>
 
@@ -409,6 +390,33 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
             </>
           )}
         </div>
+
+        <div className="rl-body scrollbar-custom">
+          <div className="rl-restaurants">
+            {survivedRestaurants.length === 0 && (
+              <div className="no-restaurant-wrap">
+                <img className="crying-face-icon" src={CryingFaceIcon} alt="crying-face" />
+                <div className="no-restaurant-text">죄송해요. 음식점이 없어요</div>
+              </div>
+            )}
+
+            {survivedRestaurants.length > 0 &&
+              survivedRestaurants.map((restaurant, index) => (
+                <RestaurantItem
+                  key={restaurant.id}
+                  restaurant={restaurant}
+                  index={index}
+                  clickedRestaurantId={clickedRestaurantId}
+                  onClickRestaurant={onClickRestaurant}
+                  onRemoveRestaurant={onRemoveRestaurant}
+                  restaurantRefs={restaurantRefs}
+                />
+              ))
+            }
+          </div>
+        </div>
+
+
       </div>
 
       {isListOpen && <div className="restaurant-list-overlay" onClick={onToggleList}></div>}

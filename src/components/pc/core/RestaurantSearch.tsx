@@ -157,7 +157,10 @@ const RestaurantSearch: React.FC<RestaurantSearchProps> = ({
             <div
               key={suggestion.id}
               className="rs-suggestion-chip"
-              onClick={() => applySuggestion(suggestion.name)}
+              onClick={() => {
+                hideTooltip()
+                applySuggestion(suggestion.name)
+              }}
               onMouseEnter={(e) => showTooltip(e, '클릭하여 검색')}
               onMouseLeave={hideTooltip}
             >

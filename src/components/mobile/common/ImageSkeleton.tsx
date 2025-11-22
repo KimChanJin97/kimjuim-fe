@@ -49,6 +49,7 @@ const ImageSkeleton: React.FC<ImageSkeletonProps> = ({
         <img
           src={src}
           alt={alt}
+          loading="lazy"
           className={`skeleton-image ${isLoaded ? 'loaded' : ''} ${className}`}
           onLoad={handleLoad}
           onError={handleError}

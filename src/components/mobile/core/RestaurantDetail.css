@@ -28,10 +28,10 @@
 
   .detail-toggle-btn {
     position: absolute;
-    top: 185px;
-    right: -30px;
-    width: 30px;
-    height: 80px;
+    top: 200px;
+    right: -40px;
+    width: 40px;
+    height: 100px;
     background-color: var(--light-black);
     border: 1px solid var(--gray);
     border-left: none;
@@ -51,9 +51,9 @@
     font-weight: 600;
     writing-mode: vertical-rl;
     text-orientation: upright;
-    letter-spacing: 8px;
+    letter-spacing: 4px;
     user-select: none;
-    transform: translateY(4px);
+    transform: translateY(2px);
     /* letter-spacing의 절반 정도 아래로 이동 */
   }
 

@@ -1,0 +1,149 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+#root {
+  --black: #121212;
+  --light-black: #242528;
+  --dark-gray: #333333;
+  --gray: #444444;
+  --light-gray: #555555;
+  --dark-white: #b7bec2;
+  --white: whitesmoke;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Noto Sans KR', sans-serif;
+  overflow: hidden;
+}
+
+/* 헤딩 태그 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  padding: 0;
+}
+
+/* 리스트 태그 */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* 버튼 태그 */
+button {
+  border: none;
+  outline: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  text-decoration: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+button:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+button:active {
+  outline: none;
+  box-shadow: none;
+}
+
+button:hover {
+  outline: none;
+}
+
+/* 앵커 태그 */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+a:visited {
+  color: inherit;
+}
+
+a:active {
+  color: inherit;
+}
+
+/* 입력 요소 태그 */
+input,
+select,
+textarea {
+  margin: 0;
+  padding: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  box-sizing: border-box;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* select의 기본 화살표 제거 */
+select::-ms-expand {
+  display: none;
+}
+
+/* 공통 스크롤 스타일 클래스 */
+.scrollbar-custom {
+
+  /* Webkit 브라우저 (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    width: 18px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--dark-gray);
+    border-radius: 4px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--light-gray);
+    border-radius: 4px;
+    transition: background 0.2s ease;
+  }
+
+  /* Firefox */
+  scrollbar-width: 18px;
+  scrollbar-color: var(--light-gray) var(--dark-gray);
+}
+
+.scrollbar-hidden {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  scrollbar-width: none;
+}

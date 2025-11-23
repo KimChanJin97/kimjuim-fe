@@ -1,0 +1,83 @@
+.pc {
+  .rvm-container {
+    display: flex;
+    width: 100vw;
+    height: calc(100vh - 80px);
+  }
+
+  .rvm-restaurant-list {
+    width: 490px;
+    height: calc(100vh - 80px);
+    flex-shrink: 0;
+  }
+
+  .rvm-vworld-map {
+    position: relative;
+    width: calc(100vw - 490px);
+    height: calc(100vh - 80px);
+  }
+
+  .rvm-tournament {
+    width: 100vw;
+    height: 100vh;
+  }
+
+  /* 공유 모달 스타일 */
+  .share-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.3s ease-in-out;
+  }
+
+  .share-modal-content {
+    background-color: var(--white);
+    border-radius: 20px;
+    padding: 40px 60px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .share-modal-content h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--black);
+    margin-bottom: 10px;
+  }
+
+  .share-modal-content p {
+    font-size: 16px;
+    color: var(--dark-gray);
+    margin: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}

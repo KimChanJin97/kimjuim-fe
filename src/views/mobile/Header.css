@@ -1,0 +1,15 @@
+.mobile {
+  .header {
+    background-color: transparent;
+    padding: 0 30px;
+    width: 100vw;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+    position: fixed;
+    bottom: 0px;
+    left: 0;
+  }
+}

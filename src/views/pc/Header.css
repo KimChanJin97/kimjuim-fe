@@ -1,0 +1,65 @@
+.pc {
+  .header {
+    background-color: var(--black);
+    padding: 0 30px;
+    width: 100vw;
+    height: 80px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    position: relative;
+    z-index: 5000;
+  }
+
+  .menu-header {
+    display: flex;
+    align-items: center;
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .beta-badge {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--white);
+    background-color: var(--dark-gray);
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    user-select: none;
+    pointer-events: none;
+  }
+
+  .map-header-tab,
+  .introduction-header-tab,
+  .question-header-tab,
+  .patchnote-header-tab {
+    width: auto;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 15px;
+    box-sizing: border-box;
+    color: var(--white);
+    font-size: 16px;
+    font-weight: 600;
+
+    &:hover {
+      border-bottom: 3px solid var(--white);
+      transition: border-bottom 0.2s ease;
+      cursor: pointer;
+    }
+
+    &.active {
+      color: var(--white);
+      border-bottom: 3px solid var(--white);
+    }
+  }
+}

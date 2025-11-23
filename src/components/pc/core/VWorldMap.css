@@ -1,0 +1,122 @@
+.pc {
+  .vworld-map-container {
+    width: 100%;
+    height: 100%;
+    background-color: var(--light-black);
+  }
+
+  .rvm-vworld-map {
+    width: 100%;
+    height: 100%;
+  }
+
+  .overlap-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 99;
+    background: transparent;
+  }
+
+  .overlap-modal {
+    position: fixed;
+    width: 180px;
+    max-height: 240px;
+    background-color: var(--light-black);
+    border: 1px solid var(--dark-gray);
+    border-radius: 10px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    transform: translateX(-50%);
+    animation: fromUpToDown 0.2s ease;
+  }
+
+  .overlap-modal::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 10px solid var(--light-black);
+    filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.3));
+  }
+
+  .om-restaurants {
+    overflow-y: auto;
+    height: 100%;
+  }
+
+  .om-restaurant {
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &+.om-restaurant {
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 16px;
+        right: 16px;
+        height: 1px;
+        background-color: var(--dark-gray);
+      }
+    }
+  }
+
+  .om-restaurant:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .om-restaurant:active {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .omr-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+
+  .omr-category {
+    font-size: 13px;
+    color: var(--light-gray);
+  }
+
+  .rvm-label-overlay {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: bold;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    /* 클릭 이벤트 방지 */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+}
+
+@keyframes fromUpToDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}

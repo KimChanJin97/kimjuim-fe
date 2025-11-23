@@ -1,0 +1,133 @@
+.mobile {
+  .patchnote-container {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 90%;
+    height: 100vh;
+    color: var(--white);
+    background-color: var(--light-black);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--gray);
+    box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .patchnote-container.closed {
+    z-index: 4900;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      z-index 0s 0.4s;
+  }
+
+  .patchnote-container.open {
+    transform: translateX(0);
+    z-index: 5000;
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      z-index 0s 0s;
+  }
+
+  .patchnote-toggle-btn {
+    position: absolute;
+    top: 420px;
+    right: -40px;
+    width: 40px;
+    height: 100px;
+    background-color: var(--light-black);
+    border: 1px solid var(--gray);
+    border-left: none;
+    border-radius: 0 10px 10px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    padding: 10px 0;
+  }
+
+  .toggle-text {
+    color: var(--white);
+    font-size: 14px;
+    font-weight: 600;
+    writing-mode: vertical-rl;
+    text-orientation: upright;
+    letter-spacing: 4px;
+    user-select: none;
+    transform: translateY(2px);
+    /* letter-spacing의 절반 정도 아래로 이동 */
+  }
+
+  .patchnote-header {
+    padding: 30px 20px 20px 20px;
+    font-size: 20px;
+    text-align: left;
+    border-bottom: 1px solid var(--gray);
+    flex-shrink: 0;
+  }
+
+  .patchnote-header h3 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+  }
+
+  .patchnote-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+  }
+
+  .patchnote-body .pb-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .patchnote-body .pb-item {
+    width: 100%;
+    background-color: var(--dark-gray);
+    border-radius: 8px;
+    padding: 16px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  .patchnote-body .pb-item-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--white);
+    margin: 0;
+  }
+
+  .patchnote-body .pb-item-created-at {
+    font-size: 12px;
+    color: var(--dark-white);
+    margin: 0;
+  }
+
+  .patchnote-body .pb-item-content {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.6;
+    margin: 0;
+  }
+
+  .patchnote-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 4999;
+  }
+}

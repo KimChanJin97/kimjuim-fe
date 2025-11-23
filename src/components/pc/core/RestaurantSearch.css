@@ -1,0 +1,171 @@
+.pc {
+  .restaurant-search-container {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* 너비 제한 없음 - 자식 요소들이 컨텐츠에 따라 결정 */
+  }
+
+  .rs-input-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50px;
+    padding: 10px 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s;
+    width: 500px;
+    /* 고정 너비로 변경 (min-width 450px + 여유) */
+  }
+
+  .rs-input-wrapper:focus-within {
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.75);
+  }
+
+  /* 입력 컨테이너 */
+  .rs-input-container {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  .rs-input {
+    border: none;
+    outline: none;
+    font-size: 15px;
+    padding: 4px;
+    background: transparent;
+    color: var(--white);
+    width: 100%;
+  }
+
+  .rs-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  /* 브라우저 autofill 스타일 제거 */
+  .rs-input:-webkit-autofill,
+  .rs-input:-webkit-autofill:hover,
+  .rs-input:-webkit-autofill:focus,
+  .rs-input:-webkit-autofill:active {
+    -webkit-text-fill-color: var(--white) !important;
+    -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+    box-shadow: 0 0 0 1000px transparent inset !important;
+    background-color: transparent !important;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  /* 자동완성 래퍼 - 검색바 아래에 flexbox로 표시 */
+  .rs-suggestion-wrapper {
+    position: absolute;
+    top: 85px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 500px;
+    /* rs-input-wrapper와 동일한 너비 */
+  }
+
+  /* 자동완성 칩 */
+  .rs-suggestion-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 15px;
+    background-color: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    font-size: 14px;
+    color: var(--white);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: all 0.2s;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
+    max-width: 100%;
+  }
+
+  .rs-suggestion-chip:hover {
+    background-color: rgba(0, 0, 0, 0.85);
+    border-color: rgba(255, 255, 255, 0.35);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  .rs-suggestion-chip:active {
+    transform: translateY(0);
+  }
+
+  .rs-arrow-icon {
+    flex-shrink: 0;
+    opacity: 0.7;
+  }
+
+  .rs-suggestion-name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .rs-suggestion-category {
+    font-size: 12px;
+    opacity: 0.7;
+    flex-shrink: 0;
+    margin-left: 4px;
+  }
+
+  .rs-reset-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    color: rgba(255, 255, 255, 0.3);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .rs-reset-btn .close-icon {
+    color: rgba(255, 255, 255, 0.3);
+  }
+
+  .rs-reset-btn:hover {
+    background-color: rgba(0, 0, 0, 0.75);
+    transform: scale(1.1);
+    border-color: rgba(255, 255, 255, 0.5);
+  }
+
+  .rs-reset-btn:active {
+    transform: scale(0.95);
+  }
+}

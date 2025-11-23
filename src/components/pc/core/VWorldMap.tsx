@@ -246,8 +246,8 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           lineDash: [5, 5],
         }),
         text: hasNoRestaurants ? new Text({
-          text: '반경을 늘리거나 재검색해서\n주변 음식점을 찾아보세요!',
-          font: 'bold 16px noto sans kr',
+          text: '반경을 늘리거나 검색해서\n주변 음식점을 찾아보세요!',
+          font: 'bold 14px noto sans kr',
           fill: new Fill({
             color: '#555555',
           }),

@@ -4,6 +4,7 @@ import { CloseIcon } from '@/assets/CloseIcon'
 import { useTooltip } from '@/hooks/useTooltip'
 import Tooltip from '../common/Tooltip'
 import { getRestaurantAutocomplete, RestaurantAutocompleteResponse } from '@/api/api'
+import magnifierIcon from '@/assets/magnifier.png'
 
 interface RestaurantSearchProps {
   onSearchRestaurants: (keyword: string) => void
@@ -129,6 +130,9 @@ const RestaurantSearch: React.FC<RestaurantSearchProps> = ({
               name="restaurant-search"
               id="restaurant-search-input"
             />
+            <button className="rs-search-btn" onClick={onSearch}>
+              <img src={magnifierIcon} alt="검색" width={20} height={20} />
+            </button>
           </div>
         </div>
         {isSearchActive && (

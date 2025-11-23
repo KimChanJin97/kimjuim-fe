@@ -137,7 +137,7 @@
     border-radius: 50%;
     background-color: rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
-    color: var(--white);
+    color: rgba(255, 255, 255, 0.3);
     border: 2px solid rgba(255, 255, 255, 0.3);
     font-size: 14px;
     font-weight: 600;
@@ -152,8 +152,7 @@
   }
 
   .rs-reset-btn .close-icon {
-    color: var(--white);
-    fill: var(--white);
+    color: rgba(255, 255, 255, 0.3);
   }
 
   .rs-reset-btn:active {

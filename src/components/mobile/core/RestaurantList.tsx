@@ -56,7 +56,7 @@ const RestaurantItem = memo<RestaurantItemProps>(({
   restaurantRefs,
 }) => {
   const { ref: inViewRef, inView } = useInView({
-    triggerOnce: true,
+    triggerOnce: false, // 화면을 벗어나면 inView: false가 되도록
     threshold: 0.1,
     rootMargin: '100px'
   })
@@ -64,14 +64,22 @@ const RestaurantItem = memo<RestaurantItemProps>(({
   const [shouldRender, setShouldRender] = useState(false)
 
   useEffect(() => {
+
+    // 이미 렌더링되었으면 다시 처리하지 않음
+    if (shouldRender) {
+      return
+    }
+
     if (inView) {
       const timer = setTimeout(() => {
         setShouldRender(true)
       }, 1500)
 
-      return () => clearTimeout(timer)
+      return () => {
+        clearTimeout(timer)
+      }
     }
-  }, [inView])
+  }, [inView, shouldRender, restaurant.name])
 
   // useCallback으로 setRefs 메모이제이션
   const setRefs = useCallback((el: HTMLDivElement | null) => {
@@ -229,7 +237,7 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
     if (clickedRestaurantId) {
       const restaurant = restaurantRefs.current.get(clickedRestaurantId)
       if (restaurant) {
-        restaurant.scrollIntoView({ behavior: 'auto' })
+        restaurant.scrollIntoView({ behavior: 'smooth' })
       }
     }
   }, [clickedRestaurantId])

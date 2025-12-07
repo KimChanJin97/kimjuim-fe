@@ -13,13 +13,13 @@ interface EllipseProps {
 
 export const Ellipse = ({
   width = 120,
-  height = 60,
+  height = 58,
   strokeWidth = 7,
   strokeColor = '#000000',
   fillColor = '#FFFFFF',
   textColor = '#000000',
   text = '김주임',
-  fontSize = 24,
+  fontSize = 26,
   fontWeight = 900,
   className = "",
 }: EllipseProps) => {

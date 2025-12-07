@@ -112,10 +112,9 @@ const Tournament: React.FC<TournamentProps> = ({
   // 라운드 정보
   const actualParticipants = currentRoundParticipants.length
   const roundSize = getNextPowerOfTwo(actualParticipants) // 8강, 16강 등
-  const currentMatchNumber = currentMatchIndex + 1
-  const totalMatchesInRound = Math.floor(actualParticipants / 2)
   const roundName = roundSize === 2 ? '결승' : `${roundSize}강`
   const hasByePlayer = actualParticipants % 2 === 1
+  const remainingRestaurants = actualParticipants - currentMatchIndex
 
   return (
     <div
@@ -141,7 +140,7 @@ const Tournament: React.FC<TournamentProps> = ({
           <div className="tournament-header">
             <h1>🏆 점심 월드컵 {roundName} 🏆</h1>
             <h2 className="tournament-remaining">
-              {currentMatchNumber}/{totalMatchesInRound} 경기
+              남은 후보: {remainingRestaurants}개
               {hasByePlayer && <span> (부전승 1개)</span>}
             </h2>
           </div>

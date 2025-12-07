@@ -12,4 +12,21 @@
     bottom: 0px;
     left: 0;
   }
+
+  .logo-header {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .snowman {
+    position: absolute;
+    width: 40px;
+    height: auto;
+    z-index: -1;
+    top: -5px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }

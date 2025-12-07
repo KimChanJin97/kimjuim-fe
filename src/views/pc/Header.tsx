@@ -1,6 +1,7 @@
 import './Header.css'
 import { useNavigate, Routes, Route, useLocation } from 'react-router-dom'
 import { Ellipse } from '@/assets/Ellipse'
+import ChristmasBadge from '@/assets/logo-christmas.png'
 
 const Header = () => {
 
@@ -16,9 +17,10 @@ const Header = () => {
 
   return (
     <header className="header">
-      <div className="logo-container" >
+      <div className="logo-container">
         <button onClick={handleLogoClick}><Ellipse /></button>
-        <span className="beta-badge">베타 버전</span>
+        {/* <span className="beta-badge">베타 버전</span> */}
+        <img src={ChristmasBadge} alt="Christmas Badge" className="christmas-badge" />
       </div>
       <div className="menu-header">
         <div className={`map-header-tab ${isActive('/map') ? 'active' : ''}`} onClick={() => navigate('/map')}>

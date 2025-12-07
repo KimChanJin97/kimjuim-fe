@@ -4,11 +4,12 @@ import upIcon from '@/assets/up.png'
 import downIcon from '@/assets/down.png'
 import profileImage from '@/assets/profile.png'
 import { sendMailMessage } from '@/api/api'
-import { profile } from 'console'
+import SmileIcon from '@/assets/smile.png'
 
 const Question = () => {
 
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null)
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState<boolean>(false)
 
   const faqs = [
     {
@@ -94,6 +95,25 @@ const Question = () => {
 
     // 제출
     sendMailMessage(name, email, type, title, content, agreement, file || new File([], ''))
+
+    // 제출 완료 모달 표시
+    setIsSubmitModalOpen(true)
+
+    // 폼 초기화
+    setFormData({
+      name: '',
+      email: '',
+      type: '',
+      title: '',
+      content: '',
+      agreement: false,
+      file: null
+    })
+
+    // 3초 후 모달 닫기
+    setTimeout(() => {
+      setIsSubmitModalOpen(false)
+    }, 3000)
   }
 
 
@@ -272,6 +292,17 @@ const Question = () => {
         </div>
 
       </div>
+
+      {/* 제출 완료 모달 */}
+      {isSubmitModalOpen && (
+        <div className="submit-modal-overlay">
+          <div className="submit-modal-content">
+            <img src={SmileIcon} width={60} height={60} />
+            <h2>제출이 완료되었습니다!</h2>
+            <p>빠른 시일 내에 답변드리겠습니다.</p>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

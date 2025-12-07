@@ -41,6 +41,26 @@ const RestaurantVWorldMap = () => {
   // 검색 상태 추가
   const [isSearchMode, setIsSearchMode] = useState<boolean>(false)
   const [searchKeyword, setSearchKeyword] = useState<string>('')
+  // 위치 로딩 상태
+  const [isLocationLoading, setIsLocationLoading] = useState<boolean>(false)
+
+  // 에러 처리 함수
+  const handleLocationError = (error: GeolocationPositionError) => {
+    switch (error.code) {
+      case error.PERMISSION_DENIED:
+        alert('위치 권한을 허용해주세요. :(')
+        break
+      case error.POSITION_UNAVAILABLE:
+        alert('네트워크가 불안정해서 위치를 가져올 수 없어요. :(')
+        break
+      case error.TIMEOUT:
+        alert('위치를 가져오는 데 너무 오래 걸렸어요. 새로고침 또는 새창으로 열어주세요. :(')
+        break
+      default:
+        alert('죄송해요. 알 수 없는 에러가 발생했어요. 최대한 빨리 고칠게요. :(')
+        break
+    }
+  }
 
   // 위치 정보 가져오기
   useEffect(() => {
@@ -79,14 +99,37 @@ const RestaurantVWorldMap = () => {
 
         // 공유 링크가 없거나 디코딩 실패 시 사용자 위치 사용
         if (finalX === undefined || finalY === undefined) {
+          // 로딩 시작
+          setIsLocationLoading(true)
+
           // 일반 접속 또는 공유 링크 디코딩 실패
           const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject)
+            const timeoutId = setTimeout(() => {
+              reject(new Error('CUSTOM_TIMEOUT'))
+            }, 60000) // 60초 타임아웃
+
+            navigator.geolocation.getCurrentPosition(
+              (pos) => {
+                clearTimeout(timeoutId)
+                resolve(pos)
+              },
+              (err) => {
+                clearTimeout(timeoutId)
+                reject(err)
+              },
+              {
+                timeout: 60000, // 60초
+                enableHighAccuracy: false // 빠른 응답 우선
+              }
+            )
           })
 
           finalX = position.coords.longitude
           finalY = position.coords.latitude
           finalDistance = finalDistance || 100
+
+          // 로딩 종료
+          setIsLocationLoading(false)
         }
 
         setX(finalX)
@@ -107,8 +150,14 @@ const RestaurantVWorldMap = () => {
           setIsTournamentOpen(true)
         }
       } catch (error) {
+        setIsLocationLoading(false)
         console.error('위치 정보를 가져올 수 없습니다:', error)
-        alert('위치 정보를 가져올 수 없습니다. 위치 권한을 확인해주세요.')
+
+        if (error instanceof GeolocationPositionError) {
+          handleLocationError(error)
+        } else {
+          alert('위치 정보를 가져올 수 없습니다. 위치 권한을 확인해주세요.')
+        }
       }
     }
     getLocation()
@@ -308,6 +357,17 @@ const RestaurantVWorldMap = () => {
 
   return (
     <div className="rvm-container">
+      {/* 위치 로딩 스피너 */}
+      {isLocationLoading && (
+        <div className="location-loading-overlay">
+          <div className="location-loading-content">
+            <div className="spinner"></div>
+            <p>위치 정보를 가져오는 중입니다...</p>
+            <small>최대 60초가 소요될 수 있습니다</small>
+          </div>
+        </div>
+      )}
+
       <div className="rvm-restaurant-list">
         <RestaurantList
           categories={categories}

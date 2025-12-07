@@ -155,7 +155,14 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
                   <div className="rdv">
                     {/* 리뷰 프로필 이미지, 작성자 이름, 작성일 */}
                     <div className="rdv-row">
-                      <img src={review.profileUrl} alt={review.authorName} />
+                      <img
+                        src={review.profileUrl}
+                        alt={review.authorName}
+                        referrerPolicy="no-referrer"
+                        onError={(e) => {
+                          e.currentTarget.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"%3E%3Ccircle cx="20" cy="20" r="20" fill="%23e0e0e0"/%3E%3Cpath d="M20 10c2.8 0 5 2.2 5 5s-2.2 5-5 5-5-2.2-5-5 2.2-5 5-5zm0 18c-4.4 0-8 1.8-8 4v2h16v-2c0-2.2-3.6-4-8-4z" fill="%23999"/%3E%3C/svg%3E'
+                        }}
+                      />
                       <div className="rdv-author-name">{review.authorName}</div>
                       <div className="rdv-created-at">{review.createdAt}</div>
                     </div>

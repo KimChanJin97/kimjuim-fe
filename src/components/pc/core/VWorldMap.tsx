@@ -10,7 +10,7 @@ import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
 import Circle from 'ol/geom/Circle'
 import { Style, Icon, Fill, Stroke, Text } from 'ol/style'
-import { fromLonLat, toLonLat } from 'ol/proj'
+import { fromLonLat, toLonLat, transformExtent } from 'ol/proj'
 import { Restaurant } from './RestaurantVWorldMap'
 import markers from '@/assets/markers.png'
 import { MapBrowserEvent, Overlay } from 'ol'
@@ -101,8 +101,11 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       view: new View({
         projection: 'EPSG:3857',
         center: fromLonLat([127.024612, 36.5146]),
-        minZoom: 12,
-        maxZoom: 18,
+        // 한국 영역으로 이동 범위 제한 (경도: 124~132, 위도: 33~43)
+        extent: transformExtent([124, 33, 132, 43], 'EPSG:4326', 'EPSG:3857'),
+        // 줌 레벨 제한 제거 (검색 시 넓은 범위의 음식점 표시를 위해)
+        minZoom: 6,
+        maxZoom: 21,
       }),
       controls: [],
     })
@@ -221,11 +224,11 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
       circleSource.addFeature(circleFeature)
 
-      // extent를 기반으로 view fit (원의 geometry가 아닌 extent 직접 사용)
+      // extent를 기반으로 view fit (모든 음식점이 뷰포트에 들어오도록)
       view.fit(extent, {
         padding: [100, 100, 100, 100],
         duration: 1000,
-        maxZoom: 13,
+        // maxZoom 제한 제거 - 모든 음식점이 뷰포트에 들어오도록
       })
     } else {
       // 기존 로직 (사용자 위치 기반)

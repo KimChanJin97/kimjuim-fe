@@ -198,7 +198,18 @@
   .rl-restaurants {
     display: flex;
     flex-direction: column;
-    padding-bottom: 170px;
+  }
+
+  .rl-footer-message {
+    padding: 200px 0;
+    border-top: 1px solid var(--gray);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--light-gray);
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
   }
 
   .rlr {

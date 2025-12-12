@@ -421,6 +421,12 @@ const RestaurantList: React.FC<RestaurantListProps> = ({
                 />
               ))
             }
+
+            {survivedRestaurants.length > 0 && (
+              <div className="rl-footer-message">
+                <span>오늘도 맛있는 하루 되세요! 🤍</span>
+              </div>
+            )}
           </div>
         </div>
 

@@ -7,6 +7,7 @@ import DescriptionIcon from '@/assets/description.png'
 import NoImageIcon from '@/assets/no-image.png'
 import CryingFaceIcon from '@/assets/crying-face.png'
 import ImageSkeleton from '../common/ImageSkeleton'
+import NoProfileIcon from '@/assets/no-profile.png'
 
 const NO_INFO = '정보없음'
 const tabs = [
@@ -180,7 +181,8 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
                   <div className="rdv">
                     {/* 리뷰 프로필 이미지, 작성자 이름, 작성일 */}
                     <div className="rdv-row">
-                      <img src={review.profileUrl} alt={review.authorName} />
+                      {/* <img src={review.profileUrl} alt={review.authorName} /> */}
+                      <img src={NoProfileIcon} alt={review.authorName} />
                       <div className="rdv-author-name">{review.authorName}</div>
                       <div className="rdv-created-at">{review.createdAt}</div>
                     </div>

@@ -469,6 +469,15 @@
     }
   }
 
+  .question-footer-message {
+    padding: 60px 0 120px 0;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-align: center;
+    color: var(--light-gray);
+  }
+
   .question-overlay {
     position: fixed;
     top: 0;

@@ -87,6 +87,10 @@ const Introduction = ({
             <p><strong>문의하기</strong>를 통해 버그를 신고하거나, 신기능을 건의할 수 있습니다. 실제 반영이 이뤄진 건에 대해서는 <strong>패치노트</strong>에 공지됩니다.</p>
           </div>
 
+          <div className="intro-footer-message">
+            <p>오늘도 맛있는 하루 되세요! 🤍</p>
+          </div>
+
         </div>
 
       </div >

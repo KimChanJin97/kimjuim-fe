@@ -287,6 +287,10 @@ const Question = ({
             </div>
           </div>
 
+          <div className="question-footer-message">
+            <p>오늘도 맛있는 하루 되세요! 🤍</p>
+          </div>
+
         </div>
       </div>
 

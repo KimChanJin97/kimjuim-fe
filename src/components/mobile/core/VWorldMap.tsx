@@ -179,17 +179,18 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
     const hasNoRestaurants = survivedRestaurants.length === 0
 
     if (isSearchMode && survivedRestaurants.length > 0) {
-      // vectorSource에서 모든 음식점 feature의 extent 가져오기
-      const vectorSource = vectorSourceRef.current
-      const extent = vectorSource.getExtent()
+      // restaurants 배열에서 직접 extent 계산 (vectorSource에 의존하지 않음)
+      const coords = survivedRestaurants.map(r => fromLonLat([r.x, r.y]))
+      const minX = Math.min(...coords.map(c => c[0]))
+      const maxX = Math.max(...coords.map(c => c[0]))
+      const minY = Math.min(...coords.map(c => c[1]))
+      const maxY = Math.max(...coords.map(c => c[1]))
+      const extent: [number, number, number, number] = [minX, minY, maxX, maxY]
 
       // extent의 중심점 구하기
       const center = getCenter(extent)
 
       // extent의 네 코너와 중심 사이의 거리를 투영 좌표계에서 직접 계산
-      const [minX, minY, maxX, maxY] = extent
-
-      // 네 코너의 좌표
       const corners = [
         [minX, minY],
         [maxX, minY],
@@ -224,11 +225,13 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
 
       circleSource.addFeature(circleFeature)
 
-      // extent를 기반으로 view fit (모든 음식점이 뷰포트에 들어오도록)
-      view.fit(extent, {
-        padding: [100, 100, 100, 100],
+      // 검색 결과 중심으로 이동 (view.animate 사용 - 타일 로드 안정적)
+      const resolution = view.getResolutionForExtent(extent)
+      const zoom = view.getZoomForResolution(resolution) ?? 15
+      view.animate({
+        center: center,
+        zoom: Math.max(zoom - 1, 6),
         duration: 1000,
-        // maxZoom 제한 제거 - 모든 음식점이 뷰포트에 들어오도록
       })
     } else {
       // 기존 로직 (사용자 위치 기반)

@@ -51,6 +51,7 @@ const RestaurantVWorldMap = () => {
         let finalDistance: number | undefined
         let ex: string[] = []
         let keyword: string = ''
+        let isValidShareLink = false // 공유 링크가 유효한지 추적
 
         // 압축된 데이터 파라미터 확인
         const dataParam = searchParams.get('data')
@@ -61,19 +62,28 @@ const RestaurantVWorldMap = () => {
             const decompressed = LZString.decompressFromEncodedURIComponent(dataParam)
             const shareData = decompressed ? JSON.parse(decompressed) : null
 
-            if (shareData) {
+            // 필수 필드(x, y, d)가 유효한 숫자인지 검증
+            if (shareData &&
+              typeof shareData.x === 'number' &&
+              typeof shareData.y === 'number' &&
+              typeof shareData.d === 'number') {
               ex = shareData.ex || []
               finalX = shareData.x
               finalY = shareData.y
               finalDistance = shareData.d
               keyword = shareData.k || ''
+              isValidShareLink = true // 디코딩 성공
             } else {
-              throw new Error('디코딩 실패')
+              throw new Error('유효하지 않은 공유 데이터')
             }
           } catch (error) {
             console.error('공유 데이터 디코딩 실패:', error)
-            // 디코딩 실패 시 사용자 위치로 폴백
-            alert('공유 링크가 유효하지 않습니다. 현재 위치로 설정됩니다.')
+            // 디코딩 실패 시 모든 데이터 초기화하고 사용자 위치로 폴백
+            setSearchParams({}, { replace: true })
+            ex = []
+            finalDistance = undefined
+            keyword = ''
+            alert('공유 링크가 유효하지 않습니다. 현재 위치로 이동합니다.')
           }
         }
 
@@ -102,8 +112,8 @@ const RestaurantVWorldMap = () => {
           await loadRestaurants(finalX, finalY, finalDistance || 100, ex)
         }
 
-        // 공유 링크로 접속했고 데이터가 유효한 경우에만 토너먼트 열기
-        if (dataParam && finalDistance !== undefined) {
+        // 유효한 공유 링크일 때만 토너먼트 열기
+        if (isValidShareLink) {
           setIsTournamentOpen(true)
         }
       } catch (error) {

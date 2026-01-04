@@ -156,8 +156,12 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
                   <div className="rdv">
                     {/* 리뷰 프로필 이미지, 작성자 이름, 작성일 */}
                     <div className="rdv-row">
-                      {/* <img src={review.profileUrl} alt={review.authorName} /> */}
-                      <img src={NoProfileIcon} alt={review.authorName} />
+                      <img
+                        src={review.profileImage
+                          ? `data:image/jpeg;base64,${review.profileImage}`
+                          : NoProfileIcon}
+                        alt={review.authorName}
+                      />
                       <div className="rdv-author-name">{review.authorName}</div>
                       <div className="rdv-created-at">{review.createdAt}</div>
                     </div>

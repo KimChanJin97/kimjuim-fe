@@ -51,7 +51,7 @@ export interface ReviewResponse {
   title: string,
   url: string,
   authorName: string,
-  profileUrl: string,
+  profileImage: string | null,  // Base64 인코딩된 이미지
   content: string,
   createdAt: string
 }

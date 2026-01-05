@@ -126,7 +126,6 @@ const RestaurantVWorldMap = () => {
         console.error('위치 정보를 가져올 수 없습니다:', error)
         alert('위치 정보를 가져올 수 없습니다. 위치 권한을 확인해주세요.')
       } finally {
-        await new Promise(resolve => setTimeout(resolve, 10000))
         setIsLoading(false)
       }
     }

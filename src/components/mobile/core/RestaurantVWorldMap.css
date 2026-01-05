@@ -15,8 +15,8 @@
     height: 100vh;
   }
 
-  /* 공유 모달 스타일 */
-  .share-modal-overlay {
+  .share-modal-overlay,
+  .loading-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -30,14 +30,18 @@
     animation: fadeIn 0.3s ease-in-out;
   }
 
-  .share-modal-content {
+  .share-modal-content,
+  .loading-modal-content {
     background-color: var(--white);
     border-radius: 20px;
-    padding: 30px 30px;
+    padding: 20px 20px;
     margin: 20px 20px;
     text-align: center;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     animation: slideUp 0.3s ease-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   .share-modal-content h2 {
@@ -47,10 +51,30 @@
     margin-bottom: 10px;
   }
 
-  .share-modal-content p {
+  .share-modal-content p,
+  .loading-modal-content p {
     font-size: 14px;
     color: var(--dark-gray);
-    margin: 0;
+  }
+
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e0e0e0;
+    border-top: 4px solid #000000;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
   }
 }
 

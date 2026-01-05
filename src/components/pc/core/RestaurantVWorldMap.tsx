@@ -41,6 +41,8 @@ const RestaurantVWorldMap = () => {
   // 검색 상태 추가
   const [isSearchMode, setIsSearchMode] = useState<boolean>(false)
   const [searchKeyword, setSearchKeyword] = useState<string>('')
+  // 로딩 상태
+  const [isLoading, setIsLoading] = useState<boolean>(true)
 
   // 위치 정보 가져오기
   useEffect(() => {
@@ -91,7 +93,11 @@ const RestaurantVWorldMap = () => {
         if (finalX === undefined || finalY === undefined) {
           // 일반 접속 또는 공유 링크 디코딩 실패
           const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject)
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: false,  // true면 GPS만 사용, false면 WiFi도 활용
+              timeout: 10000,             // 10초 타임아웃
+              maximumAge: 60000           // 1분 이내 캐시된 위치 허용
+            })
           })
 
           finalX = position.coords.longitude
@@ -119,6 +125,9 @@ const RestaurantVWorldMap = () => {
       } catch (error) {
         console.error('위치 정보를 가져올 수 없습니다:', error)
         alert('위치 정보를 가져올 수 없습니다. 위치 권한을 확인해주세요.')
+      } finally {
+        await new Promise(resolve => setTimeout(resolve, 10000))
+        setIsLoading(false)
       }
     }
     getLocation()
@@ -373,6 +382,16 @@ const RestaurantVWorldMap = () => {
             <CheckIcon width={80} height={80} />
             <h2>공유 링크가 복사되었습니다!</h2>
             <p>클립보드에 링크가 저장되었습니다.</p>
+          </div>
+        </div>
+      )}
+
+      {isLoading && (
+        <div className="loading-modal-overlay">
+          <div className="loading-modal-content">
+            <div className="loading-spinner" />
+            <h2>위치 정보를 가져오는 중입니다.</h2>
+            <p>위치 정보를 가져오지 못할 경우, <br />위치 권한을 확인하거나 OS를 업데이트해주세요.</p>
           </div>
         </div>
       )}

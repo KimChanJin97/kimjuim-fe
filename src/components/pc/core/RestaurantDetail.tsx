@@ -90,8 +90,6 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
                       <ImageSkeleton
                         src={menu.menuImages[0].url || NoImageIcon}
                         alt={menu.name}
-                        width={140}
-                        height={140}
                         borderRadius="8px"
                       />
                     </div>
@@ -103,8 +101,6 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
                       <ImageSkeleton
                         src={NoImageIcon}
                         alt="이미지 없음"
-                        width={140}
-                        height={140}
                         borderRadius="8px"
                       />
                     </div>

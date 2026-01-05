@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import './RestaurantDetail.css'
 import { RestaurantDetailResponse } from '@/api/api'
 import MenuIcon from '@/assets/menu.png'
@@ -37,8 +37,6 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
   restaurantName
 }) => {
   const [activeTab, setActiveTab] = useState(0)
-  const [imageSize, setImageSize] = useState(140)
-  const rdBodyRef = useRef<HTMLDivElement>(null)
 
   const onClickTab = (index: number) => {
     setActiveTab(index)
@@ -47,16 +45,6 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
   const hasInfo = (info: string) => {
     return info !== NO_INFO && info !== '' && info !== null && info !== undefined
   }
-
-  useEffect(() => {
-    if (rdBodyRef.current && isDetailOpen) {
-      const bodyWidth = rdBodyRef.current.offsetWidth
-      // rd-menus의 패딩(좌우 60px), 컬럼 갭(15px)을 고려
-      const availableWidth = bodyWidth - 60 - 15
-      const size = Math.floor(availableWidth / 2)
-      setImageSize(size)
-    }
-  }, [isDetailOpen])
 
   return (
     <>
@@ -81,7 +69,7 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
           )}
         </div>
 
-        <div className="rd-body" ref={rdBodyRef}>
+        <div className="rd-body">
 
           <div className="tabs">
             {tabs.map((tab) => (
@@ -110,8 +98,6 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
                       <ImageSkeleton
                         src={menu.menuImages[0].url || NoImageIcon}
                         alt={menu.name}
-                        width={imageSize}
-                        height={imageSize}
                         borderRadius="8px"
                       />
                     </div>
@@ -123,8 +109,6 @@ const RestaurantDetail: React.FC<RestaurantDetailProps> = ({
                       <ImageSkeleton
                         src={NoImageIcon}
                         alt="이미지 없음"
-                        width={imageSize}
-                        height={imageSize}
                         borderRadius="8px"
                       />
                     </div>

@@ -10,20 +10,18 @@
     border-right: 1px solid var(--gray);
     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.3);
     transform: translateX(-100%);
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform 0.25s ease-out;
   }
 
   .restaurant-detail-container.closed {
     z-index: 4900;
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-      z-index 0s 0.4s;
+    transition: transform 0.25s ease-out, z-index 0s 0.25s;
   }
 
   .restaurant-detail-container.open {
     transform: translateX(0);
     z-index: 5000;
-    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
-      z-index 0s 0s;
+    transition: transform 0.25s ease-out, z-index 0s 0s;
   }
 
   .detail-toggle-btn {
@@ -151,7 +149,8 @@
 
   .rdm-image-wrap {
     position: relative;
-    display: inline-block;
+    width: 100%;
+    aspect-ratio: 1;
   }
 
   .rdm-badge {
@@ -164,6 +163,7 @@
     border-radius: 4px;
     font-size: 10px;
     letter-spacing: 1.1px;
+    z-index: 1;
   }
 
   .rdm-image-wrap img {

@@ -392,7 +392,7 @@ const RestaurantVWorldMap = () => {
           <div className="loading-modal-content">
             <div className="loading-spinner" />
             <h2>위치 정보를 가져오는 중입니다.</h2>
-            <p>위치 정보를 가져오지 못할 경우, <br />WiFi 연결 또는 위치 권한을 확인하거나 <br />위치 서비스 데몬이 기동될 때까지 잠시 기다려주세요.<br />(부팅 직후에는 WiFi AP 스캔 시간이 소요될 수 있어요.)</p>
+            <p>위치 정보를 가져오지 못할 경우, <br />WiFi 연결 또는 위치 권한을 확인하거나 <br />위치 서비스 데몬이 기동될 때까지 잠시 기다려주세요.<br />(부팅 직후에는 WiFi AP 스캔 시간이 필요해요.)</p>
           </div>
         </div>
       )}
@@ -402,7 +402,7 @@ const RestaurantVWorldMap = () => {
           <div className="error-modal-content">
             <div className="error-icon">!</div>
             <h2>위치 정보를 가져올 수 없습니다</h2>
-            <p>WiFi 연결 또는 위치 권한을 확인하거나 <br />위치 서비스 데몬이 기동될 때까지 잠시 기다려주세요.<br />(부팅 직후에는 WiFi AP 스캔 시간이 소요될 수 있어요.)</p>
+            <p>WiFi 연결 또는 위치 권한을 확인하거나 <br />위치 서비스 데몬이 기동될 때까지 잠시 기다려주세요.<br />(부팅 직후에는 WiFi AP 스캔 시간이 필요해요.)</p>
           </div>
         </div>
       )}

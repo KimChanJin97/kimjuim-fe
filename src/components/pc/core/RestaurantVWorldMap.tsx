@@ -43,6 +43,8 @@ const RestaurantVWorldMap = () => {
   const [searchKeyword, setSearchKeyword] = useState<string>('')
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  // 위치 에러 상태
+  const [isLocationError, setIsLocationError] = useState<boolean>(false)
 
   // 위치 정보 가져오기
   useEffect(() => {
@@ -124,7 +126,7 @@ const RestaurantVWorldMap = () => {
         }
       } catch (error) {
         console.error('위치 정보를 가져올 수 없습니다:', error)
-        alert('위치 정보를 가져올 수 없습니다. 위치 권한을 확인해주세요.')
+        setIsLocationError(true)
       } finally {
         setIsLoading(false)
       }
@@ -390,7 +392,17 @@ const RestaurantVWorldMap = () => {
           <div className="loading-modal-content">
             <div className="loading-spinner" />
             <h2>위치 정보를 가져오는 중입니다.</h2>
-            <p>위치 정보를 가져오지 못할 경우, <br />위치 권한을 확인하거나 OS를 업데이트해주세요.</p>
+            <p>위치 정보를 가져오지 못할 경우, <br />WiFi 연결 또는 위치 권한을 확인하거나 <br />위치 서비스 데몬이 기동될 때까지 잠시 기다려주세요.<br />(부팅 직후에는 WiFi AP 스캔 시간이 소요될 수 있어요.)</p>
+          </div>
+        </div>
+      )}
+
+      {isLocationError && (
+        <div className="error-modal-overlay">
+          <div className="error-modal-content">
+            <div className="error-icon">!</div>
+            <h2>위치 정보를 가져올 수 없습니다</h2>
+            <p>WiFi 연결 또는 위치 권한을 확인하거나 <br />위치 서비스 데몬이 기동될 때까지 잠시 기다려주세요.<br />(부팅 직후에는 WiFi AP 스캔 시간이 소요될 수 있어요.)</p>
           </div>
         </div>
       )}

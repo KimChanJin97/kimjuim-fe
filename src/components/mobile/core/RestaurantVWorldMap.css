@@ -16,7 +16,8 @@
   }
 
   .share-modal-overlay,
-  .loading-modal-overlay {
+  .loading-modal-overlay,
+  .error-modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -31,7 +32,8 @@
   }
 
   .share-modal-content,
-  .loading-modal-content {
+  .loading-modal-content,
+  .error-modal-content {
     background-color: var(--white);
     border-radius: 20px;
     padding: 20px 20px;
@@ -44,15 +46,18 @@
     align-items: center;
   }
 
-  .share-modal-content h2 {
-    font-size: 20px;
+  .share-modal-content h2,
+  .loading-modal-content h2,
+  .error-modal-content h2 {
+    font-size: 15px;
     font-weight: 600;
     color: var(--black);
     margin-bottom: 10px;
   }
 
   .share-modal-content p,
-  .loading-modal-content p {
+  .loading-modal-content p,
+  .error-modal-content p {
     font-size: 14px;
     color: var(--dark-gray);
   }
@@ -64,6 +69,20 @@
     border-top: 4px solid #000000;
     border-radius: 50%;
     animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+
+  .error-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #ff4444;
+    color: white;
+    font-size: 30px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin-bottom: 20px;
   }
 }

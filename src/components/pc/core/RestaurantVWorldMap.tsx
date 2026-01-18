@@ -9,7 +9,12 @@ import { useSearchParams } from 'react-router-dom'
 import LZString from 'lz-string'
 import { AddIcon } from '@/assets/AddIcon'
 import { CheckIcon } from '@/assets/CheckIcon'
+import { CloseIcon } from '@/assets/CloseIcon'
 import RestaurantSearch from './RestaurantSearch'
+import macHelpSetting from '@/assets/mac-help-setting.png'
+import macHelpToggle from '@/assets/mac-help-toggle.png'
+import macHelpLocalizing from '@/assets/mac-help-localizing.png'
+import mapHelpService from '@/assets/mac-help-service.png'
 
 export interface Category {
   name: string
@@ -43,8 +48,8 @@ const RestaurantVWorldMap = () => {
   const [searchKeyword, setSearchKeyword] = useState<string>('')
   // 로딩 상태
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  // 위치 에러 상태
-  const [isLocationError, setIsLocationError] = useState<boolean>(false)
+  // MAC 도움말 모달
+  const [macHelpModalState, setMacHelpModalState] = useState<'hidden' | 'visible' | 'closing'>('hidden')
 
   // 위치 정보 가져오기
   useEffect(() => {
@@ -126,10 +131,13 @@ const RestaurantVWorldMap = () => {
         }
       } catch (error) {
         console.error('위치 정보를 가져올 수 없습니다:', error)
-        setIsLocationError(true)
-      } finally {
-        setIsLoading(false)
+        // 5초 후 재시도
+        setTimeout(() => {
+          getLocation()
+        }, 10000)
+        return // 재시도 시 isLoading 유지
       }
+      setIsLoading(false)
     }
     getLocation()
   }, [])
@@ -326,6 +334,14 @@ const RestaurantVWorldMap = () => {
     setClickedRestaurantId('')
   }
 
+  // MAC 도움말 모달 닫기
+  const closeMacHelpModal = () => {
+    setMacHelpModalState('closing')
+    setTimeout(() => {
+      setMacHelpModalState('hidden')
+    }, 300)
+  }
+
   return (
     <div className="rvm-container">
       <div className="rvm-restaurant-list">
@@ -393,17 +409,27 @@ const RestaurantVWorldMap = () => {
             <div className="loading-spinner" />
             <h2>위치 정보를 가져오는 중입니다.</h2>
             <p>위치 정보를 가져오지 못할 경우, <br />WiFi 연결 또는 위치 권한을 확인하거나 <br />위치 서비스 데몬이 기동될 때까지 잠시 기다려주세요.<br />(부팅 직후에는 WiFi AP 스캔 시간이 필요해요.)</p>
+            <a className="mac-help-link" onClick={() => setMacHelpModalState('visible')}>
+              MAC 운영체제에서 문제가 지속될 경우 조치방법
+            </a>
           </div>
         </div>
       )}
 
-      {isLocationError && (
-        <div className="error-modal-overlay">
-          <div className="error-modal-content">
-            <div className="error-icon">!</div>
-            <h2>위치 정보를 가져올 수 없습니다</h2>
-            <p>WiFi 연결 또는 위치 권한을 확인하거나 <br />위치 서비스 데몬이 기동될 때까지 잠시 기다려주세요.<br />(부팅 직후에는 WiFi AP 스캔 시간이 필요해요.)</p>
-          </div>
+      {macHelpModalState !== 'hidden' && (
+        <div className={`mac-help-modal-content ${macHelpModalState === 'closing' ? 'closing' : ''}`}>
+          <button className="mac-help-close-btn" onClick={closeMacHelpModal}>
+            <CloseIcon width={22} height={22} />
+          </button>
+          <h2>MAC 로컬라이징 버그 조치 방법</h2>
+          <p>1. 터미널을 열고 <strong>setting</strong> 을 검색하세요.</p>
+          <img src={macHelpSetting} alt="MAC 위치 서비스 조치방법" className="mac-help-image" />
+          <p>2. <strong>개인정보 보호 및 보안</strong> 탭 클릭 후 <strong>위치 서비스</strong> 탭을 클릭하세요.</p>
+          <img src={macHelpLocalizing} alt="MAC 위치 서비스 조치방법" className="mac-help-image" />
+          <p>3. <strong>위치 서비스 스위치</strong>를 껐다 켜주세요.</p>
+          <img src={macHelpToggle} alt="MAC 위치 서비스 조치방법" className="mac-help-image" />
+          <p>4. 브라우저를 <strong>새로고침하면</strong> 위치 정보를 가져올 수 있습니다!</p>
+          <img src={mapHelpService} alt="MAC 위치 서비스 조치방법" className="mac-help-image" />
         </div>
       )}
     </div>

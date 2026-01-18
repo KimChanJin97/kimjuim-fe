@@ -37,6 +37,8 @@ interface RestaurantFeature extends Feature {
   get(key: 'type'): string;
   get(key: 'categoryType'): CategoryType;
   get(key: 'markerState'): MarkerState;
+  get(key: 'x'): number;
+  get(key: 'y'): number;
 }
 
 enum MarkerState {
@@ -152,6 +154,8 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           category: r.category,
           categoryType: categoryType,
           markerState: MarkerState.NORMAL,  // 항상 NORMAL
+          x: r.x,
+          y: r.y,
         })
 
         const icon = extractCategoryIcon(categoryType, false)  // 기본 아이콘
@@ -299,12 +303,13 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       const markerState = feature.get('markerState')
       const categoryType = feature.get('categoryType') as CategoryType
       const normalIcon = extractCategoryIcon(categoryType, false)
+      const isClicked = feature.get('rid') === clickedRestaurantId
 
       if (markerState === MarkerState.NORMAL_HOVERED) {
-        feature.setStyle(new Style({ image: normalIcon }))
+        feature.setStyle(new Style({ image: normalIcon, zIndex: isClicked ? 9999 : 1 }))
         feature.set('markerState', MarkerState.NORMAL)
       } else if (markerState === MarkerState.CLICKED_HOVERED) {
-        feature.setStyle(new Style({ image: normalIcon }))
+        feature.setStyle(new Style({ image: normalIcon, zIndex: isClicked ? 9999 : 1 }))
         feature.set('markerState', MarkerState.CLICKED)
       }
     }
@@ -314,12 +319,13 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       const markerState = feature.get('markerState')
       const categoryType = feature.get('categoryType') as CategoryType
       const hoveredIcon = extractCategoryIcon(categoryType, true)
+      const isClicked = feature.get('rid') === clickedRestaurantId
 
       if (markerState === MarkerState.NORMAL) {
-        feature.setStyle(new Style({ image: hoveredIcon }))
+        feature.setStyle(new Style({ image: hoveredIcon, zIndex: isClicked ? 9999 : 1 }))
         feature.set('markerState', MarkerState.NORMAL_HOVERED)
       } else if (markerState === MarkerState.CLICKED) {
-        feature.setStyle(new Style({ image: hoveredIcon }))
+        feature.setStyle(new Style({ image: hoveredIcon, zIndex: isClicked ? 9999 : 1 }))
         feature.set('markerState', MarkerState.CLICKED_HOVERED)
       }
     }
@@ -339,12 +345,28 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
         const overlappedRids = features.map(f => f.get('rid'))
         const overlappedRestaurants = restaurants.filter(r => overlappedRids.includes(r.rid))
 
-        // 모달창 위치 설정
-        setOverlappedRestaurants(overlappedRestaurants)
-        setIsOverlapModalOpen(true)
-        setOverlapModalPosition({
-          x: event.originalEvent.clientX,
-          y: event.originalEvent.clientY
+        // 지도 이동 완료 후 모달 표시
+        zoomIn(features[0].getGeometry(), () => {
+          // 피처의 위경도로 화면 좌표 계산
+          const featureX = features[0].get('x')
+          const featureY = features[0].get('y')
+
+          if (mapInstanceRef.current && mapRef.current) {
+            const coord = fromLonLat([featureX, featureY])
+            const pixel = mapInstanceRef.current.getPixelFromCoordinate(coord)
+
+            // 지도 컨테이너의 브라우저 창 기준 위치
+            const mapRect = mapRef.current.getBoundingClientRect()
+
+            if (pixel) {
+              setOverlappedRestaurants(overlappedRestaurants)
+              setIsOverlapModalOpen(true)
+              setOverlapModalPosition({
+                x: pixel[0] + mapRect.left,
+                y: pixel[1] + mapRect.top
+              })
+            }
+          }
         })
       }
 
@@ -427,7 +449,7 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
   }, [clickedRestaurantId, restaurants])
 
   // 음식점 클릭시 줌인 처리 (리스트/지도)
-  const zoomIn = (geometry: Geometry | undefined) => {
+  const zoomIn = (geometry: Geometry | undefined, onComplete?: () => void) => {
     if (!mapInstanceRef.current || !geometry) return
     if (geometry instanceof Point) {
       const coord = geometry.getCoordinates()
@@ -436,6 +458,10 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
           center: coord,
           zoom: 19,
           duration: 900,
+        }, (finished) => {
+          if (finished && onComplete) {
+            onComplete()
+          }
         })
       }
     }
@@ -457,7 +483,10 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       features.forEach(f => {
         const categoryType = f.get('categoryType') as CategoryType
         const normalIcon = extractCategoryIcon(categoryType, false)
-        const style = new Style({ image: normalIcon })
+        const style = new Style({
+          image: normalIcon,
+          zIndex: 1
+        })
         style.getImage()?.setOpacity(1)
         f.setStyle(style)
         f.set('markerState', MarkerState.NORMAL)
@@ -470,7 +499,10 @@ const VWorldMap: React.FC<VWorldMapProps> = ({
       const normalIcon = extractCategoryIcon(categoryType, false)
       const isClicked = f.get('rid') === clickedRestaurantId
 
-      const style = new Style({ image: normalIcon })
+      const style = new Style({
+        image: normalIcon,
+        zIndex: isClicked ? 9999 : 1
+      })
       style.getImage()?.setOpacity(isClicked ? 1 : 0.3)
       f.setStyle(style)
       f.set('markerState', MarkerState.NORMAL)

@@ -33,7 +33,7 @@
     border-radius: 4px;
     white-space: nowrap;
     user-select: none;
-    pointer-events: none;
+    cursor: default;
   }
 
   .map-header-tab,
